@@ -30,6 +30,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setFilters(myFilters);
         LinkedHashMap<String, String> filterMap = new LinkedHashMap<>();
         filterMap.put("/login", "anon");
+        filterMap.put("/server/**", "anon");
         filterMap.put("/logout", "anon");
         //忽略websocket
         filterMap.put("/websocket", "anon");

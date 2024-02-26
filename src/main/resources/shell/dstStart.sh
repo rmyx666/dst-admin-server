@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #jar包名称
-server_name="dst-admin"
+server_name="dst-server"
 
 status() {
   if [[ -n $(ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}') ]]; then
