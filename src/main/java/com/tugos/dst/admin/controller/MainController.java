@@ -52,6 +52,15 @@ public class MainController {
         Menu menu5 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(5).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
 
+        Menu menu6 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(6).
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu7.name")).type(1).url("/roomlist/index").build();
+
+        Menu menu7 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(7).
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu8.name")).type(1).url("/serverlist/index").build();
+
+        Menu menu8 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(8).
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/server/index").build();
+
         Map<String, Menu> treeMenu = new HashMap<>(16);
         treeMenu.put("0", menu);
         treeMenu.put("1", menu1);
@@ -59,12 +68,15 @@ public class MainController {
         treeMenu.put("3", menu3);
         treeMenu.put("4", menu4);
         treeMenu.put("5", menu5);
+        treeMenu.put("6", menu6);
+        treeMenu.put("7", menu7);
+        treeMenu.put("8", menu8);
 
         Locale locale = LocaleContextHolder.getLocale();
         if (Locale.CHINA.getLanguage().equals(locale.getLanguage())) {
-            Menu menu6 = Menu.builder().id(5L).icon("layui-icon layui-icon-about").sort(6).
+            Menu menu9 = Menu.builder().id(6L).icon("layui-icon layui-icon-about").sort(9).
                     children(new HashMap<>()).title("关于").type(1).url("/system/about").build();
-            treeMenu.put("6", menu6);
+            treeMenu.put("9", menu9);
         }
         model.addAttribute("treeMenu", treeMenu);
         return "main";
