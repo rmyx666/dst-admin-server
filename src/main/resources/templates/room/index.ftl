@@ -25,6 +25,9 @@
                         {{scope.row.nowPlayers}}/{{scope.row.maxPlayers}}
                     </template>
                 </el-table-column>
+                <el-table-column label="详情">
+                    <a href="/room/room_main">详情</a>
+                </el-table-column>
             </el-table>
         </div>
         <div style="width: 30%;  padding: 10px">
