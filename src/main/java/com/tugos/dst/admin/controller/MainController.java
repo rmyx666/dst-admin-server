@@ -59,7 +59,7 @@ public class MainController {
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu8.name")).type(1).url("/server/index").build();
 
         Menu menu8 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(8).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/serverinfo/index").build();
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/serverInfo/index").build();
 
         Map<String, Menu> treeMenu = new HashMap<>(16);
         treeMenu.put("0", menu);

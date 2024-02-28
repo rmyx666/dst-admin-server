@@ -15,7 +15,7 @@ public class RoomShowController {
 	@GetMapping("index")
 	@RequiresPermissions("index")
 	public String index() {
-		return "roomlist/index";
+		return "room/index";
 	}
 
 }
