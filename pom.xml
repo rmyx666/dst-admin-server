@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.tugos.dst</groupId>
-    <artifactId>dst-server</artifactId>
+    <artifactId>dst-admin</artifactId>
     <version>1.5.0</version>
     <name>dst-admin</name>
     <description>饥荒管理后台</description>

@@ -2,6 +2,7 @@ package com.tugos.dst.admin.utils;
 
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
@@ -60,16 +61,14 @@ public class DBUtils {
         try {
             if (StringUtils.isNotBlank(data)) {
                 DstConfigDataTable table = JSONUtil.toBean(data, DstConfigDataTable.class);
-                DstConfigData.clearAllData();
-                DstConfigData.SCHEDULE_BACKUP_MAP.putAll(table.getSCHEDULE_BACKUP_MAP());
-                DstConfigData.SCHEDULE_UPDATE_MAP.putAll(table.getSCHEDULE_UPDATE_MAP());
+
+                if (null!=DstConfigData.ROOM_INFO_MAP){
+                    DstConfigData.ROOM_INFO_MAP.values().forEach(DstConfigRoomData::clearAllData);
+                    BeanUtils.copyProperties(table.getRoomDataMap(),DstConfigData.ROOM_INFO_MAP);
+                }
+
                 BeanUtils.copyProperties(table.getUSER_INFO(),DstConfigData.USER_INFO);
-                DstConfigData.notStartMaster = table.getNotStartMaster();
-                DstConfigData.notStartCaves = table.getNotStartCaves();
-                DstConfigData.smartUpdate = table.getSmartUpdate();
-                DstConfigData.masterPort = table.getMasterPort();
-                DstConfigData.groundPort = table.getGroundPort();
-                DstConfigData.cavesPort = table.getCavesPort();
+
                 log.info("读取文件中的数据到缓存中成功：{}",data);
             }
         } catch (Exception e) {
@@ -84,15 +83,10 @@ public class DBUtils {
     public static void saveDataToFile() {
         try {
             DstConfigDataTable table = new DstConfigDataTable();
-            table.setSCHEDULE_BACKUP_MAP(DstConfigData.SCHEDULE_BACKUP_MAP);
-            table.setSCHEDULE_UPDATE_MAP(DstConfigData.SCHEDULE_UPDATE_MAP);
+
+            table.setRoomDataMap(DstConfigData.ROOM_INFO_MAP);
             table.setUSER_INFO(DstConfigData.USER_INFO);
-            table.setNotStartMaster(DstConfigData.notStartMaster);
-            table.setNotStartCaves(DstConfigData.notStartCaves);
-            table.setSmartUpdate(DstConfigData.smartUpdate);
-            table.setMasterPort(DstConfigData.masterPort);
-            table.setGroundPort(DstConfigData.groundPort);
-            table.setCavesPort(DstConfigData.cavesPort);
+
             String data = JSONUtil.toJsonStr(table);
             writeProjectData(DstConstant.DST_ADMIN_JSON, data);
         } catch (Exception e) {
