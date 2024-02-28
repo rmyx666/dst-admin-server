@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -230,6 +231,7 @@ public class CoreScheduleService {
             DstConfigData.USER_INFO.setUsername(dstUser);
             DstConfigData.USER_INFO.setPassword(dstPassword);
             DstConfigData.USER_INFO.setNickname(nickname);
+            DstConfigData.ROOM_INFO_MAP=new HashMap<>();
 //            DstConfigData.masterPort = masterPort;
 //            DstConfigData.groundPort = groundPort;
 //            DstConfigData.cavesPort = cavesPort;

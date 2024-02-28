@@ -3,10 +3,12 @@ package com.tugos.dst.admin.utils;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.io.*;
+import java.util.HashMap;
 
 /**
  * @author qinming
@@ -62,12 +64,20 @@ public class DBUtils {
             if (StringUtils.isNotBlank(data)) {
                 DstConfigDataTable table = JSONUtil.toBean(data, DstConfigDataTable.class);
 
-                if (null!=DstConfigData.ROOM_INFO_MAP){
-                    DstConfigData.ROOM_INFO_MAP.values().forEach(DstConfigRoomData::clearAllData);
-                    BeanUtils.copyProperties(table.getRoomDataMap(),DstConfigData.ROOM_INFO_MAP);
-                }
 
                 BeanUtils.copyProperties(table.getUSER_INFO(),DstConfigData.USER_INFO);
+
+                DstConfigData.ROOM_INFO_MAP=new HashMap<>();
+                if (null!=table.roomDataMap){
+                    DstConfigData.ROOM_INFO_MAP=table.roomDataMap;
+                }
+
+                //待修改问题 不知道为什么要清理时间配置
+                if (MapUtils.isNotEmpty(DstConfigData.ROOM_INFO_MAP)){
+                    DstConfigData.ROOM_INFO_MAP.values().forEach(DstConfigRoomData::clearAllData);
+                }
+
+
 
                 log.info("读取文件中的数据到缓存中成功：{}",data);
             }
