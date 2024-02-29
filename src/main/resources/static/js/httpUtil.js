@@ -1,3 +1,6 @@
+const OK = 0;
+const ERR = 50000;
+
 const http = axios.create({
     //超时时间 三分钟
     timeout: 1000 * 60 * 3,
@@ -15,7 +18,7 @@ http.interceptors.response.use(
                 //对返回成功码的直接返回数据
                 return Promise.resolve(response.data);
             } else {
-                return Promise.resolve(response);
+                return Promise.reject(response.data.message);
             }
         } else {
             return Promise.reject(response);
