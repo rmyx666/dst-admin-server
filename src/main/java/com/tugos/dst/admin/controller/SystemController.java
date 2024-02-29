@@ -1,7 +1,7 @@
 package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.service.SystemService;
+//import com.tugos.dst.admin.service.SystemService;
 import com.tugos.dst.admin.vo.GamePortVO;
 import com.tugos.dst.admin.vo.ScheduleVO;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/system")
 public class SystemController {
 
-    private SystemService systemService;
+//    private SystemService systemService;
 
     /**
      * 系统设置页
@@ -45,7 +45,7 @@ public class SystemController {
         if (Locale.CHINA.getLanguage().equals(locale.getLanguage())) {
             //中文语言
             return "system/guide";
-        }else {
+        } else {
             return "system/guide_en";
         }
     }
@@ -59,9 +59,11 @@ public class SystemController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<List<String>> getDstLog(@RequestParam(required = false, defaultValue = "0") Integer type,
-                                            @RequestParam(required = false, defaultValue = "100") Integer rowNum) {
+                                            @RequestParam(required = false, defaultValue = "100") Integer rowNum,
+                                            @RequestParam(required = true) String roomId) {
         log.info("拉取饥荒的日志：type={},rowNum={}", type, rowNum);
-        return ResultVO.data(systemService.getDstLog(type, rowNum));
+//        return ResultVO.data(systemService.getDstLog(type, rowNum, roomId));
+        return ResultVO.success();
     }
 
     /**
@@ -70,15 +72,17 @@ public class SystemController {
     @GetMapping("/getScheduleList")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<ScheduleVO> getScheduleList(){
-        return ResultVO.data(systemService.getScheduleList());
+    public ResultVO<ScheduleVO> getScheduleList(@RequestParam(required = true) String roomId) {
+//        return ResultVO.data(systemService.getScheduleList(roomId));
+        return ResultVO.success();
     }
 
     @PostMapping("/saveSchedule")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> saveSchedule(@RequestBody ScheduleVO vo){
-        systemService.saveSchedule(vo);
+    public ResultVO<String> saveSchedule(@RequestBody ScheduleVO vo,
+                                         @RequestParam(required = true) String roomId) {
+//        systemService.saveSchedule(vo, roomId);
         return ResultVO.success();
     }
 
@@ -86,31 +90,33 @@ public class SystemController {
     @GetMapping("/getVersion")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<Map<String,String>> getVersion(){
-        return ResultVO.data(systemService.getVersion());
+    public ResultVO<Map<String, String>> getVersion() {
+//        return ResultVO.data(systemService.getVersion());
+        return ResultVO.success();
     }
 
 
     @GetMapping("/getGamePort")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<GamePortVO> getGamePort(){
-        return ResultVO.data(systemService.getGamePort());
+    public ResultVO<GamePortVO> getGamePort(@RequestParam(required = true) String roomId) {
+//        return ResultVO.data(systemService.getGamePort(roomId));
+        return ResultVO.success();
     }
 
 
     @PostMapping("/saveGamePort")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<Map<String,String>> saveGamePort(@RequestBody GamePortVO gamePortVO){
-        systemService.saveGamePort(gamePortVO);
+    public ResultVO<Map<String, String>> saveGamePort(@RequestBody GamePortVO gamePortVO,
+                                                      @RequestParam(required = true) String roomId) {
+//        systemService.saveGamePort(gamePortVO, roomId);
         return ResultVO.success();
     }
 
 
-
-    @Autowired
-    public void setSystemService(SystemService systemService) {
-        this.systemService = systemService;
-    }
+//    @Autowired
+//    public void setSystemService(SystemService systemService) {
+//        this.systemService = systemService;
+//    }
 }

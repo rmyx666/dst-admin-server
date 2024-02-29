@@ -2,9 +2,9 @@ package com.tugos.dst.admin.controller;
 
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.service.BackupService;
-import com.tugos.dst.admin.service.HomeService;
-import com.tugos.dst.admin.service.ShellService;
+//import com.tugos.dst.admin.service.BackupService;
+//import com.tugos.dst.admin.service.HomeService;
+//import com.tugos.dst.admin.service.ShellService;
 import com.tugos.dst.admin.vo.DstServerInfoVO;
 import com.tugos.dst.admin.vo.GameArchiveVO;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +29,9 @@ import java.util.Map;
 @RequestMapping("/home")
 public class HomeController {
 
-    private HomeService homeService;
-    private ShellService shellService;
-    private BackupService backupService;
+//    private HomeService homeService;
+//    private ShellService shellService;
+//    private BackupService backupService;
 
 
     /**
@@ -58,70 +58,80 @@ public class HomeController {
     @GetMapping("/getSystemInfo")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<DstServerInfoVO> getSystemInfo() throws Exception {
+    public ResultVO<DstServerInfoVO> getSystemInfo(@RequestParam(required = true) String roomId) throws Exception {
         log.debug("获取服务器的信息");
-        return ResultVO.data(homeService.getSystemInfo());
+//        return ResultVO.data(homeService.getSystemInfo(roomId));
+        return ResultVO.success();
     }
 
     @GetMapping("/start")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> start(@RequestParam Integer type) throws Exception {
+    public ResultVO<String> start(@RequestParam Integer type,
+                                  @RequestParam(required = true) String roomId) throws Exception {
         log.info("启动服务器，type={}", type);
-        return homeService.start(type);
+//        return homeService.start(type,roomId);
+        return ResultVO.success();
     }
 
 
     @GetMapping("/stop")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> stop(@RequestParam Integer type) throws Exception {
+    public ResultVO<String> stop(@RequestParam Integer type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("停止服务器，type={}", type);
-        return homeService.stop(type);
+//        return homeService.stop(type,roomId);
+        return ResultVO.success();
     }
 
     @GetMapping("/updateGame")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> updateGame() {
+    public ResultVO<String> updateGame(@RequestParam(required = true) String roomId) {
         log.info("更新游戏");
-        return homeService.updateGame();
+//        return homeService.updateGame(roomId);
+        return ResultVO.success();
     }
+
 
 
     @GetMapping("/backup")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> backup(@RequestParam(required = false) String name) throws Exception {
+    public ResultVO<String> backup(@RequestParam(required = false) String name,
+                                   @RequestParam(required = true) String roomId) throws Exception {
         log.info("备份游戏,{}", name);
-        return backupService.backup(name);
+//        return backupService.backup(name,roomId);
+        return ResultVO.success();
     }
 
     @GetMapping("/restore")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> restore(@RequestParam String name) throws Exception {
+    public ResultVO<String> restore(@RequestParam String name,@RequestParam(required = true) String roomId) throws Exception {
         log.info("恢复存档,{}", name);
-        homeService.stopServer();
-        return backupService.restore(name);
+//        homeService.stopServer();
+//        return backupService.restore(name,roomId);
+        return ResultVO.success();
     }
 
     @GetMapping("/delRecord")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> delRecord() throws Exception {
+    public ResultVO<String> delRecord(@RequestParam(required = true) String roomId) throws Exception {
         log.info("清理游戏记录");
-        homeService.delRecord();
+//        homeService.delRecord(roomId);
         Thread.sleep(1000);
         return ResultVO.success();
+
     }
 
     @GetMapping("/sendBroadcast")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> sendBroadcast(@RequestParam String message) throws Exception {
+    public ResultVO<String> sendBroadcast(@RequestParam String message,@RequestParam(required = true) String roomId) throws Exception {
         log.info("发送公告：" + message);
-        shellService.sendBroadcast(message);
+//        shellService.sendBroadcast(message,roomId);
         Thread.sleep(1000);
         return ResultVO.success();
     }
@@ -129,101 +139,104 @@ public class HomeController {
     @GetMapping("/getPlayerList")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<List<String>> getPlayerList() throws Exception {
-        List<String> playerList = shellService.getPlayerList();
-        return ResultVO.data(playerList);
+    public ResultVO<List<String>> getPlayerList(@RequestParam(required = true) String roomId) throws Exception {
+//        List<String> playerList = shellService.getPlayerList(roomId);
+//        return ResultVO.data(playerList);
+        return ResultVO.success();
     }
 
     @GetMapping("/kickPlayer")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> kickPlayer(@RequestParam String userId) {
+    public ResultVO<String> kickPlayer(@RequestParam String userId,@RequestParam(required = true) String roomId) {
         log.info("踢出玩家：" + userId);
-        shellService.kickPlayer(userId);
+//        shellService.kickPlayer(userId,roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/rollback")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> rollback(@RequestParam Integer dayNum) {
+    public ResultVO<String> rollback(@RequestParam Integer dayNum,@RequestParam(required = true) String roomId) {
         log.info("回滚指定的天数：" + dayNum);
-        shellService.rollback(dayNum);
+//        shellService.rollback(dayNum,roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/regenerate")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> regenerate() {
+    public ResultVO<String> regenerate(@RequestParam(required = true) String roomId) {
         log.info("重置世界...");
-        shellService.regenerate();
+//        shellService.regenerate(roomId);
         return ResultVO.success();
     }
 
     @PostMapping("/masterConsole")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> masterConsole(@RequestBody Map<String, String> param) {
-        shellService.masterConsole(param.get("command"));
+    public ResultVO<String> masterConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
+//        shellService.masterConsole(param.get("command"),roomId);
         return ResultVO.success();
     }
 
     @PostMapping("/cavesConsole")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> cavesConsole(@RequestBody Map<String, String> param) {
-        shellService.cavesConsole(param.get("command"));
+    public ResultVO<String> cavesConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
+//        shellService.cavesConsole(param.get("command"),roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/playerOperate")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type) throws Exception {
+    public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("执行高级针对玩家的操作：type={},userId={}", type, userId);
-        return shellService.playerOperate(type, userId);
+//        return shellService.playerOperate(type, userId,roomId);
+        return ResultVO.success();
     }
 
     @GetMapping("/delMyDediServer")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> delMyDediServer() {
+    public ResultVO<String> delMyDediServer(@RequestParam(required = true) String roomId) {
         log.info("删除MyDediServer目录");
-        homeService.delMyDediServer();
+//        homeService.delMyDediServer(roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/delCavesRecord")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> onlyDelSave() {
+    public ResultVO<String> onlyDelSave(@RequestParam(required = true) String roomId) {
         log.info("删除地面存档记录");
-        homeService.onlyDelSave();
+//        homeService.onlyDelSave(roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/getGameArchive")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<GameArchiveVO> getGameArchive() throws Exception {
-        return ResultVO.data(homeService.getGameArchive());
+    public ResultVO<GameArchiveVO> getGameArchive(@RequestParam(required = true) String roomId) throws Exception {
+//        return ResultVO.data(homeService.getGameArchive(roomId));
+        return ResultVO.success();
     }
 
 
 
-    @Autowired
-    public void setHomeService(HomeService homeService) {
-        this.homeService = homeService;
-    }
-
-    @Autowired
-    public void setShellService(ShellService shellService) {
-        this.shellService = shellService;
-    }
-
-    @Autowired
-    public void setBackupService(BackupService backupService) {
-        this.backupService = backupService;
-    }
+//    @Autowired
+//    public void setHomeService(HomeService homeService) {
+//        this.homeService = homeService;
+//    }
+//
+//    @Autowired
+//    public void setShellService(ShellService shellService) {
+//        this.shellService = shellService;
+//    }
+//
+//    @Autowired
+//    public void setBackupService(BackupService backupService) {
+//        this.backupService = backupService;
+//    }
 }

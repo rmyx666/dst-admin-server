@@ -79,4 +79,45 @@ public class ModFileUtil {
     }
 
 
+
+    /**
+     * 读取dst目录下所有安装的mod的列表
+     *
+     * @param path mod文件地址
+     * @return 编号列表
+     */
+    public static List<String> readAllModConfigFile(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            String content = FileUtil.readString(path, StandardCharsets.UTF_8);
+            return findAllModNo(content);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+
+    /**
+     * mod匹配正则
+     */
+    public static final String ALLMOD_REGEX = "[0-9]+";
+
+    /**
+     * 获取modNo
+     *
+     * @param content mod信息
+     */
+    public static List<String> findAllModNo(String content) {
+        List<String> result = new ArrayList<>();
+        List<String> resultFindAll = ReUtil.findAll(ALLMOD_REGEX, content, 0, new ArrayList<>());
+        //匹配出来的结果："workshop-1651623054"
+        if (CollectionUtils.isNotEmpty(resultFindAll)) {
+            resultFindAll.forEach(e -> {
+                String modNo = e.replace("\"", "").split("-")[1];
+                result.add(modNo);
+            });
+        }
+        return result;
+    }
+
 }

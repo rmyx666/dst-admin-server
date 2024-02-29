@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.service.SettingService;
+//import com.tugos.dst.admin.service.SettingService;
 import com.tugos.dst.admin.vo.GameConfigVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +25,7 @@ import java.util.Locale;
 @Slf4j
 public class SettingController {
 
-    private SettingService settingService;
+//    private SettingService settingService;
 
     @GetMapping("/index")
     @RequiresAuthentication
@@ -43,22 +43,24 @@ public class SettingController {
     @PostMapping("/saveConfig")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> saveConfig(@RequestBody GameConfigVO model) throws Exception {
+    public ResultVO<String> saveConfig(@RequestBody GameConfigVO model,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存游戏配置，{}", StringUtils.deleteWhitespace(model.toString()));
-        return settingService.saveConfig(model);
+//        return settingService.saveConfig(model,roomId);
+        return ResultVO.success();
     }
 
     @GetMapping("/getConfig")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<GameConfigVO> getConfig() throws Exception {
+    public ResultVO<GameConfigVO> getConfig(@RequestParam(required = true) String roomId) throws Exception {
         log.info("读取游戏配置");
-        GameConfigVO config = settingService.getConfig();
-        return ResultVO.data(config);
+//        GameConfigVO config = settingService.getConfig(roomId);
+//        return ResultVO.data(config);
+        return ResultVO.success();
     }
 
-    @Autowired
-    public void setSettingService(SettingService settingService) {
-        this.settingService = settingService;
-    }
+//    @Autowired
+//    public void setSettingService(SettingService settingService) {
+//        this.settingService = settingService;
+//    }
 }

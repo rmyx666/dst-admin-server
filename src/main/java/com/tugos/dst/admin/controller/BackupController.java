@@ -5,7 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONUtil;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
-import com.tugos.dst.admin.service.BackupService;
+//import com.tugos.dst.admin.service.BackupService;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.vo.BackupFileVO;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class BackupController {
 
-    private BackupService backupService;
+//    private BackupService backupService;
 
 
     @GetMapping("/index")
@@ -40,37 +40,43 @@ public class BackupController {
     @GetMapping("/getBackupList")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<List<BackupFileVO>> getBackupList() {
-        return ResultVO.data(backupService.getBackupFileInfo());
+    public ResultVO<List<BackupFileVO>> getBackupList(@RequestParam(required = true) String roomId) {
+//        return ResultVO.data(backupService.getBackupFileInfo(roomId));
+        return ResultVO.success();
     }
 
     @GetMapping(value = "/download")
     @RequiresAuthentication
-    public void download(String fileName, HttpServletResponse response) throws Exception {
+    public void download(String fileName,
+                         @RequestParam(required = true) String roomId,
+                         HttpServletResponse response) throws Exception {
         log.info("下载文件：" + fileName);
-        backupService.download(fileName, response);
+//        backupService.download(fileName, roomId, response);
     }
 
     @PostMapping(value = "/upload")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> upload(@RequestParam("file") MultipartFile file) throws Exception {
+    public ResultVO<String> upload(@RequestParam("file") MultipartFile file,
+                                   @RequestParam(required = true) String roomId) throws Exception {
         String suffix = FileUtil.extName(file.getOriginalFilename());
         if (!DstConstant.BACKUP_FILE_EXTENSION_NON_POINT.equalsIgnoreCase(suffix) &&
                 !DstConstant.BACKUP_FILE_EXTENSION_NON_POINT_ZIP.equalsIgnoreCase(suffix)) {
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.backup.tarfile"));
         }
-        return backupService.upload(file);
+//        return backupService.upload(file,roomId);
+        return ResultVO.success();
     }
 
     @PostMapping("/deleteBackup")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> deleteBackup(@RequestBody String[] fileNames) {
+    public ResultVO<String> deleteBackup(@RequestBody String[] fileNames,
+                                         @RequestParam(required = true) String roomId) {
         log.info("删除备份:{}", JSONUtil.toJsonStr(fileNames));
         if (fileNames != null && fileNames.length > 0) {
             for (String s : fileNames) {
-                backupService.deleteBackup(s);
+//                backupService.deleteBackup(s,roomId);
             }
         }
         return ResultVO.success();
@@ -79,13 +85,16 @@ public class BackupController {
     @GetMapping("/rename")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> rename(String fileName, String newFileName) {
+    public ResultVO<String> rename(String fileName,
+                                   String newFileName,
+                                   @RequestParam(required = true) String roomId) {
         log.info("重命名备份:{},新文件名:{}", fileName, newFileName);
-        return backupService.rename(fileName, newFileName);
+//        return backupService.rename(fileName, newFileName,roomId);
+        return ResultVO.success();
     }
 
-    @Autowired
-    public void setBackupService(BackupService backupService) {
-        this.backupService = backupService;
-    }
+//    @Autowired
+//    public void setBackupService(BackupService backupService) {
+//        this.backupService = backupService;
+//    }
 }
