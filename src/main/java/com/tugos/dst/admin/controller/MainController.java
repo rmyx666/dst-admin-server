@@ -34,23 +34,23 @@ public class MainController {
         User user = new User();
         user.setNickname(I18nResourcesConfig.getMessage("main.user.name"));
         model.addAttribute("user", user);
-        Menu menu = Menu.builder().id(2L).icon("layui-icon layui-icon-home").sort(0).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu1.name")).type(1).url("/home/index").build();
-
-        Menu menu1 = Menu.builder().id(2L).icon("layui-icon layui-icon-set").sort(1).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu2.name")).type(1).url("/setting/index").build();
-
-        Menu menu2 = Menu.builder().id(4L).icon("layui-icon layui-icon-group").sort(2).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu3.name")).type(1).url("/player/index").build();
-
-        Menu menu3 = Menu.builder().id(2L).icon("layui-icon layui-icon-log").sort(3).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu4.name")).type(1).url("/backup/index").build();
-
-        Menu menu4 = Menu.builder().id(3L).icon("layui-icon layui-icon-survey").sort(4).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu5.name")).type(1).url("/system/guide").build();
-
-        Menu menu5 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(5).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
+//        Menu menu = Menu.builder().id(2L).icon("layui-icon layui-icon-home").sort(0).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu1.name")).type(1).url("/home/index").build();
+//
+//        Menu menu1 = Menu.builder().id(2L).icon("layui-icon layui-icon-set").sort(1).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu2.name")).type(1).url("/setting/index").build();
+//
+//        Menu menu2 = Menu.builder().id(4L).icon("layui-icon layui-icon-group").sort(2).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu3.name")).type(1).url("/player/index").build();
+//
+//        Menu menu3 = Menu.builder().id(2L).icon("layui-icon layui-icon-log").sort(3).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu4.name")).type(1).url("/backup/index").build();
+//
+//        Menu menu4 = Menu.builder().id(3L).icon("layui-icon layui-icon-survey").sort(4).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu5.name")).type(1).url("/system/guide").build();
+//
+//        Menu menu5 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(5).
+//                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
 
         Menu menu6 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(6).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu7.name")).type(1).url("/room/index").build();
@@ -59,28 +59,29 @@ public class MainController {
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu8.name")).type(1).url("/server/index").build();
 
         Menu menu8 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(8).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/serverinfo/index").build();
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/serverInfo/index").build();
 
         Map<String, Menu> treeMenu = new HashMap<>(16);
-        treeMenu.put("0", menu);
-        treeMenu.put("1", menu1);
-        treeMenu.put("2", menu2);
-        treeMenu.put("3", menu3);
-        treeMenu.put("4", menu4);
-        treeMenu.put("5", menu5);
-        treeMenu.put("6", menu6);
-        treeMenu.put("7", menu7);
-        treeMenu.put("8", menu8);
+//        treeMenu.put("0", menu);
+//        treeMenu.put("1", menu1);
+//        treeMenu.put("2", menu2);
+//        treeMenu.put("3", menu3);
+//        treeMenu.put("4", menu4);
+//        treeMenu.put("5", menu5);
+        treeMenu.put("1", menu6);
+        treeMenu.put("2", menu7);
+        treeMenu.put("3", menu8);
 
         Locale locale = LocaleContextHolder.getLocale();
         if (Locale.CHINA.getLanguage().equals(locale.getLanguage())) {
             Menu menu9 = Menu.builder().id(6L).icon("layui-icon layui-icon-about").sort(9).
                     children(new HashMap<>()).title("关于").type(1).url("/system/about").build();
-            treeMenu.put("9", menu9);
+            treeMenu.put("4", menu9);
         }
         model.addAttribute("treeMenu", treeMenu);
         return "main";
     }
+
 
 
     /**
