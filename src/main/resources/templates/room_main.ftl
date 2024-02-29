@@ -82,15 +82,10 @@
             </div>
             <!-- 导航区域 -->
             <ul class="layui-nav layui-nav-tree" lay-filter="layui-nav-side">
-                <li class="layui-nav-item">
-                    <a href="/" target="_parent">
-                        <span class="layui-nav-title">返回</span>
-                    </a>
-                </li>
                 <#if treeMenu2?exists>
                     <#list treeMenu2?keys as key>
                         <li class="layui-nav-item">
-                            <a href="javascript:;" lay-url="${treeMenu2[key].url}">
+                            <a href="javascript:" lay-url="${treeMenu2[key].url}">
                                 <i class="${treeMenu2[key].icon}"></i>
                                 <span class="layui-nav-title">${treeMenu2[key].title}</span>
                             </a>
@@ -98,7 +93,7 @@
                                 <#list treeMenu2[key].children?keys as child>
                                     <dl class="layui-nav-child">
                                         <dd>
-                                            <a href="javascript:;" lay-url="${treeMenu2[key].children[child].url}">
+                                            <a href="javascript:" lay-url="${treeMenu2[key].children[child].url}">
                                                 <span class="layui-nav-title">${treeMenu2[key].children[child].title}</span></a>
                                         </dd>
                                     </dl>
@@ -106,6 +101,12 @@
                             </#if>
                         </li>
                     </#list>
+                    <li class="layui-nav-item">
+                        <i class="fh.icon"></i>
+                        <a href="/" target="_parent">
+                            返回
+                        </a>
+                    </li>
                 </#if>
             </ul>
         </div>
