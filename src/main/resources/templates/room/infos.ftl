@@ -17,9 +17,9 @@
     <div style="display: flex;">
         <div style="width: 70%; padding: 10px">
             <el-table :data="serverList" style="width: 100%" stripe @row-click="rowClick">
-                <el-table-column label="服务器名称" prop="clusterName" ></el-table-column>
-                <el-table-column label="季节" prop="season" ></el-table-column>
-                <el-table-column label="mod数量" prop="totalModNum" ></el-table-column>
+                <el-table-column label="服务器名称" prop="clusterName"></el-table-column>
+                <el-table-column label="季节" prop="season"></el-table-column>
+                <el-table-column label="mod数量" prop="totalModNum"></el-table-column>
                 <el-table-column label="在线情况">
                     <template slot-scope="scope">
                         {{scope.row.nowPlayers}}/{{scope.row.maxPlayers}}
@@ -38,7 +38,8 @@
                 <el-descriptions-item label="mod数量">{{server.totalModNum}}</el-descriptions-item>
                 <el-descriptions-item label="在线情况">{{server.nowPlayers}}/{{server.maxPlayers}}</el-descriptions-item>
                 <el-descriptions-item label="在线玩家">
-                    <el-empty v-if="server.playerList == null || server.playerList.length === 0" description="当前没有玩家在线"></el-empty>
+                    <el-empty v-if="server.playerList == null || server.playerList.length === 0"
+                              description="当前没有玩家在线"></el-empty>
                     <ul>
                         <li v-for="(player, playerIndex) in server.playerList" :key="playerIndex">{{ player }}</li>
                     </ul>
