@@ -22,17 +22,17 @@ public class RoomShowController {
 	@Autowired
 	RoomService roomService;
 
-	@GetMapping("infos")
+	@GetMapping("index")
 	@RequiresPermissions("index")
 	public String index() {
-		return "room/infos";
+		return "/room/index";
 	}
 
 
 	@PostMapping("/save")
 	@ResponseBody
-    @RequiresAuthentication
-    public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
+	@RequiresAuthentication
+	public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
         return roomService.saveRoomInfos(roomInfo);
     }
 
