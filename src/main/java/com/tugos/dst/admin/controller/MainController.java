@@ -53,7 +53,7 @@ public class MainController {
 //                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
 
         Menu menu6 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(6).
-                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu7.name")).type(1).url("/room/index").build();
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu7.name")).type(1).url("/room/infos").build();
 
         Menu menu7 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(7).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu8.name")).type(1).url("/server/index").build();
@@ -105,7 +105,6 @@ public class MainController {
 
         Menu menu5 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(5).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
-
 
         Map<String, Menu> treeMenu2 = new HashMap<>(16);
         treeMenu2.put("0", menu);

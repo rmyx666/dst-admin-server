@@ -44,8 +44,6 @@ layui.use(['element', 'form', 'layer', 'upload'], function () {
             if (bootLay.length === 0) {
                 var title = item.attr("lay-icon") === 'true' ? item.html()
                     : item.children(".layui-nav-title").text();
-                window.alert(url+"11111111");
-
                 var iframeUrl = (window.location.pathname + url).replace('/room_main','');
                 element.tabAdd('iframe-tabs', {
                     title: title
