@@ -26,7 +26,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="详情">
-                    <a href="/room/room_main">详情</a>
+                    <a href="/room_main" target="_parent">详情</a>
                 </el-table-column>
             </el-table>
         </div>
