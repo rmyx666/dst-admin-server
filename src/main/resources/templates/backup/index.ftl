@@ -24,7 +24,7 @@
             <el-card>
                 <el-upload
                         class="upload-demo"
-                        action="/backup/upload"
+                        :action="'/backup/upload?roomId=' + roomId"
                         :before-remove="beforeRemove"
                         :on-success="handleSuccess"
                         multiple
@@ -63,6 +63,7 @@
     new Vue({
         el: '#backup_index_app',
         data: {
+            roomId: null,
             tableData: [],
             drawer: false,
             fileList: [],
@@ -70,6 +71,7 @@
             selectData: [],
         },
         created() {
+            this.roomId = RoomUtil.getRoomId()
             this.getBackupList();
         },
         methods: {
@@ -77,7 +79,7 @@
                 this.selectData = val;
             },
             getBackupList() {
-                get("/backup/getBackupList").then((data) => {
+                get("/backup/getBackupList?roomId=" + this.roomId).then((data) => {
                     this.tableData = data ? data : [];
                     if (this.tableData.length > 0) {
                         let total = 0;
@@ -93,7 +95,7 @@
                     confirmButtonText: '<@spring.message code="home.pane1.card1.dst.confirm"/>',
                     cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                 }).then(({value}) => {
-                    get("/backup/rename", {fileName: val.fileName,newFileName:value}).then((data) => {
+                    get("/backup/rename?roomId=" + this.roomId, {fileName: val.fileName,newFileName:value}).then((data) => {
                         this.getBackupList();
                         if (data){
                             this.warningMessage(data.message);
@@ -106,7 +108,7 @@
                 });
             },
             download(val){
-                window.location.href="/backup/download?fileName="+val.fileName;
+                window.location.href="/backup/download?fileName="+val.fileName + "&roomId=" + this.roomId;
             },
             handleClose(done) {
                 this.$confirm('<@spring.message code="backup.js.close.window"/>？')
@@ -135,7 +137,7 @@
                     cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                     type: 'warning'
                 }).then(() => {
-                    post("/backup/deleteBackup", fileNames).then((data) => {
+                    post("/backup/deleteBackup?roomId=" + this.roomId, fileNames).then((data) => {
                         this.successMessage('<@spring.message code="backup.js.del.success"/>');
                         this.getBackupList();
                     })

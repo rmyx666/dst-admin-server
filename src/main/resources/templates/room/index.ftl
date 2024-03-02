@@ -23,7 +23,8 @@
         </el-table-column>
         <el-table-column label="详情">
             <template slot-scope="scope">
-                <a :href="'/room_main?roomId=' + scope.row.roomId" target="_parent">详情</a>
+                <el-button @click="goDetail(scope.row)">详情</el-button>
+<#--                <a :href="'/room_main?roomId=' + scope.row.roomId" target="_parent">详情</a>-->
             </template>
         </el-table-column>
     </el-table>
@@ -143,6 +144,13 @@
                         })
                         .catch((msg) => { this.$message.error(msg) })
                 })
+            },
+            goDetail(room) {
+                RoomUtil.saveRoomId(room.roomId)
+                const dom = document.createElement('a')
+                dom.href = '/room_main'
+                dom.target = '_parent'
+                dom.click()
             }
         }
     });

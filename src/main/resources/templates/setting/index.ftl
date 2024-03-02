@@ -208,6 +208,7 @@
     new Vue({
         el: '#setting_index_app',
         data: {
+            roomId: null,
             active: 0,
             max: 32,
             drawer: false,
@@ -631,6 +632,7 @@
             size:'medium'
         },
         created() {
+            this.roomId = RoomUtil.getRoomId()
             //拉取服务器信息
             this.getConfig();
             this.getLabelPosition()
@@ -678,7 +680,7 @@
             },
             save(type) {
                 this.model.type = type;
-                post("/setting/saveConfig", this.model).then((data) => {
+                post("/setting/saveConfig?roomId=" + this.roomId, this.model).then((data) => {
                     if (data) {
                         this.warningMessage(data.message);
                     } else {
@@ -689,7 +691,7 @@
                 })
             },
             getConfig() {
-                get("/setting/getConfig").then((data) => {
+                get("/setting/getConfig?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.model = data;
                     }

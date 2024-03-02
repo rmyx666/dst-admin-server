@@ -84,22 +84,24 @@
     new Vue({
         el: '#player_index',
         data: {
+            roomId: null,
             activeName: 'first',
             adminList:[],
             blackList:[],
             playerList:[],
         },
         created() {
+            this.roomId = RoomUtil.getRoomId()
             this.init();
         },
         methods: {
             init(){
-                get("/player/getDstAdminList").then((data) => {
+                get("/player/getDstAdminList?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.adminList = data;
                     }
                 })
-                get("/player/getDstBlacklist").then((data) => {
+                get("/player/getDstBlacklist?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.blackList = data;
                     }
@@ -126,7 +128,7 @@
                 let param = {};
                 param.adminList = this.adminList;
                 param.blackList = this.blackList;
-                post("/player/saveAdminAndBlackList", param).then((data) => {
+                post("/player/saveAdminAndBlackList?roomId=" + this.roomId, param).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});
                     } else {
@@ -142,7 +144,8 @@
                 })
             },
             getPlayerList(){
-                get("/home/getPlayerList").then((data) => {
+                const roomId = RoomUtil.getRoomId()
+                get("/home/getPlayerList?roomId=" + roomId).then((data) => {
                     if (data) {
                         this.playerList = data;
                     }

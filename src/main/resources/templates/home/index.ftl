@@ -313,6 +313,7 @@
     let vue = new Vue({
         el: '#app',
         data: {
+            roomId: null,
             loading: false,
             runStatus: false,
             masterStatus: false,//地面状态
@@ -356,6 +357,7 @@
             size:'medium'
         },
         created() {
+            this.roomId = RoomUtil.getRoomId()
             //拉取服务器信息
             this.getSystemInfo();
             this.timer = setInterval(function () {
@@ -379,7 +381,7 @@
             controlDst(status, type) {
                 if (status) {
                     this.loading = true;
-                    get("/home/start", {type: type}).then((data) => {
+                    get("/home/start?roomId=" + this.roomId, {type: type}).then((data) => {
                         this.loading = false;
                         if (data) {
                             this.warningMessage(data.message);
@@ -388,7 +390,7 @@
                     })
                 } else {
                     this.loading = true;
-                    get("/home/stop", {type: type}).then((data) => {
+                    get("/home/stop?roomId=" + this.roomId, {type: type}).then((data) => {
                         this.loading = false;
                         if (data) {
                             this.warningMessage(data.message);
@@ -401,7 +403,7 @@
             clearGame() {
                 this.visible = false;//隐藏
                 this.loading = true;
-                get("/home/delRecord").then((data) => {
+                get("/home/delRecord?roomId=" + this.roomId).then((data) => {
                     this.loading = false;
                     this.getSystemInfo();
                     this.successMessage('<@spring.message code="home.js.clear.success"/>');
@@ -411,7 +413,7 @@
             updateGame() {
                 this.visible2 = false;//隐藏
                 this.loading = true;
-                get("/home/updateGame").then((data) => {
+                get("/home/updateGame?roomId=" + this.roomId).then((data) => {
                     this.loading = false;
                     if (data) {
                         this.warningMessage(data.message);
@@ -422,7 +424,7 @@
             //备份
             backupGame() {
                 this.loading = true;
-                get("/home/backup").then((data) => {
+                get("/home/backup?roomId=" + this.roomId).then((data) => {
                     this.loading = false;
                     if (data) {
                         this.warningMessage(data.message);
@@ -435,7 +437,7 @@
                 this.visible1 = false;//隐藏
                 if (this.backupName) {
                     this.loading = true;
-                    get("/home/restore", {name: this.backupName}).then((data) => {
+                    get("/home/restore?roomId=" + this.roomId, {name: this.backupName}).then((data) => {
                         this.loading = false;
                         if (data) {
                             this.warningMessage(data.message);
@@ -453,7 +455,7 @@
             delCavesRecord() {
                 this.visible6 = false;//隐藏
                 this.loading = true;
-                get("/home/delCavesRecord").then((data) => {
+                get("/home/delCavesRecord?roomId=" + this.roomId).then((data) => {
                     this.loading = false;
                     if (data) {
                         this.warningMessage(data.message);
@@ -466,7 +468,7 @@
             delMyDediServer() {
                 this.visible7 = false;//隐藏
                 this.loading = true;
-                get("/home/delMyDediServer").then((data) => {
+                get("/home/delMyDediServer?roomId=" + this.roomId).then((data) => {
                     this.loading = false;
                     if (data) {
                         this.warningMessage(data.message);
@@ -477,7 +479,7 @@
             },
             sendBroadcast(){
                 if (this.broadcastContent) {
-                    get("/home/sendBroadcast", {message: this.broadcastContent}).then((data) => {
+                    get("/home/sendBroadcast?roomId=" + this.roomId, {message: this.broadcastContent}).then((data) => {
                         if (data) {
                             this.warningMessage(data.message);
                         } else {
@@ -492,7 +494,7 @@
                 }
             },
             getPlayerList(){
-                get("/home/getPlayerList").then((data) => {
+                get("/home/getPlayerList?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.playerList = data;
                     }
@@ -501,7 +503,7 @@
             kickPlayer(){
                 this.visible3 = false;
                 if (this.kickUserId) {
-                    get("/home/kickPlayer", {userId: this.kickUserId}).then((data) => {
+                    get("/home/kickPlayer?roomId=" + this.roomId, {userId: this.kickUserId}).then((data) => {
                         if (data) {
                             this.warningMessage(data.message);
                         } else {
@@ -518,7 +520,7 @@
             //踢出玩家
             kickPlayer2(player) {
                 let split = player.split(" ");
-                get("/home/kickPlayer", {userId: split[0]}).then((data) => {
+                get("/home/kickPlayer?roomId=" + this.roomId, {userId: split[0]}).then((data) => {
                     if (data) {
                         this.warningMessage(data.message);
                     } else {
@@ -532,7 +534,7 @@
                 let split = player.split(" ");
                 this.loading = true;
                 let params = {userId: split[0], type: type};
-                get("/home/playerOperate", params).then((data) => {
+                get("/home/playerOperate?roomId=" + this.roomId, params).then((data) => {
                     this.loading = false;
                     if (data) {
                         this.warningMessage(data.message);
@@ -545,7 +547,7 @@
             //重置世界
             regenerate(){
                 this.visible5 = false;
-                get("/home/regenerate").then((data) => {
+                get("/home/regenerate?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.warningMessage(data.message);
                     } else {
@@ -555,7 +557,7 @@
             },
             //回滚世界
             rollback(day){
-                get("/home/rollback", {dayNum: day}).then((data) => {
+                get("/home/rollback?roomId=" + this.roomId, {dayNum: day}).then((data) => {
                     if (data) {
                         this.warningMessage(data.message);
                     } else {
@@ -565,7 +567,7 @@
             },
             masterConsole(){
                 if (this.masterCommand) {
-                    post("/home/masterConsole", {command: this.masterCommand}).then((data) => {
+                    post("/home/masterConsole?roomId=" + this.roomId, {command: this.masterCommand}).then((data) => {
                         if (data) {
                             this.warningMessage(data.message);
                         }else {
@@ -581,7 +583,7 @@
             },
             cavesConsole(){
                 if (this.cavesCommand) {
-                    post("/home/cavesConsole", {command: this.cavesCommand}).then((data) => {
+                    post("/home/cavesConsole?roomId=" + this.roomId, {command: this.cavesCommand}).then((data) => {
                         if (data) {
                             this.warningMessage(data.message);
                         }else {
@@ -621,14 +623,14 @@
             },
             //存档信息
             getGameArchive(){
-                get("/home/getGameArchive").then((data) => {
+                get("/home/getGameArchive?roomId=" + this.roomId).then((data) => {
                     if (data){
                         this.gameArchive = data;
                     }
                 })
             },
             getSystemInfo() {
-                get("/home/getSystemInfo").then((data) => {
+                get("/home/getSystemInfo?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.menInfo = data.mem.usage;
                         this.cpuInfo = data.cpu.used;
