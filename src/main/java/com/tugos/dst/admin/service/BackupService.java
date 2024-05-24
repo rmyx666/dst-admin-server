@@ -57,7 +57,7 @@ public class BackupService {
      */
     public List<BackupFileVO> getBackupFileInfo(String roomId) {
         List<BackupFileVO> result = new ArrayList<>();
-        String backupPath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
         List<String> allFileList = FileUtils.getFiles(backupPath);
         //过滤出所有备份文件压缩包 包括zip，tar
         List<String> backupFileList = new ArrayList<>();
@@ -115,7 +115,7 @@ public class BackupService {
      * @param name 备份的文件名称全称
      */
     public ResultVO<String> restore(String name, String roomId) {
-        if (!this.checkBackupIsExists(name)) {
+        if (!this.checkBackupIsExists(name, roomId)) {
             //未安装dst
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error2") + name);
         }
@@ -148,10 +148,10 @@ public class BackupService {
      * @param name 文件名称 全称
      * @return true 存在
      */
-    private boolean checkBackupIsExists(String name) {
+    private boolean checkBackupIsExists(String name, String roomId) {
         boolean flag = false;
         if (StringUtils.isNotBlank(name)) {
-            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
+            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
             File file = new File(path);
             flag = file.exists();
         }
@@ -197,7 +197,7 @@ public class BackupService {
      * @return 结果
      */
     public ResultVO<String> backup(String name, String roomId) {
-        if (!this.checkGameFileIsExists()) {
+        if (!this.checkGameFileIsExists(roomId)) {
             //未安装dst
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error"));
         }
@@ -216,7 +216,7 @@ public class BackupService {
             String serverName = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.room");
             String playDate = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.playDay");
             String season = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.season");
-            String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
+            String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
             File file = new File(filePath);
             if (file.exists()) {
                 List<String> list = FileUtil.readLines(filePath, StandardCharsets.UTF_8);
@@ -232,14 +232,14 @@ public class BackupService {
                 }
             }
             BackupService backupService = new BackupService();
-            GameSnapshotVO gameSnapshot = backupService.getGameSnapshot();
+            GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomId);
             if (gameSnapshot != null) {
                 playDate = gameSnapshot.getPlayDay() + I18nResourcesConfig.getMessage("tip.game.Archive.days");
                 season = gameSnapshot.getSeasonChinese();
             }
             fileName = String.format("%s_%s_%s_%s.zip", DateUtil.format(new Date(), "yyyyMMddHHmmss"), serverName, playDate, season);
         }
-        createBackup(fileName);
+        createBackup(fileName, roomId);
         return ResultVO.success();
     }
 
@@ -248,8 +248,8 @@ public class BackupService {
      *
      * @return true 存在
      */
-    private boolean checkGameFileIsExists() {
-        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CONFG_PATH;
+    private boolean checkGameFileIsExists(String roomId) {
+        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
         File file = new File(path);
         return file.exists();
     }
@@ -257,10 +257,10 @@ public class BackupService {
     /**
      * 备份游戏存档
      */
-    public void createBackup(String fileName) {
+    public void createBackup(String fileName, String roomId) {
         fileName = fileNameFilter(fileName);
-        String basePath = DstConstant.ROOT_PATH + "/.klei/DoNotStarveTogether/";
-        String scrPath = basePath + "MyDediServer";
+        String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH;
+        String scrPath = basePath + roomId;
         ZipUtil.zip(scrPath, basePath + fileName, true);
     }
 
@@ -276,10 +276,10 @@ public class BackupService {
     /**
      * 获取快照信息
      */
-    public GameSnapshotVO getGameSnapshot() {
+    public GameSnapshotVO getGameSnapshot(String roomId) {
         GameSnapshotVO gameSnapshotVO = null;
         try {
-            String snapshot = getSnapshot();
+            String snapshot = getSnapshot(roomId);
             log.info("快照信息：{}", snapshot);
             if (StringUtils.isNotBlank(snapshot)) {
                 gameSnapshotVO = parseSnapshot(snapshot);
@@ -293,8 +293,8 @@ public class BackupService {
     /**
      * 获取存档中的快照元信息
      */
-    private static String getSnapshot() {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_SESSION;
+    private static String getSnapshot(String roomId) {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_SESSION;
         File sessionFile = new File(filePath);
         List<File> targetFileList = new ArrayList<>();
         if (sessionFile.exists()) {
@@ -393,12 +393,12 @@ public class BackupService {
      * @param fileName 备份的游戏名称
      */
     public void revertZIPBackup(String fileName, String roomId) {
-        String basePath = DstConstant.ROOT_PATH + "/.klei/DoNotStarveTogether/";
-        String outFileDir = (basePath + "MyDediServer").replace("MyDediServer", "MyDediServer_" + roomId);
+        String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH;
+        String outFileDir = basePath + roomId;
         FileUtil.del(outFileDir);
         FileUtil.mkdir(outFileDir);
-        String zipPath = basePath + fileName;
-        String tmpPath = basePath + "tmp";
+        String zipPath = basePath + roomId + DstConstant.SINGLE_SLASH + fileName;
+        String tmpPath = basePath + roomId + DstConstant.SINGLE_SLASH + "tmp";
         File file = null;
         boolean unzipFail = false;
         try {
@@ -456,8 +456,8 @@ public class BackupService {
         String extName = FileUtil.extName(fileName);
         if (StringUtils.isNotBlank(fileName) && !fileName.contains(DstConstant.BACKUP_ERROR_PATH) && StringUtils.equalsAnyIgnoreCase(extName,
                 DstConstant.BACKUP_FILE_EXTENSION_NON_POINT, DstConstant.BACKUP_FILE_EXTENSION_NON_POINT_ZIP)) {
-            String filepath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_DOC_PATH + "/" + roomId;
-            filepath += "/" + fileName;
+            String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+            filepath += DstConstant.SINGLE_SLASH + fileName;
             File file = new File(filepath);
             if (file.exists()) {
                 //文件存在
@@ -491,7 +491,7 @@ public class BackupService {
      * 上传存档
      */
     public ResultVO<String> upload(MultipartFile file, String roomId) throws Exception {
-        String filepath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_DOC_PATH + "/" + roomId + "/" + file.getOriginalFilename();
+        String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + file.getOriginalFilename();
         File dest = new File(filepath);
         if (!dest.exists()) {
             file.transferTo(dest);

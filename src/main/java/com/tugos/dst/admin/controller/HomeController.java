@@ -2,9 +2,9 @@ package com.tugos.dst.admin.controller;
 
 
 import com.tugos.dst.admin.common.ResultVO;
-//import com.tugos.dst.admin.service.BackupService;
-//import com.tugos.dst.admin.service.HomeService;
-//import com.tugos.dst.admin.service.ShellService;
+import com.tugos.dst.admin.service.BackupService;
+import com.tugos.dst.admin.service.HomeService;
+import com.tugos.dst.admin.service.ShellService;
 import com.tugos.dst.admin.vo.DstServerInfoVO;
 import com.tugos.dst.admin.vo.GameArchiveVO;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class HomeController {
     public ResultVO<DstServerInfoVO> getSystemInfo(@RequestParam(required = true) String roomId) throws Exception {
         log.debug("获取服务器的信息");
         return ResultVO.data(homeService.getSystemInfo(roomId));
-        return ResultVO.success();
+
     }
 
     @GetMapping("/start")
@@ -71,7 +71,7 @@ public class HomeController {
                                   @RequestParam(required = true) String roomId) throws Exception {
         log.info("启动服务器，type={}", type);
         return homeService.start(type,roomId);
-        return ResultVO.success();
+
     }
 
 
@@ -81,7 +81,7 @@ public class HomeController {
     public ResultVO<String> stop(@RequestParam Integer type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("停止服务器，type={}", type);
         return homeService.stop(type,roomId);
-        return ResultVO.success();
+
     }
 
     @GetMapping("/updateGame")
@@ -90,7 +90,7 @@ public class HomeController {
     public ResultVO<String> updateGame(@RequestParam(required = true) String roomId) {
         log.info("更新游戏");
         return homeService.updateGame(roomId);
-        return ResultVO.success();
+
     }
 
 
@@ -102,7 +102,7 @@ public class HomeController {
                                    @RequestParam(required = true) String roomId) throws Exception {
         log.info("备份游戏,{}", name);
         return backupService.backup(name,roomId);
-        return ResultVO.success();
+
     }
 
     @GetMapping("/restore")
@@ -142,7 +142,7 @@ public class HomeController {
     public ResultVO<List<String>> getPlayerList(@RequestParam(required = true) String roomId) throws Exception {
         List<String> playerList = shellService.getPlayerList(roomId);
         return ResultVO.data(playerList);
-        return ResultVO.success();
+
     }
 
     @GetMapping("/kickPlayer")
@@ -194,7 +194,7 @@ public class HomeController {
     public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("执行高级针对玩家的操作：type={},userId={}", type, userId);
         return shellService.playerOperate(type, userId,roomId);
-        return ResultVO.success();
+
     }
 
     @GetMapping("/delMyDediServer")
@@ -220,7 +220,7 @@ public class HomeController {
     @RequiresAuthentication
     public ResultVO<GameArchiveVO> getGameArchive(@RequestParam(required = true) String roomId) throws Exception {
         return ResultVO.data(homeService.getGameArchive(roomId));
-        return ResultVO.success();
+
     }
 
 

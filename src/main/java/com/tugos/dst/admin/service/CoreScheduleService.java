@@ -10,6 +10,7 @@ import com.tugos.dst.admin.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,10 +27,10 @@ import java.util.concurrent.TimeUnit;
  * @author qinming
  * @date 2020-05-21
  * <p>
- *     核心定时器服务，定时执行更新，备份任务
- *     启动释放管理脚本
- *     启动读取存储的数据
- *     定时将缓存写入文件
+ * 核心定时器服务，定时执行更新，备份任务
+ * 启动释放管理脚本
+ * 启动读取存储的数据
+ * 定时将缓存写入文件
  * </p>
  */
 @Service
@@ -65,6 +66,9 @@ public class CoreScheduleService {
      */
     public int upper = 3 * 60 * 1000;
 
+    @Autowired
+    EhcacheDataService ehcacheDataService;
+
     /**
      * 每天更新清理一下定时任务的执行次数
      */
@@ -72,7 +76,7 @@ public class CoreScheduleService {
     public void resetScheduleMap() {
 
 
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : DstConfigData.ROOM_INFO_MAP.entrySet()) {
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
             Set<String> backupKeySet = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             for (String key : backupKeySet) {
                 roomInfo.getValue().SCHEDULE_BACKUP_MAP.put(key, 0);
@@ -91,7 +95,7 @@ public class CoreScheduleService {
      */
     @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
     public void smartUpdateGame() {
-        Boolean smartUpdate = DstConfigData.smartUpdate;
+        Boolean smartUpdate = ehcacheDataService.getSmartUpdate();
         if (smartUpdate != null && smartUpdate) {
             String steamVersion = DstVersionUtils.getSteamVersionV3();
             String localVersion = DstVersionUtils.getLocalVersion();
@@ -100,7 +104,7 @@ public class CoreScheduleService {
                 long lv = Long.parseLong(localVersion);
                 if (sv > lv) {
                     log.info("智能更新进行...");
-                    for (Map.Entry<String, DstConfigRoomData> roomInfo : DstConfigData.ROOM_INFO_MAP.entrySet()) {
+                    for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
                         onlyUpdateGame(roomInfo.getValue());
                     }
 
@@ -114,7 +118,7 @@ public class CoreScheduleService {
     /**
      * 定时任务每5秒执行一次,第一次延长10秒
      */
-    @Scheduled(fixedDelay = 5*1000, initialDelay = 10*1000)
+    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 10 * 1000)
     public void scheduleExe() {
         this.backupGame();
         this.updateGame();
@@ -126,10 +130,10 @@ public class CoreScheduleService {
     /**
      * 更新游戏任务
      */
-    public void updateGame(){
+    public void updateGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : DstConfigData.ROOM_INFO_MAP.entrySet()) {
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
             Set<String> updateListTime = roomInfo.getValue().SCHEDULE_UPDATE_MAP.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
                 updateListTime.forEach(time -> {
@@ -152,28 +156,28 @@ public class CoreScheduleService {
 
     }
 
-    private void onlyUpdateGame(DstConfigRoomData roomInfo){
-        shellService.sendBroadcast("服务器将马上进行更新，你将与服务器断开连接(The server will be updated immediately)");
-        shellService.sendBroadcast("请稍后再进入房间(Please enter the room later)");
+    private void onlyUpdateGame(DstConfigRoomData roomInfo) {
+        shellService.sendBroadcast("服务器将马上进行更新，你将与服务器断开连接(The server will be updated immediately)", roomInfo.roomId);
+        shellService.sendBroadcast("请稍后再进入房间(Please enter the room later)", roomInfo.roomId);
         try {
             TimeUnit.SECONDS.sleep(20);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        homeService.updateGame();
+        homeService.updateGame(roomInfo.roomId);
         boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
         boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
         if (!notStartMaster && !notStartCaves) {
             //全启动
-            homeService.start(StartTypeEnum.START_ALL.type);
+            homeService.start(StartTypeEnum.START_ALL.type,roomInfo.roomId);
         }
         if (notStartMaster && !notStartCaves) {
             //不启动地面
-            homeService.start(StartTypeEnum.START_CAVES.type);
+            homeService.start(StartTypeEnum.START_CAVES.type,roomInfo.roomId);
         }
         if (!notStartMaster && notStartCaves) {
             //不启动洞穴
-            homeService.start(StartTypeEnum.START_MASTER.type);
+            homeService.start(StartTypeEnum.START_MASTER.type,roomInfo.roomId);
         }
         if (notStartMaster && notStartCaves) {
             //都不启动
@@ -184,10 +188,10 @@ public class CoreScheduleService {
     /**
      * 备份游戏任务
      */
-    public void backupGame(){
+    public void backupGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : DstConfigData.ROOM_INFO_MAP.entrySet()) {
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
             Set<String> backupListTime = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             //执行备份任务
             if (CollectionUtils.isNotEmpty(backupListTime)) {
@@ -198,10 +202,10 @@ public class CoreScheduleService {
                         long execTime = parse.getTime();
                         long currentDateTime = currentDate.getTime();
                         long subTime = currentDateTime - execTime;
-                        if (Range.open(0, upper).contains((int) subTime)){
+                        if (Range.open(0, upper).contains((int) subTime)) {
                             log.info("定时备份游戏");
-                            backupService.backup(null);
-                            roomInfo.getValue().SCHEDULE_BACKUP_MAP.put(time,1);
+                            backupService.backup(null,roomInfo.getValue().getRoomId());
+                            roomInfo.getValue().SCHEDULE_BACKUP_MAP.put(time, 1);
                         }
                     }
                 });
@@ -220,12 +224,12 @@ public class CoreScheduleService {
     public void initSystem() throws Exception {
 //        String data = DBUtils.readProjectData(DstConstant.DST_ADMIN_JSON);
 //        if (StringUtils.isNotBlank(data)) {
-            //本地有数据读取到缓存中
+        //本地有数据读取到缓存中
 //            DBUtils.readDataToCache(data);
 //        } else {
-            //配置每天6点更新游戏
+        //配置每天6点更新游戏
 //            DstConfigData.SCHEDULE_UPDATE_MAP.put("06:00:00", 0);
-            //每天6点，18点备份
+        //每天6点，18点备份
 //            DstConfigData.SCHEDULE_BACKUP_MAP.put("06:00:00", 0);
 //            DstConfigData.SCHEDULE_BACKUP_MAP.put("18:00:00", 0);
 //            DstConfigData.USER_INFO.setUsername(dstUser);

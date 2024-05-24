@@ -65,7 +65,7 @@ public class BackupController {
                 !DstConstant.BACKUP_FILE_EXTENSION_NON_POINT_ZIP.equalsIgnoreCase(suffix)) {
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.backup.tarfile"));
         }
-        return backupService.upload(file,roomId);
+        return backupService.upload(file, roomId);
 
     }
 
@@ -77,7 +77,7 @@ public class BackupController {
         log.info("删除备份:{}", JSONUtil.toJsonStr(fileNames));
         if (fileNames != null && fileNames.length > 0) {
             for (String s : fileNames) {
-                backupService.deleteBackup(s,roomId);
+                backupService.deleteBackup(s, roomId);
             }
         }
         return ResultVO.success();
@@ -90,7 +90,7 @@ public class BackupController {
                                    String newFileName,
                                    @RequestParam(required = true) String roomId) {
         log.info("重命名备份:{},新文件名:{}", fileName, newFileName);
-        return backupService.rename(fileName, newFileName,roomId);
+        return backupService.rename(fileName, newFileName, roomId);
 
     }
 
