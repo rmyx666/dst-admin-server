@@ -5,7 +5,6 @@ import cn.hutool.core.io.FileUtil;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.enums.SettingTypeEnum;
 import com.tugos.dst.admin.enums.StartTypeEnum;
-import com.tugos.dst.admin.utils.DstConfigData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.StrUtils;
@@ -158,18 +157,7 @@ public class SettingService {
         return gameConfigVO;
     }
 
-    /**
-     * 校验token文件是否已经存在
-     *
-     * @return true 存在
-     */
-    @Deprecated
-    private boolean checkTokenIsExists() {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
-        File file = new File(filePath);
-        return file.exists();
-    }
+
 
     /**
      * 读取房间设置
