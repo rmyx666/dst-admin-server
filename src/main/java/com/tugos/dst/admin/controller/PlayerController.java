@@ -36,7 +36,7 @@ public class PlayerController {
     public ResultVO<List<String>> getDstAdminList(@RequestParam(required = true) String roomId) {
         log.info("拉取管理员列表");
         return ResultVO.data(playerService.getDstAdminList(roomId));
-        return ResultVO.success();
+
     }
 
     @GetMapping("/getDstBlacklist")
@@ -45,7 +45,7 @@ public class PlayerController {
     public ResultVO<List<String>> getDstBlacklist(@RequestParam(required = true) String roomId) {
         log.info("拉取玩家黑名单列表");
         return ResultVO.data(playerService.getDstBlacklist(roomId));
-        return ResultVO.success();
+
     }
 
     @PostMapping("/saveAdminList")
@@ -55,7 +55,7 @@ public class PlayerController {
     public ResultVO<String> saveAdminList(@RequestBody List<String> adminList,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存管理员：" + adminList);
         return playerService.saveAdminList(adminList,roomId);
-        return ResultVO.success();
+
     }
 
     @PostMapping("/saveBlackList")
@@ -65,7 +65,7 @@ public class PlayerController {
     public ResultVO<String> saveBlackList(@RequestBody List<String> blackList,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存黑名单：" + blackList);
         return playerService.saveBlackList(blackList,roomId);
-        return ResultVO.success();
+
     }
 
     @PostMapping("/saveAdminAndBlackList")

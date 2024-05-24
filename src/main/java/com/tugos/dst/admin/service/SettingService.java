@@ -53,61 +53,51 @@ public class SettingService {
     @Value("${dst.caves.port:10999}")
     private String cavesPort;
 
+    @Autowired
+    EhcacheDataService ehcacheDataService;
+
     /**
      * 保存戏设置 如果type为2 会启动新游戏
      *
      * @param vo 信息
      */
-    public ResultVO<String> saveConfig(GameConfigVO vo) throws Exception {
+    public ResultVO<String> saveConfig(GameConfigVO vo, String roomId) throws Exception {
         this.filterSensitiveWords(vo);
         //创建存档目录
-        FileUtil.mkdir(DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH);
+        FileUtil.mkdir(DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId);
         //创建地面和洞穴的ini配置文件
-        //this.createMasterServerIni();
-        this.createMasterServerIniV2();
-        //this.createCavesServerIni();
-        this.createCavesServerIniV2();
+        this.createMasterServerIniV2(roomId);
+        this.createCavesServerIniV2(roomId);
         //创建房间配置
-        //this.createCluster(vo);
-        this.createClusterV2(vo);
+        this.createClusterV2(vo, roomId);
         //创建token配置
-        this.createToken(vo.getToken().trim());
+        this.createToken(vo.getToken().trim(), roomId);
         //创建地面世界设置
-        this.createMasterMap(vo.getMasterMapData());
+        this.createMasterMap(vo.getMasterMapData(), roomId);
         //创建洞穴世界设置
-        this.createCavesMap(vo.getCavesMapData());
+        this.createCavesMap(vo.getCavesMapData(), roomId);
         //创建mod设置
-        this.createMod(vo.getModData());
+        this.createMod(vo.getModData(), roomId);
         if (SettingTypeEnum.START_GAME.type.equals(vo.getType())) {
             //启动新游戏
-            homeService.delRecord();
-            homeService.start(StartTypeEnum.START_ALL.type);
+            homeService.delRecord(roomId);
+            homeService.start(StartTypeEnum.START_ALL.type, roomId);
         }
-        if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())){
-            homeService.start(StartTypeEnum.START_ALL.type);
+        if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
+            homeService.start(StartTypeEnum.START_ALL.type, roomId);
         }
         return ResultVO.success();
     }
 
-    /**
-     * 监测配置文件文件夹是否存在
-     *
-     * @return true存在
-     */
-    private boolean checkConfigIsExists() {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH;
-        File file = new File(filePath);
-        return file.exists();
-    }
 
     /**
      * 读取游戏配置
      *
      * @return token配置不存在是返回null
      */
-    public GameConfigVO getConfig() throws Exception {
+    public GameConfigVO getConfig(String roomId) throws Exception {
         GameConfigVO gameConfigVO = new GameConfigVO();
-        String token = this.getToken();
+        String token = this.getToken(roomId);
         gameConfigVO.setToken(token);
         List<String> clusterData = this.getClusterData();
         if (CollectionUtils.isNotEmpty(clusterData)) {
@@ -159,11 +149,11 @@ public class SettingService {
                 }
             }
         }
-        String masterMapData = this.getMasterMapData();
+        String masterMapData = this.getMasterMapData(roomId);
         gameConfigVO.setMasterMapData(masterMapData);
-        String cavesMapData = this.getCavesMapData();
+        String cavesMapData = this.getCavesMapData(roomId);
         gameConfigVO.setCavesMapData(cavesMapData);
-        String modData = this.getModData();
+        String modData = this.getModData(roomId);
         gameConfigVO.setModData(modData);
         return gameConfigVO;
     }
@@ -210,9 +200,8 @@ public class SettingService {
      *
      * @return token
      */
-    public String getToken() throws Exception {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
+    public String getToken(String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
         return FileUtils.readFile(filePath);
     }
 
@@ -221,46 +210,22 @@ public class SettingService {
      * 生成地面 server.ini 端口号10998
      * [NETWORK]
      * server_port = 10999
-     *
-     *
+     * <p>
+     * <p>
      * [SHARD]
      * is_master = true
-     *
-     *
+     * <p>
+     * <p>
      * [ACCOUNT]
      * encode_user_path = true
      */
-    public void createMasterServerIni() throws Exception {
-        String basePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER;
-        //创建地面设置的文件夹
-        FileUtils.mkdirs(basePath);
-        String finalPath = basePath + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_SERVER_INI_NAME;
-        log.info("生成地面 server.ini文件,{}", finalPath);
-        List<String> ini = new ArrayList<>();
-        ini.add("[NETWORK]");
-        String groundPort = StringUtils.isNotBlank(DstConfigData.groundPort) ?
-                DstConfigData.groundPort : this.groundPort;
-        ini.add("server_port = " + groundPort);
-        ini.add("");
-        ini.add("");
-        ini.add("[SHARD]");
-        ini.add("is_master = true");
-        ini.add("name = Master");
-        ini.add("id = 10000");
-        ini.add("");
-        ini.add("");
-        ini.add("[ACCOUNT]");
-        ini.add("encode_user_path = true");
-        FileUtils.writeLineFile(finalPath, ini);
-    }
+
 
     /**
      * 生成地面 server.ini
      */
-    public void createMasterServerIniV2() throws Exception {
-        String basePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER;
+    public void createMasterServerIniV2(String roomId) throws Exception {
+        String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER;
         //创建地面设置的文件夹
         FileUtils.mkdirs(basePath);
         String finalPath = basePath + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_SERVER_INI_NAME;
@@ -272,9 +237,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(DstConfigData.groundPort, this.groundPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(DstConfigData.groundPort, this.groundPort));
+            network.put("server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -311,42 +276,12 @@ public class SettingService {
      * [NETWORK]
      * server_port = 10998          # 监听的 UDP 端口，只能介于 10998 - 11018 之间，确保每个实例都不相同
      */
-    public void createCavesServerIni() throws Exception {
-        String basePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH + "/" + DstConstant.DST_CAVES;
-        //创建洞穴设置的文件夹
-        FileUtils.mkdirs(basePath);
-        String finalPath = basePath + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_SERVER_INI_NAME;
-        log.info("生成洞穴 server.ini文件,{}", finalPath);
-        List<String> ini = new ArrayList<>();
-        ini.add("[NETWORK]");
-        String cavesPort = StringUtils.isNotBlank(DstConfigData.cavesPort) ?
-                DstConfigData.cavesPort : this.cavesPort;
-        ini.add("server_port = " + cavesPort);
-        ini.add("");
-        ini.add("");
-        ini.add("[SHARD]");
-        ini.add("is_master = false");
-        ini.add("name = Caves");
-        ini.add("id = 10010");
-        ini.add("");
-        ini.add("");
-        ini.add("[ACCOUNT]");
-        ini.add("encode_user_path = true");
-        ini.add("");
-        ini.add("");
-        ini.add("[STEAM]");
-        ini.add("authentication_port = 8766");
-        ini.add("master_server_port = 27016");
-        FileUtils.writeLineFile(finalPath, ini);
-    }
-
-
 
     /**
      * 生成洞穴 server.ini
      */
-    public void createCavesServerIniV2() throws Exception {
-        String basePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH + "/" + DstConstant.DST_CAVES;
+    public void createCavesServerIniV2(String roomId) throws Exception {
+        String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_CAVES;
         //创建洞穴设置的文件夹
         FileUtils.mkdirs(basePath);
         String finalPath = basePath + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_SERVER_INI_NAME;
@@ -359,9 +294,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(DstConfigData.cavesPort, this.cavesPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(DstConfigData.cavesPort, this.cavesPort));
+            network.put("server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -397,9 +332,8 @@ public class SettingService {
     /**
      * 生成cluster_token.txt 文件
      */
-    private void createToken(String token) throws Exception {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH
-                + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
+    private void createToken(String token, String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
         log.info("生成cluster_token.txt 文件,{}", filePath);
         FileUtils.writeFile(filePath, token);
     }
@@ -441,70 +375,15 @@ public class SettingService {
      * pause_when_empty = false           # 没人服务器暂停，刷天数必备
      * vote_kick_enabled = false          # 投票踢人
      */
-    private void createCluster(GameConfigVO vo) throws Exception {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
-        log.info("生成游戏配置文件 cluster.ini文件,{}", filePath);
-        LinkedList<String> list = new LinkedList<>();
-        list.add("[GAMEPLAY]");
-        list.add("game_mode = " + vo.getGameMode());
-        list.add("max_players = " + vo.getMaxPlayers());
-        list.add("pvp = " + vo.getPvp());
-        list.add("pause_when_empty = true");
-        list.add("");
-        list.add("");
-        list.add("[NETWORK]");
-        list.add("lan_only_cluster = false");
-        //list.add("cluster_intention = " + vo.getClusterIntention());
-        String clusterPassword = vo.getClusterPassword();
-        if (StringUtils.isNotBlank(clusterPassword)) {
-            //密码存在
-            clusterPassword = clusterPassword.trim();
-            list.add("cluster_password = " + clusterPassword);
-        } else {
-            list.add("cluster_password = ");
-        }
-        String clusterDescription = vo.getClusterDescription();
-        if (StringUtils.isNotBlank(clusterDescription)) {
-            //密码存在
-            clusterDescription = clusterDescription.trim();
-            list.add("cluster_description = " + clusterDescription);
-        } else {
-            list.add("cluster_description = ");
-        }
-        list.add("cluster_name = " + vo.getClusterName());
-        list.add("offline_cluster = false");
-        //根据环境设置语言
-        Locale locale = LocaleContextHolder.getLocale();
-        list.add("cluster_language = " + locale.getLanguage());
-        list.add("");
-        list.add("[MISC]");
-        list.add("console_enabled = true");
-        list.add("max_snapshots = " + maxSnapshots);
-        list.add("");
-        list.add("");
-        list.add("[SHARD]");
-        list.add("shard_enabled = true");
-        list.add("bind_ip = 127.0.0.1");
-        list.add("master_ip = 127.0.0.1");
-        String masterPort = StringUtils.isNotBlank(DstConfigData.masterPort) ?
-                DstConfigData.masterPort : this.masterPort;
-        list.add("master_port = " + masterPort);
-        list.add("cluster_key = defaultPass");
-
-        StringBuffer sb = new StringBuffer();
-        list.forEach(e -> sb.append(e).append("\n"));
-        FileUtils.writeFile(filePath, sb.toString());
-    }
 
     /**
      * 新的生成游戏配置，不会覆盖不支持编辑的配置
+     *
      * @param vo 配置
      * @throws Exception 异常
      */
-    public void createClusterV2(GameConfigVO vo) throws Exception {
-        String filePath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH +
-                DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
+    public void createClusterV2(GameConfigVO vo, String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
         log.info("生成游戏配置文件 cluster.ini文件,{}", filePath);
 
         if (!FileUtil.exist(filePath)) {
@@ -555,13 +434,13 @@ public class SettingService {
             ini.add("SHARD", "shard_enabled", "true");
             ini.add("SHARD", "bind_ip", "127.0.0.1");
             ini.add("SHARD", "master_ip", "127.0.0.1");
-            ini.add("SHARD", "master_port", StrUtils.ofNULL(DstConfigData.masterPort, this.masterPort));
+            ini.add("SHARD", "master_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
             ini.add("SHARD", "cluster_key", "defaultPass");
         } else {
             //shard.put("shard_enabled",  "127.0.0.1");
             //shard.put("bind_ip",  "127.0.0.1");
             //shard.put("master_ip",  "127.0.0.1");
-            shard.put("master_port", StrUtils.ofNULL(DstConfigData.masterPort, this.masterPort));
+            shard.put("master_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
             //shard.put("cluster_key", "defaultPass");
         }
         ini.store();
@@ -596,25 +475,25 @@ public class SettingService {
     /**
      * 读取mod设置
      */
-    public String getModData() throws Exception {
+    public String getModData(String roomId) throws Exception {
         String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MOD_PATH;
-        return FileUtils.readFile(filePath);
+        return FileUtils.readFile(filePath.replace("MyDediServer", roomId));
     }
 
     /**
      * 读取地面世界设置
      */
-    public String getMasterMapData() throws Exception {
-        String filePath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_MASTER_MAP_PATH;
-        return FileUtils.readFile(filePath);
+    public String getMasterMapData(String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MAP_PATH;
+        return FileUtils.readFile(filePath.replace("MyDediServer", roomId));
     }
 
     /**
      * 读取洞穴世界设置
      */
-    public String getCavesMapData() throws Exception {
-        String filePath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_CAVES_MAP_PATH;
-        return FileUtils.readFile(filePath);
+    public String getCavesMapData(String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CAVES_MAP_PATH;
+        return FileUtils.readFile(filePath.replace("MyDediServer", roomId));
     }
 
 
@@ -623,16 +502,16 @@ public class SettingService {
      *
      * @param data mod设置
      */
-    public void createMod(String data) throws Exception {
-        String masterModeFile = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_MASTER_MOD_PATH;
-        String cavesModeFile = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_CAVES_MOD_PATH;
+    public void createMod(String data, String roomId) throws Exception {
+        String masterModeFile = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MOD_PATH;
+        String cavesModeFile = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CAVES_MOD_PATH;
         if (StringUtils.isNotBlank(data)) {
-            FileUtils.writeFile(masterModeFile, data);
-            FileUtils.writeFile(cavesModeFile, data);
+            FileUtils.writeFile(masterModeFile.replace("MyDediServer", roomId), data);
+            FileUtils.writeFile(cavesModeFile.replace("MyDediServer", roomId), data);
         } else {
             //置空
-            FileUtils.writeFile(masterModeFile, "");
-            FileUtils.writeFile(cavesModeFile, "");
+            FileUtils.writeFile(masterModeFile.replace("MyDediServer", roomId), "");
+            FileUtils.writeFile(cavesModeFile.replace("MyDediServer", roomId), "");
         }
     }
 
@@ -641,13 +520,13 @@ public class SettingService {
      *
      * @param data 地面设置
      */
-    public void createMasterMap(String data) throws Exception {
-        String filePath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_MASTER_MAP_PATH;
+    public void createMasterMap(String data, String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MAP_PATH;
         if (StringUtils.isNotBlank(data)) {
-            FileUtils.writeFile(filePath, data);
+            FileUtils.writeFile(filePath.replace("MyDediServer", roomId), data);
         } else {
             //置空
-            FileUtils.writeFile(filePath, "");
+            FileUtils.writeFile(filePath.replace("MyDediServer", roomId), "");
         }
     }
 
@@ -656,13 +535,13 @@ public class SettingService {
      *
      * @param data 洞穴设置
      */
-    public void createCavesMap(String data) throws Exception {
-        String filePath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_CAVES_MAP_PATH;
+    public void createCavesMap(String data, String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CAVES_MAP_PATH;
         if (StringUtils.isNotBlank(data)) {
-            FileUtils.writeFile(filePath, data);
+            FileUtils.writeFile(filePath.replace("MyDediServer", roomId), data);
         } else {
             //置空
-            FileUtils.writeFile(filePath, "");
+            FileUtils.writeFile(filePath.replace("MyDediServer", roomId), "");
         }
     }
 

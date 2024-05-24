@@ -43,7 +43,7 @@ public class HomeService {
      *
      * @param type 0 启动所有 1 启动地面 2 启动洞穴
      */
-    public ResultVO<String> start(Integer type,String roomId) {
+    public ResultVO<String> start(Integer type, String roomId) {
         if (!this.checkIsInstallDst()) {
             //未安装dst
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.start.error"));
@@ -78,7 +78,7 @@ public class HomeService {
     /**
      * 直接停止服务
      */
-    public void stopServer(String roomId){
+    public void stopServer(String roomId) {
         shellService.stopMaster(roomId);
         shellService.stopCaves(roomId);
     }
@@ -88,7 +88,7 @@ public class HomeService {
      *
      * @param type 0 停止所有 1 停止地面 2 停止洞穴
      */
-    public ResultVO<String> stop(Integer type,String roomId) {
+    public ResultVO<String> stop(Integer type, String roomId) {
         StopTypeEnum typeEnum = StopTypeEnum.get(type);
         Objects.requireNonNull(typeEnum);
         switch (typeEnum) {
@@ -181,55 +181,55 @@ public class HomeService {
      * @param name 存档名称
      * @return 信息
      */
-    @Deprecated
-    public ResultVO<String> backup(String name,String roomId) {
-        if (!this.checkGameFileIsExists(roomId)) {
-            //未安装dst
-            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error"));
-        }
-        String weekStr = DateUtil.thisDayOfWeekEnum().toString();
-        String fileName;
-        if (StringUtils.isNotBlank(name)) {
-            fileName = name + ".tar";
-        } else {
-            //未设置名称
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-            String format = sdf.format(new Date());
-            format += weekStr;
-            fileName = format + ".tar";
-        }
-        shellService.createBackup(fileName,roomId);
-        return ResultVO.success();
-    }
+//    @Deprecated
+//    public ResultVO<String> backup(String name, String roomId) {
+//        if (!this.checkGameFileIsExists(roomId)) {
+//            //未安装dst
+//            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error"));
+//        }
+//        String weekStr = DateUtil.thisDayOfWeekEnum().toString();
+//        String fileName;
+//        if (StringUtils.isNotBlank(name)) {
+//            fileName = name + ".tar";
+//        } else {
+//            //未设置名称
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+//            String format = sdf.format(new Date());
+//            format += weekStr;
+//            fileName = format + ".tar";
+//        }
+//        shellService.createBackup(fileName, roomId);
+//        return ResultVO.success();
+//    }
 
     /**
      * 校验游戏存档文件是否存在
      *
      * @return true 存在
      */
-    private boolean checkGameFileIsExists(String roomId) {
-        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CONFG_PATH.replace("MyDediServer", "MyDediServer_" + roomId);
-        File file = new File(path);
-        return file.exists();
-    }
+//    private boolean checkGameFileIsExists(String roomId) {
+//        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+//        File file = new File(path);
+//        return file.exists();
+//    }
 
     /**
      * 恢复存档 需要暂停游戏，清空之前的记录
      *
      * @param name 备份的文件名称全称
      */
-    @Deprecated
-    public ResultVO<String> restore(String name,String roomId) {
-        if (!this.checkBackupIsExists(name)) {
-            //未安装dst
-            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error2") + name);
-        }
-        //清空在恢复
-        this.delRecord(roomId);
-        //释放打包好的存档文件
-        shellService.revertBackup(name,roomId);
-        return ResultVO.success();
-    }
+//    @Deprecated
+//    public ResultVO<String> restore(String name, String roomId) {
+//        if (!this.checkBackupIsExists(name)) {
+//            //未安装dst
+//            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error2") + name);
+//        }
+//        //清空在恢复
+//        this.delRecord(roomId);
+//        //释放打包好的存档文件
+//        shellService.revertBackup(name, roomId);
+//        return ResultVO.success();
+//    }
 
     /**
      * 校验存档文件是否存在
@@ -237,15 +237,15 @@ public class HomeService {
      * @param name 文件名称 全称
      * @return true 存在
      */
-    private boolean checkBackupIsExists(String name) {
-        boolean flag = false;
-        if (StringUtils.isNotBlank(name)) {
-            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
-            File file = new File(path);
-            flag = file.exists();
-        }
-        return flag;
-    }
+//    private boolean checkBackupIsExists(String name) {
+//        boolean flag = false;
+//        if (StringUtils.isNotBlank(name)) {
+//            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
+//            File file = new File(path);
+//            flag = file.exists();
+//        }
+//        return flag;
+//    }
 
     /**
      * 清理地面和洞穴游戏进度，需要停止服务
@@ -260,9 +260,9 @@ public class HomeService {
      */
     public void delMyDediServer(String roomId) {
         this.stopServer(roomId);
-        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CONFG_PATH;
+        String path = DstConstant.ROOT_PATH +  DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
         log.warn("删除MyDediServer目录:{}", path);
-        FileUtil.del(path.replace("MyDediServer", "MyDediServer_" + roomId);
+        FileUtil.del(path);
     }
 
     /**
@@ -274,6 +274,7 @@ public class HomeService {
 
     /**
      * 解析存档信息 包括天数，季节等信息
+     *
      * @return 存档信息
      */
     public GameArchiveVO getGameArchive(String roomId) throws Exception {
@@ -288,7 +289,7 @@ public class HomeService {
             gameArchiveVO.setModNos(modNoList);
         }
         gameArchiveVO.setMaxPlayers(gameArchiveVO.getMaxPlayers());
-        GameSnapshotVO gameSnapshot = backupService.getGameSnapshot();
+        GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomId);
         if (gameSnapshot != null) {
             gameArchiveVO.setPlayDay(gameSnapshot.getPlayDay());
             gameArchiveVO.setSeason(gameSnapshot.getSeasonChinese());

@@ -5,7 +5,7 @@ import com.tugos.dst.admin.common.ResultCodeEnum;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.EhcacheDataService;
-import com.tugos.dst.admin.utils.DstConfigData;
+
 import com.tugos.dst.admin.vo.UpdatePwdVO;
 import com.tugos.dst.admin.vo.UpdateUserDetailVO;
 import org.apache.commons.lang3.StringUtils;

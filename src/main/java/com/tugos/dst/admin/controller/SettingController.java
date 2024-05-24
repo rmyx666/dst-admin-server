@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 
 import com.tugos.dst.admin.common.ResultVO;
-//import com.tugos.dst.admin.service.SettingService;
+import com.tugos.dst.admin.service.SettingService;
 import com.tugos.dst.admin.vo.GameConfigVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +46,7 @@ public class SettingController {
     public ResultVO<String> saveConfig(@RequestBody GameConfigVO model,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存游戏配置，{}", StringUtils.deleteWhitespace(model.toString()));
         return settingService.saveConfig(model,roomId);
-        return ResultVO.success();
+
     }
 
     @GetMapping("/getConfig")
@@ -55,8 +55,8 @@ public class SettingController {
     public ResultVO<GameConfigVO> getConfig(@RequestParam(required = true) String roomId) throws Exception {
         log.info("读取游戏配置");
         GameConfigVO config = settingService.getConfig(roomId);
-        return ResultVO.data(config);
-        return ResultVO.success();
+        return ResultVO.data(config,roomId);
+
     }
 
     @Autowired
