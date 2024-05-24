@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.tugos.dst.admin.entity.User;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Map;
  */
 
 @Data
-public class DstConfigRoomData {
+public class DstConfigRoomData  implements Serializable {
 
     /**
      * 房间id

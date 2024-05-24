@@ -28,7 +28,12 @@ public class RoomService {
     @Autowired
     EhcacheDataService ehcacheDataService;
 
+    @Autowired
+    ShellService shellService;
+
     public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
+        roomInfo.setRoomId("SERVER_"+roomInfo.getRoomId());
+
         Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
         if (roomInfoMap.containsKey(roomInfo.roomId)) {
             return ResultVO.fail("roomId重复");
@@ -45,6 +50,8 @@ public class RoomService {
         roomInfo.setNotStartCaves(false);
 
         roomInfoMap.put(roomInfo.roomId, roomInfo);
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        shellService.createServer(roomInfo.roomId);
 
 
         return ResultVO.success();

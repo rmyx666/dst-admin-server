@@ -109,14 +109,17 @@ public class ModFileUtil {
      */
     public static List<String> findAllModNo(String content) {
         List<String> result = new ArrayList<>();
-        List<String> resultFindAll = ReUtil.findAll(ALLMOD_REGEX, content, 0, new ArrayList<>());
-        //匹配出来的结果："workshop-1651623054"
-        if (CollectionUtils.isNotEmpty(resultFindAll)) {
-            resultFindAll.forEach(e -> {
-                String modNo = e.replace("\"", "").split("-")[1];
-                result.add(modNo);
-            });
+        if (content.contains("workshop-")){
+            List<String> resultFindAll = ReUtil.findAll(ALLMOD_REGEX, content, 0, new ArrayList<>());
+            //匹配出来的结果："workshop-1651623054"
+            if (CollectionUtils.isNotEmpty(resultFindAll)) {
+                resultFindAll.forEach(e -> {
+                    String modNo = e.replace("\"", "").split("-")[1];
+                    result.add(modNo);
+                });
+            }
         }
+
         return result;
     }
 

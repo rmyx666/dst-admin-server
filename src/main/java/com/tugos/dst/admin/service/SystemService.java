@@ -11,6 +11,7 @@ import com.tugos.dst.admin.vo.GamePortVO;
 import com.tugos.dst.admin.vo.ScheduleVO;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -24,138 +25,157 @@ import java.util.*;
 @Service
 public class SystemService {
 
+    @Autowired
+    EhcacheDataService ehcacheDataService;
+
     /**
      * 拉取dst游戏日志
-     * @param type 0地面日志 ，1 洞穴日志 2 玩家聊天记录
+     *
+     * @param type   0地面日志 ，1 洞穴日志 2 玩家聊天记录
      * @param rowNum 日志的行数，从后开始取
      * @return 日志
      */
-    public List<String> getDstLog(Integer type, Integer rowNum) {
+    public List<String> getDstLog(Integer type, Integer rowNum, String roomId) {
         String path;
-        switch (Objects.requireNonNull(DstLogTypeEnum.get(type))){
+        switch (Objects.requireNonNull(DstLogTypeEnum.get(type))) {
             case CAVES_LOG:
                 //洞穴
-                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_CAVES_SERVER_LOG_PATH.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId);
+                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_CAVES_SERVER_LOG_PATH.replace("MyDediServer", roomId);
                 break;
             case CHAT_LOG:
                 //聊天
-                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER_SERVER_CHAT_LOG_PATH.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId);
+                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER_SERVER_CHAT_LOG_PATH.replace("MyDediServer", roomId);
                 break;
             default:
                 //地面
-                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER_SERVER_LOG_PATH.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId);
+                path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER_SERVER_LOG_PATH.replace("MyDediServer", roomId);
         }
         File file = new File(path);
         List<String> result = FileUtils.readLastNLine(file, rowNum);
-        if (CollectionUtils.isEmpty(result)){
-            result = Lists.newArrayList(I18nResourcesConfig.getMessage("tip.log.not.exist")+":"+path);
+        if (CollectionUtils.isEmpty(result)) {
+            result = Lists.newArrayList(I18nResourcesConfig.getMessage("tip.log.not.exist") + ":" + path);
         }
         return result;
     }
 
     /**
      * 获取任务时间列表
+     *
      * @return 数据
      */
-    public ScheduleVO getScheduleList() {
+    public ScheduleVO getScheduleList(String roomId) {
         ScheduleVO data = new ScheduleVO();
-        Set<String> updateSet = DstConfigData.SCHEDULE_UPDATE_MAP.keySet();
-        if (CollectionUtils.isNotEmpty(updateSet)){
+        Set<String> updateSet = ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.keySet();
+        if (CollectionUtils.isNotEmpty(updateSet)) {
             List<ScheduleVO.InnerData> updateTimeList = new ArrayList<>();
-            updateSet.forEach(e->{
+            updateSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(DstConfigData.SCHEDULE_UPDATE_MAP.get(e));
+                innerData.setCount(ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.get(e));
                 updateTimeList.add(innerData);
             });
             data.setUpdateTimeList(updateTimeList);
         }
-        Set<String> backupSet = DstConfigData.SCHEDULE_BACKUP_MAP.keySet();
-        if (CollectionUtils.isNotEmpty(backupSet)){
+        Set<String> backupSet = ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.keySet();
+        if (CollectionUtils.isNotEmpty(backupSet)) {
             List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
-            backupSet.forEach(e->{
+            backupSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(DstConfigData.SCHEDULE_BACKUP_MAP.get(e));
+                innerData.setCount(ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.get(e));
                 backupTimeList.add(innerData);
             });
             data.setBackupTimeList(backupTimeList);
         }
-        data.setNotStartMaster(DstConfigData.notStartMaster);
-        data.setNotStartCaves(DstConfigData.notStartCaves);
-        data.setSmartUpdate(DstConfigData.smartUpdate);
+        data.setNotStartMaster(ehcacheDataService.getRoomInfoMap().get(roomId).notStartMaster);
+        data.setNotStartCaves(ehcacheDataService.getRoomInfoMap().get(roomId).notStartCaves);
+        data.setSmartUpdate(ehcacheDataService.getSmartUpdate());
         return data;
     }
 
     /**
      * 将任务时间写入缓存中
+     *
      * @param vo 提交的数据
      */
-    public void saveSchedule(ScheduleVO vo) {
-        DstConfigData.clearAllData();
-        if (CollectionUtils.isNotEmpty(vo.getBackupTimeList())){
+    public void saveSchedule(ScheduleVO vo,String roomId) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
+        dstConfigRoomData.clearAllData();
+
+        if (CollectionUtils.isNotEmpty(vo.getBackupTimeList())) {
             //写入缓存
-            vo.getBackupTimeList().forEach(e->{
-                if (StringUtils.isNotBlank(e.getTime())){
-                    DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
-                    String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    DstConfigData.SCHEDULE_BACKUP_MAP.put(format,e.getCount());
-                }
-            });
-        }
-        if (CollectionUtils.isNotEmpty(vo.getUpdateTimeList())){
-            //写入缓存
-            vo.getUpdateTimeList().forEach(e->{
+            vo.getBackupTimeList().forEach(e -> {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    DstConfigData.SCHEDULE_UPDATE_MAP.put(format, e.getCount());
+                    dstConfigRoomData.SCHEDULE_BACKUP_MAP.put(format, e.getCount());
+                }
+            });
+        }
+        if (CollectionUtils.isNotEmpty(vo.getUpdateTimeList())) {
+            //写入缓存
+            vo.getUpdateTimeList().forEach(e -> {
+                if (StringUtils.isNotBlank(e.getTime())) {
+                    DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
+                    String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
+                    dstConfigRoomData.SCHEDULE_UPDATE_MAP.put(format, e.getCount());
                 }
             });
         }
         if (vo.getNotStartCaves() != null) {
-            DstConfigData.notStartMaster = vo.getNotStartMaster();
-        }else {
-            DstConfigData.notStartMaster = false;
+            dstConfigRoomData.notStartMaster = vo.getNotStartMaster();
+        } else {
+            dstConfigRoomData.notStartMaster = false;
         }
         if (vo.getNotStartCaves() != null) {
-            DstConfigData.notStartCaves = vo.getNotStartCaves();
-        }else {
-            DstConfigData.notStartCaves = false;
+            dstConfigRoomData.notStartCaves = vo.getNotStartCaves();
+        } else {
+            dstConfigRoomData.notStartCaves = false;
         }
-        if (vo.getSmartUpdate() != null) {
-            DstConfigData.smartUpdate = vo.getSmartUpdate();
-        }else {
-            DstConfigData.smartUpdate = false;
-        }
+//        if (vo.getSmartUpdate() != null) {
+//            dstConfigRoomData.smartUpdate = vo.getSmartUpdate();
+//        } else {
+//            dstConfigRoomData.smartUpdate = false;
+//        }
+        roomInfoMap.put(roomId,dstConfigRoomData);
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
     }
 
     /**
      * 获取服务器的版本号
+     *
      * @return 版本号
      */
-    public Map<String,String> getVersion() {
+    public Map<String, String> getVersion() {
         String steamVersion = DstVersionUtils.getSteamVersionV3();
         String localVersion = DstVersionUtils.getLocalVersion();
-        Map<String,String> map = new HashMap<>(16);
-        map.put("steamVersion",steamVersion);
-        map.put("localVersion",localVersion);
+        Map<String, String> map = new HashMap<>(16);
+        map.put("steamVersion", steamVersion);
+        map.put("localVersion", localVersion);
         return map;
     }
 
 
-    public GamePortVO getGamePort(){
+    public GamePortVO getGamePort(String roomId) {
         GamePortVO gamePortVO = new GamePortVO();
-        gamePortVO.setMasterPort(DstConfigData.masterPort);
-        gamePortVO.setGroundPort(DstConfigData.groundPort);
-        gamePortVO.setCavesPort(DstConfigData.cavesPort);
+        DstConfigRoomData dstConfigRoomData = ehcacheDataService.getRoomInfoMap().get(roomId);
+        gamePortVO.setMasterPort(dstConfigRoomData.masterPort);
+        gamePortVO.setGroundPort(dstConfigRoomData.groundPort);
+        gamePortVO.setCavesPort(dstConfigRoomData.cavesPort);
         return gamePortVO;
     }
 
-    public void saveGamePort(GamePortVO gamePortVO) {
-        DstConfigData.masterPort = gamePortVO.getMasterPort();
-        DstConfigData.groundPort = gamePortVO.getGroundPort();
-        DstConfigData.cavesPort = gamePortVO.getCavesPort();
-        DBUtils.saveDataToFile();
+    public void saveGamePort(GamePortVO gamePortVO,String roomId) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
+
+        dstConfigRoomData.masterPort = gamePortVO.getMasterPort();
+        dstConfigRoomData.groundPort = gamePortVO.getGroundPort();
+        dstConfigRoomData.cavesPort = gamePortVO.getCavesPort();
+
+        roomInfoMap.put(roomId,dstConfigRoomData);
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+//        DBUtils.saveDataToFile();
     }
 }

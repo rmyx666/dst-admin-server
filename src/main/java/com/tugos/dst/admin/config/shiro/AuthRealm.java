@@ -3,7 +3,6 @@ package com.tugos.dst.admin.config.shiro;
 
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.EhcacheDataService;
-import com.tugos.dst.admin.utils.DstConfigData;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;

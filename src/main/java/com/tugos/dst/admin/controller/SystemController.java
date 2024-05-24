@@ -1,7 +1,7 @@
 package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
-//import com.tugos.dst.admin.service.SystemService;
+import com.tugos.dst.admin.service.SystemService;
 import com.tugos.dst.admin.vo.GamePortVO;
 import com.tugos.dst.admin.vo.ScheduleVO;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/system")
 public class SystemController {
 
-//    private SystemService systemService;
+    private SystemService systemService;
 
     /**
      * 系统设置页
@@ -63,7 +63,6 @@ public class SystemController {
                                             @RequestParam(required = true) String roomId) {
         log.info("拉取饥荒的日志：type={},rowNum={}", type, rowNum);
         return ResultVO.data(systemService.getDstLog(type, rowNum, roomId));
-        return ResultVO.success();
     }
 
     /**
@@ -74,7 +73,6 @@ public class SystemController {
     @RequiresAuthentication
     public ResultVO<ScheduleVO> getScheduleList(@RequestParam(required = true) String roomId) {
         return ResultVO.data(systemService.getScheduleList(roomId));
-        return ResultVO.success();
     }
 
     @PostMapping("/saveSchedule")
@@ -92,7 +90,7 @@ public class SystemController {
     @RequiresAuthentication
     public ResultVO<Map<String, String>> getVersion() {
         return ResultVO.data(systemService.getVersion());
-        return ResultVO.success();
+
     }
 
 
@@ -101,7 +99,7 @@ public class SystemController {
     @RequiresAuthentication
     public ResultVO<GamePortVO> getGamePort(@RequestParam(required = true) String roomId) {
         return ResultVO.data(systemService.getGamePort(roomId));
-        return ResultVO.success();
+
     }
 
 

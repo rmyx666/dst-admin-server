@@ -59,7 +59,7 @@ public class ShellService {
      * 获取地面程序进程号
      */
     public String getMasterProcessNum(String roomId) {
-        List<String> result = ShellUtil.runShell(DstConstant.FIND_MASTER_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        List<String> result = ShellUtil.runShell(DstConstant.FIND_MASTER_CMD.replace("Master", "Master_" + roomId));
         if (CollectionUtils.isNotEmpty(result)) {
             return result.get(0);
         } else {
@@ -71,7 +71,7 @@ public class ShellService {
      * 获取洞穴程序进程号
      */
     public String getCavesProcessNum(String roomId) {
-        List<String> result = ShellUtil.runShell(DstConstant.FIND_CAVES_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        List<String> result = ShellUtil.runShell(DstConstant.FIND_CAVES_CMD.replace("Caves", "Caves_" + roomId));
         if (CollectionUtils.isNotEmpty(result)) {
             return result.get(0);
         } else {
@@ -83,12 +83,25 @@ public class ShellService {
     /**
      * 备份游戏存档
      */
-    @Deprecated
-    public void createBackup(String fileName,String roomId) {
+//    @Deprecated
+//    public void createBackup(String fileName, String roomId) {
+//        StringBuilder command = new StringBuilder();
+//        command.append("cd $HOME/.klei/DoNotStarveTogether ").append(" ; ");
+//        command.append("tar zcvf ").append(fileName).append(" MyDediServer/");
+//        ShellUtil.runShell(command.toString().replace("MyDediServer", "MyDediServer_" + roomId));
+//    }
+
+
+    /**
+     * 创建一个新room的文件夹
+     *
+
+     * @param roomId
+     */
+    public void createServer( String roomId) {
         StringBuilder command = new StringBuilder();
-        command.append("cd $HOME/.klei/DoNotStarveTogether ").append(" ; ");
-        command.append("tar zcvf ").append(fileName).append(" MyDediServer/");
-        ShellUtil.runShell(command.toString().replace("MyDediServer", "MyDediServer_" + roomId));
+        command.append("mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer");
+        ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
     }
 
     /**
@@ -96,32 +109,32 @@ public class ShellService {
      *
      * @param fileName 备份的游戏名称
      */
-    public void revertBackup(String fileName,String roomId) {
+    public void revertBackup(String fileName, String roomId) {
         StringBuilder command = new StringBuilder();
         command.append("cd ~/.klei/DoNotStarveTogether ").append(" ; ");
         command.append("rm -rf MyDediServer/").append(" ;");
         //使用tar -xvf 来解压
         command.append("tar -xvf ").append(fileName);
-        ShellUtil.runShell(command.toString().replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
     }
 
     /**
      * 获取备份路径下的备份文件名称
      */
-    public List<String> getBackupList() {
-        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
-        File file = new File(backupPath);
-        if (!file.exists()) {
-            return new ArrayList<>();
-        }
-        List<String> files = FileUtils.getFileNames(backupPath);
-        if (CollectionUtils.isNotEmpty(files)) {
-            return files.stream()
-                    .filter(e -> e.contains(DstConstant.BACKUP_FILE_EXTENSION)).collect(Collectors.toList());
-
-        }
-        return new ArrayList<>();
-    }
+//    public List<String> getBackupList() {
+//        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
+//        File file = new File(backupPath);
+//        if (!file.exists()) {
+//            return new ArrayList<>();
+//        }
+//        List<String> files = FileUtils.getFileNames(backupPath);
+//        if (CollectionUtils.isNotEmpty(files)) {
+//            return files.stream()
+//                    .filter(e -> e.contains(DstConstant.BACKUP_FILE_EXTENSION)).collect(Collectors.toList());
+//
+//        }
+//        return new ArrayList<>();
+//    }
 
     /**
      * 启动地面进程
@@ -132,7 +145,7 @@ public class ShellService {
         //开始游戏是安装mod
         ResultVO<String> stringResultVO = this.installModToServer(roomId);
         log.info("安装mod：{}", stringResultVO);
-        return ShellUtil.runShell(DstConstant.START_MASTER_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.START_MASTER_CMD.replace("DST_MASTER", "Master_" + roomId).replace("MyDediServer", roomId));
     }
 
 
@@ -142,7 +155,7 @@ public class ShellService {
      * @return 执行信息
      */
     public List<String> startCaves(String roomId) {
-        return ShellUtil.runShell(DstConstant.START_CAVES_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.START_CAVES_CMD.replace("DST_CAVES", "Caves_" + roomId).replace("MyDediServer", roomId));
     }
 
     /**
@@ -151,7 +164,7 @@ public class ShellService {
      * @return 执行信息
      */
     public List<String> stopMaster(String roomId) {
-        return ShellUtil.runShell(DstConstant.STOP_MASTER_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.STOP_MASTER_CMD.replace("Master", "Master_" + roomId));
     }
 
 
@@ -161,7 +174,7 @@ public class ShellService {
      * @return 执行信息
      */
     public List<String> stopCaves(String roomId) {
-        return ShellUtil.runShell(DstConstant.STOP_CAVES_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.STOP_CAVES_CMD.replace("Caves", "Caves_" + roomId));
     }
 
     /**
@@ -205,7 +218,7 @@ public class ShellService {
      */
     private void shutdownMaster(String roomId) {
         String shell = "screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"c_shutdown(true)\\n\"";
-        ShellUtil.execShellBin(shell.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(shell.replace("DST_MASTER", "Master_" + roomId));
     }
 
     /**
@@ -213,7 +226,7 @@ public class ShellService {
      */
     private void shutdownCaves(String roomId) {
         String shell = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"c_shutdown(true)\\n\"";
-        ShellUtil.execShellBin(shell.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(shell.replace("DST_CAVES", "Caves_" + roomId));
     }
 
     /**
@@ -255,7 +268,7 @@ public class ShellService {
      */
     public List<String> delMasterRecord(String roomId) {
         this.stopMaster(roomId);
-        return ShellUtil.runShell(DstConstant.DEL_RECORD_MASTER_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.DEL_RECORD_MASTER_CMD.replace("MyDediServer", roomId));
     }
 
     /**
@@ -265,7 +278,7 @@ public class ShellService {
      */
     public List<String> delCavesRecord(String roomId) {
         this.stopCaves(roomId);
-        return ShellUtil.runShell(DstConstant.DEL_RECORD_CAVES_CMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        return ShellUtil.runShell(DstConstant.DEL_RECORD_CAVES_CMD.replace("MyDediServer", roomId));
     }
 
     /**
@@ -274,7 +287,7 @@ public class ShellService {
      */
     public ResultVO<String> installModToServer(String roomId) {
         log.info("安装mod到服务器.....");
-        String myGameModPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MOD_PATH.replace("Master", "Master_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId);
+        String myGameModPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_MASTER_MOD_PATH.replace("MyDediServer", roomId);
         File file = new File(myGameModPath);
         if (!file.exists()) {
             return ResultVO.fail("mod文件不存在");
@@ -301,13 +314,13 @@ public class ShellService {
      *
      * @param message 内容
      */
-    public void sendBroadcast(String message,String roomId) {
+    public void sendBroadcast(String message, String roomId) {
         StringBuilder masterBroadcast = new StringBuilder();
         masterBroadcast.append("screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"c_announce(\\\"");
         masterBroadcast.append(message);
         masterBroadcast.append("\\\")\\n\"");
         //发送地面广播
-        ShellUtil.execShellBin(masterBroadcast.toString().replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(masterBroadcast.toString().replace("DST_MASTER", "Master_" + roomId));
        /* StringBuilder CavesBroadcast = new StringBuilder();
         CavesBroadcast.append("screen -S \"DST_CAVES\" -p 0 -X stuff \"c_announce(\\\"");
         CavesBroadcast.append(message);
@@ -321,11 +334,11 @@ public class ShellService {
      *
      * @param userId klei的userId
      */
-    public void kickPlayer(String userId,String roomId) {
+    public void kickPlayer(String userId, String roomId) {
         String masterCMD = "screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"TheNet:Kick(\\\"" + userId + "\\\")\\n\"";
         String cavesCMD = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"TheNet:Kick(\\\"" + userId + "\\\")\\n\"";
-        ShellUtil.execShellBin(masterCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
-        ShellUtil.execShellBin(cavesCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(masterCMD.replace("DST_MASTER", "Master_" + roomId));
+        ShellUtil.execShellBin(cavesCMD.replace("DST_CAVES", "Caves_" + roomId));
     }
 
 
@@ -334,11 +347,11 @@ public class ShellService {
      *
      * @param dayNum 1-5天
      */
-    public void rollback(int dayNum,String roomId) {
+    public void rollback(int dayNum, String roomId) {
         String masterCMD = "screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"c_rollback(" + dayNum + ")\\n\"";
         String cavesCMD = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"c_rollback(" + dayNum + ")\\n\"";
-        ShellUtil.execShellBin(masterCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
-        ShellUtil.execShellBin(cavesCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(masterCMD.replace("DST_MASTER", "Master_" + roomId));
+        ShellUtil.execShellBin(cavesCMD.replace("DST_CAVES", "Caves_" + roomId));
     }
 
 
@@ -348,8 +361,8 @@ public class ShellService {
     public void regenerate(String roomId) {
         String masterCMD = "screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"c_regenerateworld()\\n\"";
         String cavesCMD = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"c_regenerateworld()\\n\"";
-        ShellUtil.execShellBin(masterCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
-        ShellUtil.execShellBin(cavesCMD.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(masterCMD.replace("DST_MASTER", "Master_" + roomId));
+        ShellUtil.execShellBin(cavesCMD.replace("DST_CAVES", "Caves_" + roomId));
     }
 
 
@@ -365,10 +378,10 @@ public class ShellService {
         String host = "[Host]";
         String timeMillis = System.currentTimeMillis() + "";
         String cmd = DstConstant.MASTER_PLAYLIST_CMD.replace("99999999", timeMillis);
-        ShellUtil.runShell(cmd.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.runShell(cmd.replace("DST_MASTER", "Master_" + roomId));
         //睡眠一秒
         TimeUnit.SECONDS.sleep(1);
-        List<String> dstLog = systemService.getDstLog(DstLogTypeEnum.MASTER_LOG.type, 100);
+        List<String> dstLog = systemService.getDstLog(DstLogTypeEnum.MASTER_LOG.type, 100, roomId);
         List<String> playList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dstLog)) {
             dstLog.forEach(e -> {
@@ -390,9 +403,9 @@ public class ShellService {
      *
      * @param command 命令
      */
-    public void masterConsole(String command,String roomId) {
+    public void masterConsole(String command, String roomId) {
         String cmd = "screen -S \"" + DstConstant.SCREEN_WORK_MASTER_NAME + "\" -p 0 -X stuff \"" + command + "\\n\"";
-        ShellUtil.execShellBin(cmd.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(cmd.replace("DST_MASTER", "Master_" + roomId));
     }
 
     /**
@@ -400,16 +413,16 @@ public class ShellService {
      *
      * @param command 命令
      */
-    public void cavesConsole(String command,String roomId) {
+    public void cavesConsole(String command, String roomId) {
         String cmd = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"" + command + "\\n\"";
-        ShellUtil.execShellBin(cmd.replace("Master", "Master_" + roomId).replace("Caves", "Caves_" + roomId).replace("DST_MASTER", "DST_MASTER_" + roomId).replace("DST_CAVES", "DST_CAVES_" + roomId).replace("MyDediServer", "MyDediServer_" + roomId));
+        ShellUtil.execShellBin(cmd.replace("DST_CAVES", "Caves_" + roomId));
     }
 
     /**
      * @param type   操作类型 0 复活 1 杀死 2 更换角色
      * @param userId 玩家id
      */
-    public ResultVO<String> playerOperate(String type, String userId,String roomId) throws Exception {
+    public ResultVO<String> playerOperate(String type, String userId, String roomId) throws Exception {
         String command = "";
         switch (type) {
             case "0":
@@ -432,8 +445,8 @@ public class ShellService {
             default:
         }
         log.info("执行命令：{}", String.format(command, userId));
-        masterConsole(String.format(command, userId),roomId);
-        cavesConsole(String.format(command, userId),roomId);
+        masterConsole(String.format(command, userId), roomId);
+        cavesConsole(String.format(command, userId), roomId);
         return ResultVO.success();
     }
 

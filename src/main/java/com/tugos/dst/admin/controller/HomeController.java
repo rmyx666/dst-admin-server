@@ -110,9 +110,8 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> restore(@RequestParam String name,@RequestParam(required = true) String roomId) throws Exception {
         log.info("恢复存档,{}", name);
-        homeService.stopServer();
+        homeService.stopServer(roomId);
         return backupService.restore(name,roomId);
-        return ResultVO.success();
     }
 
     @GetMapping("/delRecord")

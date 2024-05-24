@@ -98,7 +98,7 @@ public class SettingService {
         GameConfigVO gameConfigVO = new GameConfigVO();
         String token = this.getToken(roomId);
         gameConfigVO.setToken(token);
-        List<String> clusterData = this.getClusterData();
+        List<String> clusterData = this.getClusterData(roomId);
         if (CollectionUtils.isNotEmpty(clusterData)) {
             for (String e : clusterData) {
                 if (StringUtils.isBlank(e)) {
@@ -158,16 +158,15 @@ public class SettingService {
     }
 
 
-
     /**
      * 读取房间设置
      *
      * @return 房间信息
      */
-    public List<String> getClusterData() throws Exception {
-        String filePath = DstConstant.ROOT_PATH + "/" + DstConstant.DST_USER_GAME_CONFIG_PATH;
+    public List<String> getClusterData(String roomId) throws Exception {
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_GAME_CONFIG_PATH;
         List<String> configList = new ArrayList<>();
-        File file = new File(filePath);
+        File file = new File(filePath.replace("MyDediServer", roomId));
         if (!file.exists()) {
             //不存在不管它
             return configList;
