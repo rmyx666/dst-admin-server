@@ -2,6 +2,7 @@ package com.tugos.dst.admin.config.shiro;
 
 
 import com.tugos.dst.admin.entity.User;
+import com.tugos.dst.admin.service.EhcacheDataService;
 import com.tugos.dst.admin.utils.DstConfigData;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
@@ -9,6 +10,7 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -20,6 +22,9 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class AuthRealm extends AuthorizingRealm {
+
+    @Autowired
+    EhcacheDataService ehcacheDataService;
 
     /**
      * 授权逻辑
@@ -58,8 +63,8 @@ public class AuthRealm extends AuthorizingRealm {
                 // 获取明文密码及密码盐
                 String password = String.valueOf(token.getPassword());
                 String username = token.getUsername();
-                if (DstConfigData.USER_INFO.getUsername().equals(username)
-                        && DstConfigData.USER_INFO.getPassword().equals(password)) {
+                if (ehcacheDataService.getUser().getUsername().equals(username)
+                        && ehcacheDataService.getUser().getPassword().equals(password)) {
                     return true;
                 }
                 return false;

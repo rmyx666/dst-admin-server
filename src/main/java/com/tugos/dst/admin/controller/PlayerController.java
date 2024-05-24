@@ -35,7 +35,7 @@ public class PlayerController {
     @ResponseBody
     public ResultVO<List<String>> getDstAdminList(@RequestParam(required = true) String roomId) {
         log.info("拉取管理员列表");
-//        return ResultVO.data(playerService.getDstAdminList(roomId));
+        return ResultVO.data(playerService.getDstAdminList(roomId));
         return ResultVO.success();
     }
 
@@ -44,7 +44,7 @@ public class PlayerController {
     @ResponseBody
     public ResultVO<List<String>> getDstBlacklist(@RequestParam(required = true) String roomId) {
         log.info("拉取玩家黑名单列表");
-//        return ResultVO.data(playerService.getDstBlacklist(roomId));
+        return ResultVO.data(playerService.getDstBlacklist(roomId));
         return ResultVO.success();
     }
 
@@ -54,7 +54,7 @@ public class PlayerController {
     @Deprecated
     public ResultVO<String> saveAdminList(@RequestBody List<String> adminList,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存管理员：" + adminList);
-//        return playerService.saveAdminList(adminList,roomId);
+        return playerService.saveAdminList(adminList,roomId);
         return ResultVO.success();
     }
 
@@ -64,7 +64,7 @@ public class PlayerController {
     @Deprecated
     public ResultVO<String> saveBlackList(@RequestBody List<String> blackList,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存黑名单：" + blackList);
-//        return playerService.saveBlackList(blackList,roomId);
+        return playerService.saveBlackList(blackList,roomId);
         return ResultVO.success();
     }
 
@@ -73,8 +73,8 @@ public class PlayerController {
     @ResponseBody
     public ResultVO<String> saveAdminAndBlackList(@RequestBody PlayerSettingVO playerSettingVO,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存管理员和黑名单：" + playerSettingVO);
-//        playerService.saveAdminList(playerSettingVO.getAdminList(),roomId);
-//        playerService.saveBlackList(playerSettingVO.getBlackList(),roomId);
+        playerService.saveAdminList(playerSettingVO.getAdminList(),roomId);
+        playerService.saveBlackList(playerSettingVO.getBlackList(),roomId);
         return ResultVO.success();
     }
 

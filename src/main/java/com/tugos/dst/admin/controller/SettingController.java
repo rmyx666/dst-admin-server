@@ -25,7 +25,7 @@ import java.util.Locale;
 @Slf4j
 public class SettingController {
 
-//    private SettingService settingService;
+    private SettingService settingService;
 
     @GetMapping("/index")
     @RequiresAuthentication
@@ -45,7 +45,7 @@ public class SettingController {
     @ResponseBody
     public ResultVO<String> saveConfig(@RequestBody GameConfigVO model,@RequestParam(required = true) String roomId) throws Exception {
         log.info("保存游戏配置，{}", StringUtils.deleteWhitespace(model.toString()));
-//        return settingService.saveConfig(model,roomId);
+        return settingService.saveConfig(model,roomId);
         return ResultVO.success();
     }
 
@@ -54,13 +54,13 @@ public class SettingController {
     @ResponseBody
     public ResultVO<GameConfigVO> getConfig(@RequestParam(required = true) String roomId) throws Exception {
         log.info("读取游戏配置");
-//        GameConfigVO config = settingService.getConfig(roomId);
-//        return ResultVO.data(config);
+        GameConfigVO config = settingService.getConfig(roomId);
+        return ResultVO.data(config);
         return ResultVO.success();
     }
 
-//    @Autowired
-//    public void setSettingService(SettingService settingService) {
-//        this.settingService = settingService;
-//    }
+    @Autowired
+    public void setSettingService(SettingService settingService) {
+        this.settingService = settingService;
+    }
 }

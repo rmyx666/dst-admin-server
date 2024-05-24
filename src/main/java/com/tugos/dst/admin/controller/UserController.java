@@ -4,12 +4,14 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultCodeEnum;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.entity.User;
+import com.tugos.dst.admin.service.EhcacheDataService;
 import com.tugos.dst.admin.utils.DstConfigData;
 import com.tugos.dst.admin.vo.UpdatePwdVO;
 import com.tugos.dst.admin.vo.UpdateUserDetailVO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,9 @@ import java.io.IOException;
 @RequestMapping("/system/user")
 public class UserController {
 
+    @Autowired
+    private EhcacheDataService ehcacheDataService;
+
     /**
      * 用户信息页
      */
@@ -36,8 +41,6 @@ public class UserController {
     @RequiresAuthentication
     public String detail(Model model) {
         UpdateUserDetailVO user = new UpdateUserDetailVO();
-        //user.setUsername("root");
-        //user.setNickname("尖角");
         model.addAttribute("user", user);
         return "/system/user/detail";
     }
@@ -69,27 +72,32 @@ public class UserController {
         if (vo.getNewPwd().length() <= weakPsw) {
             return ResultVO.fail(ResultCodeEnum.UPDATE_PWD_ERROR4);
         }
-        DstConfigData.USER_INFO.setPassword(vo.getNewPwd());
+        ehcacheDataService.updatePassword(vo.getNewPwd());
         //退出登录
         SecurityUtils.getSubject().logout();
         return ResultVO.success("success");
     }
 
-    @PostMapping("/setNewUserDetail")
-    @RequiresAuthentication
-    @ResponseBody
-    public ResultVO setNewUserDetail(@RequestBody UpdateUserDetailVO vo) {
-        User userInfo = (User) SecurityUtils.getSubject().getPrincipal();
-        if (StringUtils.isAnyBlank(vo.getNickname(),vo.getPicture(),vo.getUsername())){
-            return ResultVO.fail("信息不能为空");
-        }
-
-        DstConfigData.USER_INFO.setNickname(vo.getPicture());
-        DstConfigData.USER_INFO.setUsername(vo.getUsername());
-        DstConfigData.USER_INFO.setPicture(vo.getPicture());
-        //退出登录
-        return ResultVO.success("修改成功");
-    }
+    /**
+     * 创建新用户用的 目前看来没有投入使用
+     * @param vo
+     * @return
+     */
+//    @PostMapping("/setNewUserDetail")
+//    @RequiresAuthentication
+//    @ResponseBody
+//    public ResultVO setNewUserDetail(@RequestBody UpdateUserDetailVO vo) {
+//        User userInfo = (User) SecurityUtils.getSubject().getPrincipal();
+//        if (StringUtils.isAnyBlank(vo.getNickname(),vo.getPicture(),vo.getUsername())){
+//            return ResultVO.fail("信息不能为空");
+//        }
+//
+//        DstConfigData.USER_INFO.setNickname(vo.getPicture());
+//        DstConfigData.USER_INFO.setUsername(vo.getUsername());
+//        DstConfigData.USER_INFO.setPicture(vo.getPicture());
+//        //退出登录
+//        return ResultVO.success("修改成功");
+//    }
 
 
     /**

@@ -29,9 +29,9 @@ import java.util.Map;
 @RequestMapping("/home")
 public class HomeController {
 
-//    private HomeService homeService;
-//    private ShellService shellService;
-//    private BackupService backupService;
+    private HomeService homeService;
+    private ShellService shellService;
+    private BackupService backupService;
 
 
     /**
@@ -60,7 +60,7 @@ public class HomeController {
     @RequiresAuthentication
     public ResultVO<DstServerInfoVO> getSystemInfo(@RequestParam(required = true) String roomId) throws Exception {
         log.debug("获取服务器的信息");
-//        return ResultVO.data(homeService.getSystemInfo(roomId));
+        return ResultVO.data(homeService.getSystemInfo(roomId));
         return ResultVO.success();
     }
 
@@ -70,7 +70,7 @@ public class HomeController {
     public ResultVO<String> start(@RequestParam Integer type,
                                   @RequestParam(required = true) String roomId) throws Exception {
         log.info("启动服务器，type={}", type);
-//        return homeService.start(type,roomId);
+        return homeService.start(type,roomId);
         return ResultVO.success();
     }
 
@@ -80,7 +80,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> stop(@RequestParam Integer type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("停止服务器，type={}", type);
-//        return homeService.stop(type,roomId);
+        return homeService.stop(type,roomId);
         return ResultVO.success();
     }
 
@@ -89,7 +89,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> updateGame(@RequestParam(required = true) String roomId) {
         log.info("更新游戏");
-//        return homeService.updateGame(roomId);
+        return homeService.updateGame(roomId);
         return ResultVO.success();
     }
 
@@ -101,7 +101,7 @@ public class HomeController {
     public ResultVO<String> backup(@RequestParam(required = false) String name,
                                    @RequestParam(required = true) String roomId) throws Exception {
         log.info("备份游戏,{}", name);
-//        return backupService.backup(name,roomId);
+        return backupService.backup(name,roomId);
         return ResultVO.success();
     }
 
@@ -110,8 +110,8 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> restore(@RequestParam String name,@RequestParam(required = true) String roomId) throws Exception {
         log.info("恢复存档,{}", name);
-//        homeService.stopServer();
-//        return backupService.restore(name,roomId);
+        homeService.stopServer();
+        return backupService.restore(name,roomId);
         return ResultVO.success();
     }
 
@@ -120,7 +120,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> delRecord(@RequestParam(required = true) String roomId) throws Exception {
         log.info("清理游戏记录");
-//        homeService.delRecord(roomId);
+        homeService.delRecord(roomId);
         Thread.sleep(1000);
         return ResultVO.success();
 
@@ -131,7 +131,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> sendBroadcast(@RequestParam String message,@RequestParam(required = true) String roomId) throws Exception {
         log.info("发送公告：" + message);
-//        shellService.sendBroadcast(message,roomId);
+        shellService.sendBroadcast(message,roomId);
         Thread.sleep(1000);
         return ResultVO.success();
     }
@@ -140,8 +140,8 @@ public class HomeController {
     @RequiresAuthentication
     @ResponseBody
     public ResultVO<List<String>> getPlayerList(@RequestParam(required = true) String roomId) throws Exception {
-//        List<String> playerList = shellService.getPlayerList(roomId);
-//        return ResultVO.data(playerList);
+        List<String> playerList = shellService.getPlayerList(roomId);
+        return ResultVO.data(playerList);
         return ResultVO.success();
     }
 
@@ -150,7 +150,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> kickPlayer(@RequestParam String userId,@RequestParam(required = true) String roomId) {
         log.info("踢出玩家：" + userId);
-//        shellService.kickPlayer(userId,roomId);
+        shellService.kickPlayer(userId,roomId);
         return ResultVO.success();
     }
 
@@ -159,7 +159,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> rollback(@RequestParam Integer dayNum,@RequestParam(required = true) String roomId) {
         log.info("回滚指定的天数：" + dayNum);
-//        shellService.rollback(dayNum,roomId);
+        shellService.rollback(dayNum,roomId);
         return ResultVO.success();
     }
 
@@ -168,7 +168,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> regenerate(@RequestParam(required = true) String roomId) {
         log.info("重置世界...");
-//        shellService.regenerate(roomId);
+        shellService.regenerate(roomId);
         return ResultVO.success();
     }
 
@@ -176,7 +176,7 @@ public class HomeController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> masterConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
-//        shellService.masterConsole(param.get("command"),roomId);
+        shellService.masterConsole(param.get("command"),roomId);
         return ResultVO.success();
     }
 
@@ -184,7 +184,7 @@ public class HomeController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> cavesConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
-//        shellService.cavesConsole(param.get("command"),roomId);
+        shellService.cavesConsole(param.get("command"),roomId);
         return ResultVO.success();
     }
 
@@ -193,7 +193,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type,@RequestParam(required = true) String roomId) throws Exception {
         log.info("执行高级针对玩家的操作：type={},userId={}", type, userId);
-//        return shellService.playerOperate(type, userId,roomId);
+        return shellService.playerOperate(type, userId,roomId);
         return ResultVO.success();
     }
 
@@ -202,7 +202,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> delMyDediServer(@RequestParam(required = true) String roomId) {
         log.info("删除MyDediServer目录");
-//        homeService.delMyDediServer(roomId);
+        homeService.delMyDediServer(roomId);
         return ResultVO.success();
     }
 
@@ -211,7 +211,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> onlyDelSave(@RequestParam(required = true) String roomId) {
         log.info("删除地面存档记录");
-//        homeService.onlyDelSave(roomId);
+        homeService.onlyDelSave(roomId);
         return ResultVO.success();
     }
 
@@ -219,24 +219,24 @@ public class HomeController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<GameArchiveVO> getGameArchive(@RequestParam(required = true) String roomId) throws Exception {
-//        return ResultVO.data(homeService.getGameArchive(roomId));
+        return ResultVO.data(homeService.getGameArchive(roomId));
         return ResultVO.success();
     }
 
 
 
-//    @Autowired
-//    public void setHomeService(HomeService homeService) {
-//        this.homeService = homeService;
-//    }
-//
-//    @Autowired
-//    public void setShellService(ShellService shellService) {
-//        this.shellService = shellService;
-//    }
-//
-//    @Autowired
-//    public void setBackupService(BackupService backupService) {
-//        this.backupService = backupService;
-//    }
+    @Autowired
+    public void setHomeService(HomeService homeService) {
+        this.homeService = homeService;
+    }
+
+    @Autowired
+    public void setShellService(ShellService shellService) {
+        this.shellService = shellService;
+    }
+
+    @Autowired
+    public void setBackupService(BackupService backupService) {
+        this.backupService = backupService;
+    }
 }

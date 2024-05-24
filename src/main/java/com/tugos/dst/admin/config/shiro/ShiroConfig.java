@@ -44,6 +44,8 @@ public class ShiroConfig {
         filterMap.put("/images/**", "anon");
         filterMap.put("/lib/**", "anon");
         filterMap.put("/favicon.ico", "anon");
+        //忽略测试用的接口
+        filterMap.put("/test/**", "anon");
         // 通过配置文件方式配置的[anon]忽略规则
         String[] excludes = properties.getExcludes().split(",");
         for (String exclude : excludes) {

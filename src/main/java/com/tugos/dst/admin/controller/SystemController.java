@@ -62,7 +62,7 @@ public class SystemController {
                                             @RequestParam(required = false, defaultValue = "100") Integer rowNum,
                                             @RequestParam(required = true) String roomId) {
         log.info("拉取饥荒的日志：type={},rowNum={}", type, rowNum);
-//        return ResultVO.data(systemService.getDstLog(type, rowNum, roomId));
+        return ResultVO.data(systemService.getDstLog(type, rowNum, roomId));
         return ResultVO.success();
     }
 
@@ -73,7 +73,7 @@ public class SystemController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<ScheduleVO> getScheduleList(@RequestParam(required = true) String roomId) {
-//        return ResultVO.data(systemService.getScheduleList(roomId));
+        return ResultVO.data(systemService.getScheduleList(roomId));
         return ResultVO.success();
     }
 
@@ -82,7 +82,7 @@ public class SystemController {
     @RequiresAuthentication
     public ResultVO<String> saveSchedule(@RequestBody ScheduleVO vo,
                                          @RequestParam(required = true) String roomId) {
-//        systemService.saveSchedule(vo, roomId);
+        systemService.saveSchedule(vo, roomId);
         return ResultVO.success();
     }
 
@@ -91,7 +91,7 @@ public class SystemController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<Map<String, String>> getVersion() {
-//        return ResultVO.data(systemService.getVersion());
+        return ResultVO.data(systemService.getVersion());
         return ResultVO.success();
     }
 
@@ -100,7 +100,7 @@ public class SystemController {
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<GamePortVO> getGamePort(@RequestParam(required = true) String roomId) {
-//        return ResultVO.data(systemService.getGamePort(roomId));
+        return ResultVO.data(systemService.getGamePort(roomId));
         return ResultVO.success();
     }
 
@@ -110,13 +110,13 @@ public class SystemController {
     @RequiresAuthentication
     public ResultVO<Map<String, String>> saveGamePort(@RequestBody GamePortVO gamePortVO,
                                                       @RequestParam(required = true) String roomId) {
-//        systemService.saveGamePort(gamePortVO, roomId);
+        systemService.saveGamePort(gamePortVO, roomId);
         return ResultVO.success();
     }
 
 
-//    @Autowired
-//    public void setSystemService(SystemService systemService) {
-//        this.systemService = systemService;
-//    }
+    @Autowired
+    public void setSystemService(SystemService systemService) {
+        this.systemService = systemService;
+    }
 }

@@ -36,6 +36,8 @@
         <jackson.version>2.14.1</jackson.version>
         <!-- ini4j版本 -->
         <ini4j.version>0.5.4</ini4j.version>
+        <!-- ehcache版本 -->
+        <ehcache.version>3.10.6</ehcache.version>
     </properties>
 
     <dependencies>
@@ -146,6 +148,30 @@
             <artifactId>ini4j</artifactId>
             <version>${ini4j.version}</version>
         </dependency>
+
+        <!--Ehcache当做数据库用，用来持久化数据-->
+<!--        <dependency>-->
+<!--            <groupId>org.ehcache</groupId>-->
+<!--            <artifactId>ehcache</artifactId>-->
+<!--            <version>${ehcache.version}</version>-->
+<!--        </dependency>-->
+        <!-- EhCache相关组件 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.10.6</version>
+        </dependency>
+        <!-- EhCache相关组件 -->
     </dependencies>
 
 
