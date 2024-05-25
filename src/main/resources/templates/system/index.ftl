@@ -193,6 +193,7 @@
     new Vue({
         el: '#sys_index',
         data: {
+            roomId: null,
             activeName: 'first',
             num1: 20,
             num2: 20,
@@ -216,6 +217,7 @@
             gamePort:{},
         },
         created() {
+            this.roomId = RoomUtil.getRoomId()
             this.getScheduleList();
             this.getVersion();
             this.getLabelPosition();
@@ -241,7 +243,7 @@
 
             },
             getScheduleList() {
-                get("/system/getScheduleList").then((data) => {
+                get("/system/getScheduleList?roomId=" + this.roomId).then((data) => {
                     this.scheduleVO = data;
                     //初始化
                     this.updateTimeList = [];
@@ -329,7 +331,7 @@
                 params.notStartMaster = this.notStartMaster;
                 params.notStartCaves = this.notStartCaves;
                 params.smartUpdate = this.smartUpdate;
-                post("/system/saveSchedule", params).then((data) => {
+                post("/system/saveSchedule?roomId=" + this.roomId, params).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});
                     } else {
@@ -340,7 +342,7 @@
             },
             getDstLog(type, rowNum) {
                 let params = {type: type, rowNum: rowNum}
-                get("/system/getDstLog", params).then((data) => {
+                get("/system/getDstLog?roomId=" + this.roomId, params).then((data) => {
                     switch (type){
                         case 0:
                             this.masterLog = data;
@@ -355,12 +357,12 @@
                 })
             },
             getGamePort(){
-                get("/system/getGamePort").then((data) => {
+                get("/system/getGamePort?roomId=" + this.roomId).then((data) => {
                     this.gamePort = data;
                 })
             },
             saveGamePort(){
-                post("/system/saveGamePort",this.gamePort).then((data) => {
+                post("/system/saveGamePort?roomId=" + this.roomId,this.gamePort).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});
                     } else {
