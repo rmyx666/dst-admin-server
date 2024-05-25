@@ -98,11 +98,11 @@ public class ShellService {
 
      * @param roomId
      */
-    public void createServer( String roomId) {
-        StringBuilder command = new StringBuilder();
-        command.append("mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer");
-        ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
-    }
+//    public void createServer( String roomId) {
+//        StringBuilder command = new StringBuilder();
+//        command.append("mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer");
+//        ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
+//    }
 
     /**
      * 恢复游戏存档

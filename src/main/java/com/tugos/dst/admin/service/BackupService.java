@@ -33,6 +33,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author qinming
@@ -57,7 +58,7 @@ public class BackupService {
      */
     public List<BackupFileVO> getBackupFileInfo(String roomId) {
         List<BackupFileVO> result = new ArrayList<>();
-        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
         List<String> allFileList = FileUtils.getFiles(backupPath);
         //过滤出所有备份文件压缩包 包括zip，tar
         List<String> backupFileList = new ArrayList<>();
@@ -68,19 +69,25 @@ public class BackupService {
                 backupFileList.add(e);
             }
         });
+
+
         if (CollectionUtils.isNotEmpty(backupFileList)) {
             SimpleDateFormat sdf = new SimpleDateFormat(DatePattern.NORM_DATETIME_PATTERN);
             for (String e : backupFileList) {
-                BackupFileVO vo = new BackupFileVO();
-                File file = new File(e);
-                String name = file.getName();
-                long lastModified = file.lastModified();
-                String time = sdf.format(lastModified);
-                vo.setCreateTime(time);
-                vo.setFileSize(file.length());
-                vo.setFileName(name);
-                vo.setTime(DateUtil.parse(vo.getCreateTime(), DatePattern.NORM_DATETIME_FORMAT));
-                result.add(vo);
+                //筛选当前room的备份文件
+                if (e.startsWith(roomId + "_")) {
+                    BackupFileVO vo = new BackupFileVO();
+                    File file = new File(e);
+                    String name = file.getName();
+                    long lastModified = file.lastModified();
+                    String time = sdf.format(lastModified);
+                    vo.setCreateTime(time);
+                    vo.setFileSize(file.length());
+                    vo.setFileName(name);
+                    vo.setTime(DateUtil.parse(vo.getCreateTime(), DatePattern.NORM_DATETIME_FORMAT));
+                    result.add(vo);
+                }
+
             }
         }
         if (CollectionUtils.isNotEmpty(result)) {
@@ -98,7 +105,7 @@ public class BackupService {
      */
     public boolean deleteBackup(String fileName, String roomId) {
         if (StringUtils.isNotBlank(fileName)) {
-            String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+            String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
             String filePath = basePath + "/" + fileName;
             File file = new File(filePath);
             if (file.exists()) {
@@ -151,7 +158,7 @@ public class BackupService {
     private boolean checkBackupIsExists(String name, String roomId) {
         boolean flag = false;
         if (StringUtils.isNotBlank(name)) {
-            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
             File file = new File(path);
             flag = file.exists();
         }
@@ -168,7 +175,7 @@ public class BackupService {
     public ResultVO<String> rename(String fileName, String newFileName, String roomId) {
         if (StringUtils.isNoneBlank(fileName, newFileName)) {
             newFileName = fileNameFilter(newFileName);
-            String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+            String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
             String filePath = basePath + DstConstant.SINGLE_SLASH + fileName;
             String suffix = "." + FileUtil.extName(filePath);
             String newFilePath = basePath + DstConstant.SINGLE_SLASH + newFileName + suffix;
@@ -249,7 +256,7 @@ public class BackupService {
      * @return true 存在
      */
     private boolean checkGameFileIsExists(String roomId) {
-        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
         File file = new File(path);
         return file.exists();
     }
@@ -397,8 +404,8 @@ public class BackupService {
         String outFileDir = basePath + roomId;
         FileUtil.del(outFileDir);
         FileUtil.mkdir(outFileDir);
-        String zipPath = basePath + roomId + DstConstant.SINGLE_SLASH + fileName;
-        String tmpPath = basePath + roomId + DstConstant.SINGLE_SLASH + "tmp";
+        String zipPath = basePath + fileName;
+        String tmpPath = basePath + "tmp";
         File file = null;
         boolean unzipFail = false;
         try {
@@ -456,7 +463,7 @@ public class BackupService {
         String extName = FileUtil.extName(fileName);
         if (StringUtils.isNotBlank(fileName) && !fileName.contains(DstConstant.BACKUP_ERROR_PATH) && StringUtils.equalsAnyIgnoreCase(extName,
                 DstConstant.BACKUP_FILE_EXTENSION_NON_POINT, DstConstant.BACKUP_FILE_EXTENSION_NON_POINT_ZIP)) {
-            String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+            String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
             filepath += DstConstant.SINGLE_SLASH + fileName;
             File file = new File(filepath);
             if (file.exists()) {
@@ -491,7 +498,7 @@ public class BackupService {
      * 上传存档
      */
     public ResultVO<String> upload(MultipartFile file, String roomId) throws Exception {
-        String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + file.getOriginalFilename();
+        String filepath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + file.getOriginalFilename();
         File dest = new File(filepath);
         if (!dest.exists()) {
             file.transferTo(dest);

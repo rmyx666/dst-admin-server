@@ -32,7 +32,7 @@ public class RoomService {
     ShellService shellService;
 
     public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
-        roomInfo.setRoomId("SERVER_"+roomInfo.getRoomId());
+        roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
 
         Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
         if (roomInfoMap.containsKey(roomInfo.roomId)) {
@@ -51,7 +51,9 @@ public class RoomService {
 
         roomInfoMap.put(roomInfo.roomId, roomInfo);
         ehcacheDataService.updateRoomInfoMap(roomInfoMap);
-        shellService.createServer(roomInfo.roomId);
+        //创建新房间的文件夹
+        String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomInfo.getRoomId();
+        FileUtils.mkdirs(basePath);
 
 
         return ResultVO.success();
