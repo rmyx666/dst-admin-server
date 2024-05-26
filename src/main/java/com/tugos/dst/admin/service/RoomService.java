@@ -67,7 +67,7 @@ public class RoomService {
         return ResultVO.success();
     }
 
-    public List<RoomInfoVO> getRoomInfos() throws Exception {
+    public List<RoomInfoVO> getRoomInfos()  {
         List<DstConfigRoomData> roomInfoList = new ArrayList<>(ehcacheDataService.getRoomInfoMap().values());
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
@@ -77,19 +77,37 @@ public class RoomService {
             BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
 
-            DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
-            roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
-            roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
-            roomInfoVO.setCpu(systemInfo.getCpu());
-            roomInfoVO.setMem(systemInfo.getMem());
-            List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
-            roomInfoVO.setNowPlayers(playerList.size());
-            GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
-            roomInfoVO.setClusterName(gameArchive.getClusterName());
-            roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
-            roomInfoVO.setPlayDay(gameArchive.getPlayDay());
-            roomInfoVO.setSeason(gameArchive.getSeason());
-            roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+            DstServerInfoVO systemInfo = null;
+            try {
+                systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
+                roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
+                roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
+                roomInfoVO.setCpu(systemInfo.getCpu());
+                roomInfoVO.setMem(systemInfo.getMem());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            List<String> playerList = null;
+            try {
+                playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
+                roomInfoVO.setNowPlayers(playerList.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            GameArchiveVO gameArchive = null;
+            try {
+                gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
+                roomInfoVO.setClusterName(gameArchive.getClusterName());
+                roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
+                roomInfoVO.setPlayDay(gameArchive.getPlayDay());
+                roomInfoVO.setSeason(gameArchive.getSeason());
+                roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
             roomInfoVOS.add(roomInfoVO);

@@ -70,14 +70,19 @@ public class FileUtils {
         return true;
     }
     /**
-     * 创建目录
+     * 创建文件
      *
-     * @param path 如 /home/ubuntu/.klei/DoNotStarveTogether/MyDediServer/Master
+     * @param path 如 /home/ubuntu/.klei/DoNotStarveTogether/user.json
      * @return true 创建成功
      */
     public static boolean createFile(String path) throws IOException {
         File file = new File(path);
         if (!file.exists()) {
+            // 确保父目录存在
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
             return file.createNewFile();
         }
         return true;
