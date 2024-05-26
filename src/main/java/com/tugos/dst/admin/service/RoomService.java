@@ -6,6 +6,8 @@ import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
+import com.tugos.dst.admin.vo.DstServerInfoVO;
+import com.tugos.dst.admin.vo.GameArchiveVO;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +29,12 @@ public class RoomService {
 
     @Autowired
     EhcacheDataService ehcacheDataService;
+
+    @Autowired
+    HomeService homeService;
+
+    @Autowired
+    BackupService backupService;
 
     @Autowired
     ShellService shellService;
@@ -59,7 +67,7 @@ public class RoomService {
         return ResultVO.success();
     }
 
-    public List<RoomInfoVO> getRoomInfos() {
+    public List<RoomInfoVO> getRoomInfos() throws Exception {
         List<DstConfigRoomData> roomInfoList = new ArrayList<>(ehcacheDataService.getRoomInfoMap().values());
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
@@ -67,10 +75,46 @@ public class RoomService {
         for (DstConfigRoomData dstConfigRoomData : roomInfoList) {
             RoomInfoVO roomInfoVO = new RoomInfoVO();
             BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
+
+
+            DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
+            roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
+            roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
+            roomInfoVO.setCpu(systemInfo.getCpu());
+            roomInfoVO.setMem(systemInfo.getMem());
+            List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
+            roomInfoVO.setNowPlayers(playerList.size());
+            GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
+            roomInfoVO.setClusterName(gameArchive.getClusterName());
+            roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
+            roomInfoVO.setPlayDay(gameArchive.getPlayDay());
+            roomInfoVO.setSeason(gameArchive.getSeason());
+            roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+
+
             roomInfoVOS.add(roomInfoVO);
         }
 
 
         return roomInfoVOS;
+    }
+
+    public ResultVO<String> delRoomInfos(String roomId) {
+
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        roomInfoMap.remove(roomId);
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        //删除房间的文件夹
+        backupService.delRoomDir(roomId);
+        return ResultVO.success();
+    }
+
+    public ResultVO<String> updateRoomInfos(DstConfigRoomData roomInfo) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomInfo.getRoomId());
+        dstConfigRoomData.setRoomName(roomInfo.getRoomName());
+        roomInfoMap.put(roomInfo.getRoomId(),dstConfigRoomData);
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        return ResultVO.success();
     }
 }

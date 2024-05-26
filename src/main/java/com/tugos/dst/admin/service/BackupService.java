@@ -33,7 +33,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author qinming
@@ -127,14 +126,14 @@ public class BackupService {
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error2") + name);
         }
         //清空在恢复
-        delMyDediServer(roomId);
+        delRoomDir(roomId);
         String extName = FileUtil.extName(name);
         if (StringUtils.equalsAnyIgnoreCase(DstConstant.BACKUP_FILE_EXTENSION_NON_POINT_ZIP, extName)) {
             //zip
             revertZIPBackup(name, roomId);
         } else {
             //tar
-            delMyDediServer(roomId);
+            delRoomDir(roomId);
             shellService.revertBackup(name, roomId);
         }
         return ResultVO.success();
@@ -143,7 +142,7 @@ public class BackupService {
     /**
      * 删除MyDediServer目录
      */
-    public void delMyDediServer(String roomId) {
+    public void delRoomDir(String roomId) {
         String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
         log.warn("删除MyDediServer目录:{}", path);
         FileUtil.del(path);

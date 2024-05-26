@@ -69,7 +69,19 @@ public class FileUtils {
         }
         return true;
     }
-
+    /**
+     * 创建目录
+     *
+     * @param path 如 /home/ubuntu/.klei/DoNotStarveTogether/MyDediServer/Master
+     * @return true 创建成功
+     */
+    public static boolean createFile(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            return file.createNewFile();
+        }
+        return true;
+    }
     /**
      * 读取指定位置文件
      *

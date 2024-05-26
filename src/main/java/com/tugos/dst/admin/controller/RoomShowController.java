@@ -19,30 +19,41 @@ import java.util.List;
 @RequestMapping("/room")
 public class RoomShowController {
 
-	@Autowired
-	RoomService roomService;
+    @Autowired
+    RoomService roomService;
 
-	@GetMapping("index")
-	@RequiresPermissions("index")
-	public String index() {
-		return "/room/index";
-	}
+    @GetMapping("index")
+    @RequiresPermissions("index")
+    public String index() {
+        return "/room/index";
+    }
 
+    @GetMapping("/infos")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<List<RoomInfoVO>> getRoomInfos() throws Exception {
+        return ResultVO.data(roomService.getRoomInfos());
+    }
 
-	@PostMapping("/save")
-	@ResponseBody
-	@RequiresAuthentication
-	public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
+    @PostMapping("/save")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
         return roomService.saveRoomInfos(roomInfo);
     }
 
-
-	@GetMapping("/infos")
+	@GetMapping("/del")
 	@ResponseBody
 	@RequiresAuthentication
-	public ResultVO<List<RoomInfoVO>> getRoomInfos() {
+	public ResultVO<String> delRoomInfos(@RequestParam String roomId) throws Exception {
+		return roomService.delRoomInfos(roomId);
+	}
 
-		return ResultVO.data(roomService.getRoomInfos());
+	@GetMapping("/update")
+	@ResponseBody
+	@RequiresAuthentication
+	public ResultVO<String> updateRoomInfos(@RequestBody DstConfigRoomData roomInfo) throws Exception {
+		return roomService.updateRoomInfos(roomInfo);
 	}
 
 }

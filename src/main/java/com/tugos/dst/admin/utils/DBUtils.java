@@ -23,38 +23,38 @@ public class DBUtils {
      * @param fileName 文件
      * @return 数据
      */
-//    public static String readProjectData(String fileName) {
-//        File file = new File(fileName);
-//        if (!file.exists()) {
-//            return null;
-//        }
-//        StringBuilder sb = new StringBuilder();
-//        try (InputStream inputStream = new FileInputStream(file)) {
-//            byte[] buf = new byte[1024];
-//            int len;
-//            while ((len = (inputStream.read(buf))) != -1) {
-//                sb.append(new String(buf, 0, len));
-//            }
-//        } catch (Exception e) {
-//            log.error("读取项目目录的文件失败:", e);
-//        }
-//        return sb.toString();
-//    }
+    public static String readProjectData(String fileName) {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        try (InputStream inputStream = new FileInputStream(file)) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = (inputStream.read(buf))) != -1) {
+                sb.append(new String(buf, 0, len));
+            }
+        } catch (Exception e) {
+            log.error("读取项目目录的文件失败:", e);
+        }
+        return sb.toString();
+    }
 
     /**
      * 写入项目数据，每次都会覆盖之前的
      * @param fileName 文件名称
      * @param data 数据
      */
-//    private static void writeProjectData(String fileName, String data) {
-//        File file = new File(fileName);
-//        try (OutputStream outputStream = new FileOutputStream(file);) {
-//            outputStream.write(data.getBytes());
-//            outputStream.flush();
-//        } catch (Exception e) {
-//            log.error("写入数据失败：", e);
-//        }
-//    }
+    private static void writeProjectData(String fileName, String data) {
+        File file = new File(fileName);
+        try (OutputStream outputStream = new FileOutputStream(file);) {
+            outputStream.write(data.getBytes());
+            outputStream.flush();
+        } catch (Exception e) {
+            log.error("写入数据失败：", e);
+        }
+    }
 
     /**
      * 读取文件中存储的数据写入到缓存中
