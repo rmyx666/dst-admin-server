@@ -74,7 +74,7 @@ public class BackupService {
             SimpleDateFormat sdf = new SimpleDateFormat(DatePattern.NORM_DATETIME_PATTERN);
             for (String e : backupFileList) {
                 //筛选当前room的备份文件
-                if (e.startsWith(roomId + "_")) {
+                if (e.contains(roomId + "_")) {
                     BackupFileVO vo = new BackupFileVO();
                     File file = new File(e);
                     String name = file.getName();
@@ -245,6 +245,7 @@ public class BackupService {
             }
             fileName = String.format("%s_%s_%s_%s.zip", DateUtil.format(new Date(), "yyyyMMddHHmmss"), serverName, playDate, season);
         }
+        fileName = roomId + "_" + fileName;
         createBackup(fileName, roomId);
         return ResultVO.success();
     }
