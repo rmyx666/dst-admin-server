@@ -44,6 +44,11 @@ public class ShiroConfig {
         filterMap.put("/images/**", "anon");
         filterMap.put("/lib/**", "anon");
         filterMap.put("/favicon.ico", "anon");
+        // 允许访问Knife4j的相关资源
+        filterMap.put("/doc.html", "anon");
+        filterMap.put("/webjars/**", "anon");
+        filterMap.put("/swagger-resources/**", "anon");
+        filterMap.put("/v2/api-docs", "anon");
         //忽略测试用的接口
         filterMap.put("/test/**", "anon");
         // 通过配置文件方式配置的[anon]忽略规则
