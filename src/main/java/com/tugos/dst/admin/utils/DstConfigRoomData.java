@@ -2,6 +2,7 @@ package com.tugos.dst.admin.utils;
 
 import com.google.common.collect.Maps;
 import com.tugos.dst.admin.entity.User;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,52 +15,33 @@ import java.util.Map;
  */
 
 @Data
-public class DstConfigRoomData  implements Serializable {
+public class DstConfigRoomData implements Serializable {
 
-    /**
-     * 房间id
-     */
+    @ApiModelProperty(value = "房间ID", required = true, hidden = false)
     public String roomId;
 
-    /**
-     * 房间名
-     */
+    @ApiModelProperty(value = "房间名称", required = true, hidden = false)
     public String roomName;
 
-    /**
-     * 定时更新游戏任务
-     */
-    public Map<String, Integer> SCHEDULE_UPDATE_MAP = Maps.newHashMap();
+    @ApiModelProperty(value = "定时更新游戏任务", required = false, hidden = true)
+    public Map<String, Integer> SCHEDULE_UPDATE_MAP;
 
-    /**
-     * 定时备份游戏任务
-     */
-    public Map<String, Integer> SCHEDULE_BACKUP_MAP = Maps.newHashMap();
+    @ApiModelProperty(value = "定时备份游戏任务", required = false, hidden = true)
+    public Map<String, Integer> SCHEDULE_BACKUP_MAP;
 
-    /**
-     * 不启动地面标志
-     */
+    @ApiModelProperty(value = "不启动地面标志", required = false, hidden = true)
     public Boolean notStartMaster;
 
-    /**
-     * 不启动洞穴标志
-     */
+    @ApiModelProperty(value = "不启动洞穴标志", required = false, hidden = true)
     public Boolean notStartCaves;
 
-
-    /**
-     * 主端口号
-     */
+    @ApiModelProperty(value = "主端口号", required = true, hidden = false)
     public String masterPort;
 
-    /**
-     * 地面端口号
-     */
+    @ApiModelProperty(value = "地面端口号", required = true, hidden = false)
     public String groundPort;
 
-    /**
-     * 洞穴端口号
-     */
+    @ApiModelProperty(value = "洞穴端口号", required = true, hidden = false)
     public String cavesPort;
 
     /**

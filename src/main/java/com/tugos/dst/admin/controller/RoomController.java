@@ -31,7 +31,7 @@ public class RoomController {
         return "/room/index";
     }
 
-    @ApiOperation(value = "获取房间信息", notes = "获取所有房间的信息")
+    @ApiOperation(value = "获取房间信息", notes = "获取所有房间的信息 概览展示房间id 房间名称 服务器名称 季节 天数 在线情况 cpu 内存 地面和洞穴是否启动 三个端口号")
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
@@ -52,8 +52,8 @@ public class RoomController {
 	public ResultVO<String> delRoomInfos(@RequestParam String roomId) throws Exception {
 		return roomService.delRoomInfos(roomId);
 	}
-    @ApiOperation(value = "更新房间信息", notes = "更新房间的信息")
-	@GetMapping("/update")
+    @ApiOperation(value = "更新房间信息", notes = "更新房间的信息 更新不能更改roomid，其他四个可以更改")
+	@PostMapping("/update")
 	@ResponseBody
 	@RequiresAuthentication
 	public ResultVO<String> updateRoomInfos(@RequestBody DstConfigRoomData roomInfo) throws Exception {

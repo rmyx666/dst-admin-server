@@ -2,6 +2,7 @@ package com.tugos.dst.admin.entity.serverInfo;
 
 
 import com.tugos.dst.admin.utils.Arith;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -10,34 +11,22 @@ import lombok.Data;
  */
 @Data
 public class Cpu {
-    /**
-     * 核心数
-     */
+    @ApiModelProperty(value = "核心数")
     private int cpuNum;
 
-    /**
-     * CPU总的使用率
-     */
+    @ApiModelProperty(value = "CPU总的使用率")
     private double total;
 
-    /**
-     * CPU系统使用率
-     */
+    @ApiModelProperty(value = "CPU系统使用率")
     private double sys;
 
-    /**
-     * CPU用户使用率
-     */
+    @ApiModelProperty(value = "CPU用户使用率")
     private double used;
 
-    /**
-     * CPU当前等待率
-     */
+    @ApiModelProperty(value = "CPU当前等待率")
     private double wait;
 
-    /**
-     * CPU当前空闲率
-     */
+    @ApiModelProperty(value = "CPU当前空闲率")
     private double free;
 
     public int getCpuNum() {

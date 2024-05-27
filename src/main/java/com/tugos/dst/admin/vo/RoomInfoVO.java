@@ -2,9 +2,10 @@ package com.tugos.dst.admin.vo;
 
 import com.tugos.dst.admin.entity.serverInfo.Cpu;
 import com.tugos.dst.admin.entity.serverInfo.Mem;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.List;
+
 
 
 /**
@@ -12,86 +13,52 @@ import java.util.List;
  * @date 2022-11-21 20:57:57
  * <p> 游戏的存档信息 服务器使用详细 </p>
  */
+
 @Data
-public class RoomInfoVO{
+public class RoomInfoVO {
 
-    /**
-     * 房间id
-     */
-    public String roomId;
+    @ApiModelProperty(value = "房间ID")
+    private String roomId;
 
-    /**
-     * 房间名
-     */
-    public String roomName;
+    @ApiModelProperty(value = "房间名称")
+    private String roomName;
 
-    /**
-     * 主端口号
-     */
-    public String masterPort;
+    @ApiModelProperty(value = "主端口号")
+    private String masterPort;
 
-    /**
-     * 地面端口号
-     */
-    public String groundPort;
+    @ApiModelProperty(value = "地面端口号")
+    private String groundPort;
 
-    /**
-     * 洞穴端口号
-     */
-    public String cavesPort;
+    @ApiModelProperty(value = "洞穴端口号")
+    private String cavesPort;
 
-
-
-    /**
-     * 房间名称
-     */
+    @ApiModelProperty(value = "房间集群名称")
     private String clusterName;
 
-
-    /**
-     * 最大玩家数量
-     */
+    @ApiModelProperty(value = "最大玩家数量")
     private Integer maxPlayers;
 
-    /**
-     * 当前玩家数量
-     */
+    @ApiModelProperty(value = "当前玩家数量")
     private Integer nowPlayers;
 
-
-    /**
-     * 存档的天数
-     */
+    @ApiModelProperty(value = "存档的天数")
     private String playDay;
 
-    /**
-     * 存档的季节
-     */
+    @ApiModelProperty(value = "存档的季节")
     private String season;
 
-    /**
-     * MOD总数
-     */
+    @ApiModelProperty(value = "MOD总数")
     private Integer totalModNum;
 
-    /**
-     * 地面状态 true 启动
-     */
+    @ApiModelProperty(value = "地面状态，true表示启动")
     private Boolean masterStatus;
 
-    /**
-     * 洞穴状态 true 启动
-     */
+    @ApiModelProperty(value = "洞穴状态，true表示启动")
     private Boolean cavesStatus;
 
-    /**
-     * CPU相关信息
-     */
+    @ApiModelProperty(value = "CPU相关信息")
     private Cpu cpu;
 
-    /**
-     * 內存相关信息
-     */
+    @ApiModelProperty(value = "内存相关信息")
     private Mem mem;
-
 }
