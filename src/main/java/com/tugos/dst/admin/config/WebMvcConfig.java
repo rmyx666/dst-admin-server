@@ -1,5 +1,7 @@
 package com.tugos.dst.admin.config;
 
+import com.tugos.dst.admin.interceptor.ServerParameterInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -18,6 +20,9 @@ import java.util.Locale;
  */
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport {
+
+    @Autowired
+    private ServerParameterInterceptor serverParameterInterceptor;
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -39,6 +44,15 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+
+        //添加转发
+        registry.addInterceptor(serverParameterInterceptor)
+                .addPathPatterns("/backup/**")
+                .addPathPatterns("/home/**")
+                .addPathPatterns("/player/**")
+                .addPathPatterns("/setting/**")
+                .addPathPatterns("/system/**")
+                .excludePathPatterns("/excludePath1/**", "/excludePath2/**"); // 排除指定路径 举个例，没有实际使用
     }
 
     @Override
