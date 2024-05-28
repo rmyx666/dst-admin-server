@@ -24,6 +24,8 @@ public class GameConfigVO {
 
     private Integer maxPlayers;
 
+    private Integer whiteListSize;
+
     private String clusterPassword;
 
     private String token;

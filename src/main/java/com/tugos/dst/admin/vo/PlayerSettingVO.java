@@ -22,4 +22,9 @@ public class PlayerSettingVO {
      */
     private List<String> blackList;
 
+    /**
+     * 白名单列表
+     */
+    private List<String> whiteList;
+
 }

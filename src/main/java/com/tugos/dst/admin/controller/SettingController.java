@@ -4,6 +4,7 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.SettingService;
 import com.tugos.dst.admin.vo.GameConfigVO;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -40,22 +41,24 @@ public class SettingController {
         return "/setting/index";
     }
 
+    @ApiOperation(value = "保存配置", notes = "保存配置 新增了whiteListSize")
     @PostMapping("/saveConfig")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> saveConfig(@RequestBody GameConfigVO model,@RequestParam(required = true) String roomId) throws Exception {
+    public ResultVO<String> saveConfig(@RequestBody GameConfigVO model, @RequestParam(required = true) String roomId) throws Exception {
         log.info("保存游戏配置，{}", StringUtils.deleteWhitespace(model.toString()));
-        return settingService.saveConfig(model,roomId);
+        return settingService.saveConfig(model, roomId);
 
     }
 
+    @ApiOperation(value = "读取配置", notes = "读取配置 新增了whiteListSize")
     @GetMapping("/getConfig")
     @RequiresAuthentication
     @ResponseBody
     public ResultVO<GameConfigVO> getConfig(@RequestParam(required = true) String roomId) throws Exception {
         log.info("读取游戏配置");
         GameConfigVO config = settingService.getConfig(roomId);
-        return ResultVO.data(config,roomId);
+        return ResultVO.data(config, roomId);
 
     }
 

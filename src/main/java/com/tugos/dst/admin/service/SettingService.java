@@ -5,6 +5,7 @@ import cn.hutool.core.io.FileUtil;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.enums.SettingTypeEnum;
 import com.tugos.dst.admin.enums.StartTypeEnum;
+import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.StrUtils;
@@ -80,10 +81,46 @@ public class SettingService {
         if (SettingTypeEnum.START_GAME.type.equals(vo.getType())) {
             //启动新游戏
             homeService.delRecord(roomId);
-            homeService.start(StartTypeEnum.START_ALL.type, roomId);
+
+            DstConfigRoomData roomInfo = ehcacheDataService.getRoomInfoMap().get(roomId);
+            boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
+            boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
+            if (!notStartMaster && !notStartCaves) {
+                //全启动
+                homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
+            }
+            if (notStartMaster && !notStartCaves) {
+                //不启动地面
+                homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
+            }
+            if (!notStartMaster && notStartCaves) {
+                //不启动洞穴
+                homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
+            }
+            if (notStartMaster && notStartCaves) {
+                //都不启动
+            }
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
-            homeService.start(StartTypeEnum.START_ALL.type, roomId);
+
+            DstConfigRoomData roomInfo = ehcacheDataService.getRoomInfoMap().get(roomId);
+            boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
+            boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
+            if (!notStartMaster && !notStartCaves) {
+                //全启动
+                homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
+            }
+            if (notStartMaster && !notStartCaves) {
+                //不启动地面
+                homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
+            }
+            if (!notStartMaster && notStartCaves) {
+                //不启动洞穴
+                homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
+            }
+            if (notStartMaster && notStartCaves) {
+                //都不启动
+            }
         }
         return ResultVO.success();
     }
@@ -114,6 +151,12 @@ public class SettingService {
                     String[] split = e.split("=");
                     if (StringUtils.isNotBlank(split[1])) {
                         gameConfigVO.setMaxPlayers(Integer.valueOf(split[1].trim()));
+                    }
+                }
+                if (e.contains("whitelist_slots")) {
+                    String[] split = e.split("=");
+                    if (StringUtils.isNotBlank(split[1])) {
+                        gameConfigVO.setWhiteListSize(Integer.valueOf(split[1].trim()));
                     }
                 }
                 if (e.contains("pvp")) {
@@ -398,6 +441,7 @@ public class SettingService {
             ini.add("NETWORK", "cluster_name", StrUtils.ofNULL(vo.getClusterName()));
             ini.add("NETWORK", "offline_cluster", "false");
             ini.add("NETWORK", "cluster_language", LocaleContextHolder.getLocale().getLanguage());
+            ini.add("NETWORK", "whitelist_slots", StrUtils.ofNULL(vo.getWhiteListSize(), "0"));
         } else {
             //network.put("lan_only_cluster", "false");
             network.put("cluster_password", StrUtils.ofNULL(vo.getClusterPassword()).trim());
@@ -405,6 +449,7 @@ public class SettingService {
             network.put("cluster_name", StrUtils.ofNULL(vo.getClusterName()));
             //network.put("offline_cluster", "false");
             network.put("cluster_language", LocaleContextHolder.getLocale().getLanguage());
+            network.put("whitelist_slots", StrUtils.ofNULL(vo.getWhiteListSize(), "0"));
         }
 
         Map<String, String> misc = ini.get("MISC");
