@@ -133,7 +133,8 @@ public class CoreScheduleService {
     public void updateGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> updateListTime = roomInfo.getValue().SCHEDULE_UPDATE_MAP.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
                 updateListTime.forEach(time -> {
@@ -154,6 +155,7 @@ public class CoreScheduleService {
             }
         }
 
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
     }
 
     private void onlyUpdateGame(DstConfigRoomData roomInfo) {
@@ -169,15 +171,15 @@ public class CoreScheduleService {
         boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
         if (!notStartMaster && !notStartCaves) {
             //全启动
-            homeService.start(StartTypeEnum.START_ALL.type,roomInfo.roomId);
+            homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
         }
         if (notStartMaster && !notStartCaves) {
             //不启动地面
-            homeService.start(StartTypeEnum.START_CAVES.type,roomInfo.roomId);
+            homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
         }
         if (!notStartMaster && notStartCaves) {
             //不启动洞穴
-            homeService.start(StartTypeEnum.START_MASTER.type,roomInfo.roomId);
+            homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
         }
         if (notStartMaster && notStartCaves) {
             //都不启动
@@ -191,7 +193,8 @@ public class CoreScheduleService {
     public void backupGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> backupListTime = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             //执行备份任务
             if (CollectionUtils.isNotEmpty(backupListTime)) {
@@ -204,14 +207,14 @@ public class CoreScheduleService {
                         long subTime = currentDateTime - execTime;
                         if (Range.open(0, upper).contains((int) subTime)) {
                             log.info("定时备份游戏");
-                            backupService.backup(null,roomInfo.getValue().getRoomId());
+                            backupService.backup(null, roomInfo.getValue().getRoomId());
                             roomInfo.getValue().SCHEDULE_BACKUP_MAP.put(time, 1);
                         }
                     }
                 });
             }
         }
-
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
 
     }
 

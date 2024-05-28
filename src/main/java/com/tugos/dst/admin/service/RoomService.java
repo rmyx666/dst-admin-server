@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +50,10 @@ public class RoomService {
 
 
         //配置每天6点更新游戏
+        roomInfo.SCHEDULE_UPDATE_MAP=new HashMap<>();
         roomInfo.SCHEDULE_UPDATE_MAP.put("06:00:00", 0);
         //每天6点，18点备份
+        roomInfo.SCHEDULE_BACKUP_MAP=new HashMap<>();
         roomInfo.SCHEDULE_BACKUP_MAP.put("06:00:00", 0);
         roomInfo.SCHEDULE_BACKUP_MAP.put("18:00:00", 0);
 
