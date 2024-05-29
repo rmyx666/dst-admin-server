@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -76,5 +77,35 @@ public class TransCoderUtil {
             }
         }
         return result;
+    }
+
+    public static Map<String, Object> convertMapToObject(Map<String, String> stringMap) {
+        Map<String, Object> objectMap = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : stringMap.entrySet()) {
+            objectMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return objectMap;
+    }
+
+    public static String buildGetQueryString(Map<String, String[]> params) throws UnsupportedEncodingException {
+        StringBuilder queryString = new StringBuilder();
+
+        for (Map.Entry<String, String[]> entry : params.entrySet()) {
+            String key = entry.getKey();
+            String[] values = entry.getValue();
+
+            for (String value : values) {
+                if (queryString.length() > 0) {
+                    queryString.append("&");
+                }
+                queryString.append(URLEncoder.encode(key, "UTF-8"))
+                        .append("=")
+                        .append(URLEncoder.encode(value, "UTF-8"));
+            }
+        }
+
+        return queryString.toString();
     }
 }

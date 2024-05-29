@@ -50,7 +50,9 @@ public class ShiroConfig {
         filterMap.put("/swagger-resources/**", "anon");
         filterMap.put("/v2/api-docs", "anon");
         //忽略测试用的接口
-        filterMap.put("/test/**", "anon");
+        filterMap.put("/backup/**", "anon");
+        filterMap.put("/server/**", "anon");
+        filterMap.put("/home/**", "anon");
         // 通过配置文件方式配置的[anon]忽略规则
         String[] excludes = properties.getExcludes().split(",");
         for (String exclude : excludes) {

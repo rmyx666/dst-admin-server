@@ -6,6 +6,7 @@ import cn.hutool.json.ObjectMapper;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
+import com.tugos.dst.admin.utils.DstServerInfoData;
 import com.tugos.dst.admin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ public class EhcacheDataService {
 
     @Autowired
     private EhcacheDataService self;
-
 
 
     //    @Cacheable(value = "defaultCache", key = "'user'")
@@ -94,7 +94,8 @@ public class EhcacheDataService {
         }
         if (StringUtils.isNotBlank(userString)) {
 //            Map<String, DstConfigRoomData> roomInfoMap = JSONUtil.(userString, Map.class);
-            Map<String, DstConfigRoomData> roomInfoMap = JSONUtil.toBean(userString, new TypeReference<Map<String, DstConfigRoomData>>() {},false);
+            Map<String, DstConfigRoomData> roomInfoMap = JSONUtil.toBean(userString, new TypeReference<Map<String, DstConfigRoomData>>() {
+            }, false);
             return roomInfoMap;
         } else {
             return new HashMap<>();
@@ -115,5 +116,38 @@ public class EhcacheDataService {
         return roomInfoMap;
     }
 
+
+    public Map<Long, DstServerInfoData> getServerInfoMap() {
+
+        String path = "data/serverInfoMap.json";
+
+        String serverInfo = null;
+        try {
+            serverInfo = FileUtils.readFile(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (StringUtils.isNotBlank(serverInfo)) {
+            Map<Long, DstServerInfoData> serverInfoMap = JSONUtil.toBean(serverInfo, new TypeReference<Map<Long, DstServerInfoData>>() {
+            }, false);
+            return serverInfoMap;
+        } else {
+            return new HashMap<>();
+        }
+
+    }
+
+
+    public Map<Long, DstServerInfoData> updateServerInfoMap(Map<Long, DstServerInfoData> serverInfoMap) {
+        String path = "data/serverInfoMap.json";
+        String serverInfo = JSONUtil.toJsonStr(serverInfoMap);
+        try {
+            FileUtils.createFile(path);
+            FileUtils.writeFile(path, serverInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return serverInfoMap;
+    }
 
 }

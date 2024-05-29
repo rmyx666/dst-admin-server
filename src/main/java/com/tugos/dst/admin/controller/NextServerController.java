@@ -1,31 +1,39 @@
 package com.tugos.dst.admin.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.tugos.dst.admin.service.DstServerInfoService;
+import com.tugos.dst.admin.utils.DstServerInfoData;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tugos.dst.admin.utils.HttpRequestUtil.sendGet;
+import static com.tugos.dst.admin.utils.HttpRequestUtil.*;
 import static com.tugos.dst.admin.utils.TransCoderUtil.*;
 
 @Log4j2
 @RestController
 public class NextServerController {
 
+    @Autowired
+    DstServerInfoService dstServerInfoService;
+
     @RequestMapping("/server")
     public Object handleAllRequests(HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         // 获取 URL
-        String uri = request.getRequestURI();
+        String uri = (String) request.getAttribute("originalPath");
         response.put("url", uri);
 
         try {
@@ -47,6 +55,21 @@ public class NextServerController {
             // 获取请求参数
             Map<String, String[]> params = request.getParameterMap();
             response.put("params", params);
+
+            //获取服务器信息
+            String[] servers = params.get("server");
+            Long serverId = Long.valueOf(servers[0]);
+            //拼接ip获取cookie
+            DstServerInfoData serverInfo = dstServerInfoService.getServerInfo(serverId);
+            String ip = "http://" + serverInfo.getIp() + ":8080";
+
+            String loginUrl = ip + "/login?username=" + serverInfo.getUsername() + "&password=" + serverInfo.getPassword();
+            String jsessionId = sendLoginRequest(loginUrl);
+
+            //更新cookie
+            headers.remove("Cookie");
+            headers.put("Cookie", "JSESSIONID=" + jsessionId);
+
 
             // 获取请求体（适用于 POST 方法）
             if (method.equals(RequestMethod.POST.name())) {
@@ -86,28 +109,32 @@ public class NextServerController {
                 }
             }
 
-
+            String result = "";
             String paramString = "";
             Map<String, Object> paramsMap = new HashMap<>();
             if (method.equals("GET")) {
                 paramsMap = convertMap(params);
+                String getQueryString = buildGetQueryString(params);
+                result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers));
+
 
             } else if (method.equals("POST")) {
 
                 if (headers.get("content-type").equals("application/x-www-form-urlencoded")) {
                     paramsMap = convertMap(params);
+                    result = sendPost(ip + uri, convertMapToObject(headers), "application/x-www-form-urlencoded", convertMapToObject(headers));
                 } else if (headers.get("content-type").equals("application/json")) {
                     paramsMap = (Map<String, Object>) response.get("body");
+                    result = sendPost(uri, paramsMap, "application/json", convertMapToObject(headers));
                 }
 
             }
-            paramString = mapToStringSortedByKey(paramsMap);
 
-            Object jsonObject = httpRequestSearchService.RequestSearch(uri, paramString);
-            log.info("uri:" + uri + "       params:" + paramString + "    结果：" + jsonObject.toString());
 
-            Object json = JSON.parse(byLogId.getContent());
-            return jsonObject;
+            log.info("uri:" + uri + "       params:" + paramString + "    结果：" + result);
+
+            Object json = JSON.parse(result);
+            return json;
         } catch (Exception e) {
             log.error("接口查询失败uri:" + uri, e);
         }
@@ -115,39 +142,5 @@ public class NextServerController {
         return "接口查询失败uri:" + uri;
     }
 
-
-    String getResult(HttpRequestTaskEntity httpRequestTaskEntity) {
-        try {
-            String result = "";
-            Map<String, Object> headers = null;
-
-            httpRequestTaskEntity.setProcessedParam(DateUtils.dateStringConvert(httpRequestTaskEntity.getParam()));
-
-            if (StringUtils.isNotBlank(httpRequestTaskEntity.getHeaders())) {
-
-                headers = jsonToMap(httpRequestTaskEntity.getHeaders());
-
-            }
-            if (httpRequestTaskEntity.getRequestMethod().equals("get")) {
-                result = sendGet(httpRequestTaskEntity.getUrl() + "?" + httpRequestTaskEntity.getProcessedParam(), headers);
-
-            } else if (httpRequestTaskEntity.getRequestMethod().equals("post")) {
-
-                if (httpRequestTaskEntity.getContentType().equals("application/x-www-form-urlencoded")) {
-                    result = sendPost(httpRequestTaskEntity.getUrl(), urlencodedToMap(httpRequestTaskEntity.getProcessedParam()), httpRequestTaskEntity.getContentType(), headers);
-                } else if (httpRequestTaskEntity.getContentType().equals("application/json")) {
-                    result = sendPost(httpRequestTaskEntity.getUrl(), jsonToMap(httpRequestTaskEntity.getProcessedParam()), httpRequestTaskEntity.getContentType(), headers);
-                }
-
-            }
-            log.info("task表记录http请求调用成功 ID:" + httpRequestTaskEntity.getId());
-            return result;
-        } catch (Exception e) {
-            log.error("task表记录http请求调用失败 ID:" + httpRequestTaskEntity.getId(), e);
-        }
-
-
-        return null;
-    }
 
 }
