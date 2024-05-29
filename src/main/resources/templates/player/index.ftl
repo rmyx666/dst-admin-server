@@ -68,6 +68,33 @@
 
             </el-card>
 
+        <el-card class="card">
+            <div slot="header" class="clearfix">
+                <span><@spring.message code="setting.player.admin.whitelist.desc"/></span>
+            </div>
+            <el-row style="margin: 5px">
+                <el-col :span="5">
+                    <el-button type="primary" @click="addWhiteList()"><@spring.message code="setting.player.admin.add"/></el-button>
+                </el-col>
+            </el-row>
+
+            <tempate v-for="(item,key) in whiteList">
+                <el-row style="margin: 5px">
+                    <el-col :span="5">
+                        <el-input placeholder="<@spring.message code="setting.player.admin.input.id"/> ID" v-model="whiteList[key]" clearable></el-input>
+                    </el-col>
+                    <el-button type="warning" style="margin-left: 5px" @click="delWhiteList(key)"><@spring.message code="setting.player.admin.delete"/></el-button>
+                </el-row>
+            </tempate>
+
+            <ul>
+                <li><@spring.message code="setting.player.admin.tips"/></li>
+                <li style="margin-top: 10px" v-for="(item,key) in playerList">{{item}} <el-button type="primary" @click="addWhiteList2(key)"><@spring.message code="setting.player.admin.add"/></el-button></li>
+            </ul>
+
+        </el-card>
+
+
 
             <el-card style="margin: 10px; position: sticky; bottom: 0;  z-index: 10;">
                 <el-button type="primary" @click="saveAdminAndBlackList()"><@spring.message code="home.pane1.card1.dst.active.save"/></el-button>
@@ -88,6 +115,7 @@
             activeName: 'first',
             adminList:[],
             blackList:[],
+            whiteList:[],
             playerList:[],
         },
         created() {
@@ -104,6 +132,11 @@
                 get("/player/getDstBlacklist?roomId=" + this.roomId).then((data) => {
                     if (data) {
                         this.blackList = data;
+                    }
+                })
+                get("/player/getDstWhitelist?roomId=" + this.roomId).then((data) => {
+                    if (data) {
+                        this.whiteList = data;
                     }
                 })
                 this.getPlayerList();
@@ -128,6 +161,7 @@
                 let param = {};
                 param.adminList = this.adminList;
                 param.blackList = this.blackList;
+                param.whiteList = this.whiteList;
                 post("/player/saveAdminAndBlackList?roomId=" + this.roomId, param).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});
@@ -161,6 +195,18 @@
             },
             delBlackList(index){
                 this.blackList.splice(index,1);
+            },
+
+            addWhiteList(){
+                this.whiteList.push("");
+            },
+            addWhiteList2(index) {
+                let item = this.playerList[index];
+                this.whiteList.push(item.split(' ')[0]);
+                this.playerList.splice(index, 1)
+            },
+            delWhiteList(index){
+                this.whiteList.splice(index,1);
             },
         }
     });
