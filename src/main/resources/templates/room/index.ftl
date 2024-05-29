@@ -149,7 +149,7 @@
         },
         methods: {
             fetchRoomList() {
-                get("/server/infos").then((data) => {
+                get("/room/infos").then((data) => {
                     this.serverList = data;
                     this.loading = false;
                 });

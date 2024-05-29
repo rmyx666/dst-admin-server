@@ -7,6 +7,7 @@ import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.vo.*;
+import lombok.extern.log4j.Log4j2;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.Map;
  * @date 2020-11-16 23:03:32
  * <p> 玩家设置 </p>
  */
+@Log4j2
 @Service
 public class RoomService {
 
@@ -37,6 +39,7 @@ public class RoomService {
 
     @Autowired
     ShellService shellService;
+
 
     public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());

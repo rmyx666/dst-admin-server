@@ -35,7 +35,7 @@ public class RoomController {
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<List<RoomInfoVO>> getRoomInfos() throws Exception {
+    public ResultVO<List<RoomInfoVO>> getRoomInfos()  {
         return ResultVO.data(roomService.getRoomInfos());
     }
     @ApiOperation(value = "保存房间信息", notes = "保存房间的信息")
