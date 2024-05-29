@@ -138,23 +138,23 @@
             addRoomRules: {
                 roomId: [
                     {required: true, message: '请输入房间id', trigger: 'blur'},
-                    { validator: validateId, trigger: 'blur' },
+                    {validator: validateId, trigger: 'blur'},
                 ],
                 roomName: [
-                    { required: true, message: '请输入房间名称', trigger: 'blur' },
-                    { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
+                    {required: true, message: '请输入房间名称', trigger: 'blur'},
+                    {min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur'}
                 ],
                 masterPort: [
-                    { required: true, message: '请输入主端口号', trigger: 'blur' },
-                    { validator: validatePort, trigger: 'blur'}
+                    {required: true, message: '请输入主端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
                 ],
                 groundPort: [
-                    { required: true, message: '请输入地面端口号', trigger: 'blur' },
-                    { validator: validatePort, trigger: 'blur'}
+                    {required: true, message: '请输入地面端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
                 ],
                 cavesPort: [
-                    { required: true, message: '请输入洞穴端口号', trigger: 'blur' },
-                    { validator: validatePort, trigger: 'blur'}
+                    {required: true, message: '请输入洞穴端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
                 ],
             },
         },
@@ -196,7 +196,9 @@
                             this.fetchRoomList()
                             this.closeAddRoomDialog()
                         })
-                        .catch((msg) => { this.$message.error(msg) })
+                        .catch((msg) => {
+                            this.$message.error(msg)
+                        })
                 })
             },
             goDetail(room) {
