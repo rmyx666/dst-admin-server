@@ -67,6 +67,12 @@
                 {{ scope.row.nowPlayers}}/{{scope.row.maxPlayers}}
             </template>
         </el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button type="primary" @click="updateRoomDialog(scope.row)">修改</el-button>
+                <el-button type="danger" @click="deleteRoom(scope.row.roomId)">删除</el-button>
+            </template>
+        </el-table-column>
         <el-table-column label="详情">
             <template slot-scope="scope">
                 <el-button @click="goDetail(scope.row)">详情</el-button>
@@ -99,6 +105,34 @@
         <span slot="footer" class="dialog-footer">
             <el-button @click="closeAddRoomDialog">取 消</el-button>
             <el-button type="primary" @click="addRoom">确 定</el-button>
+        </span>
+    </el-dialog>
+    <!-- 修改房间对话框 -->
+    <el-dialog
+            title="修改房间信息"
+            :visible.sync="updateRoomDialogVisible"
+            width="30%"
+            :before-close="closeUpdateRoomDialog">
+        <el-form ref="updateRoomForm" :model="updateRoomForm" label-width="100px" :rules="updateRoomRules">
+            <el-form-item label="房间id">
+                <el-input v-model="updateRoomForm.roomId" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="房间名称" prop="roomName">
+                <el-input v-model="updateRoomForm.roomName"></el-input>
+            </el-form-item>
+            <el-form-item label="主端口号" prop="masterPort">
+                <el-input v-model="updateRoomForm.masterPort"></el-input>
+            </el-form-item>
+            <el-form-item label="地面端口号" prop="groundPort">
+                <el-input v-model="updateRoomForm.groundPort"></el-input>
+            </el-form-item>
+            <el-form-item label="洞穴端口号" prop="cavesPort">
+                <el-input v-model="updateRoomForm.cavesPort"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="closeUpdateRoomDialog">取 消</el-button>
+            <el-button type="primary" @click="updateRoom">确 定</el-button>
         </span>
     </el-dialog>
 </div>
@@ -140,6 +174,33 @@
                     {required: true, message: '请输入房间id', trigger: 'blur'},
                     {validator: validateId, trigger: 'blur'},
                 ],
+                roomName: [
+                    {required: true, message: '请输入房间名称', trigger: 'blur'},
+                    {min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur'}
+                ],
+                masterPort: [
+                    {required: true, message: '请输入主端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
+                ],
+                groundPort: [
+                    {required: true, message: '请输入地面端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
+                ],
+                cavesPort: [
+                    {required: true, message: '请输入洞穴端口号', trigger: 'blur'},
+                    {validator: validatePort, trigger: 'blur'}
+                ],
+            },
+            // 修改房间信息的数据和校验规则
+            updateRoomDialogVisible: false,
+            updateRoomForm: {
+                roomId: '',
+                roomName: '',
+                masterPort: '',
+                groundPort: '',
+                cavesPort: ''
+            },
+            updateRoomRules: {
                 roomName: [
                     {required: true, message: '请输入房间名称', trigger: 'blur'},
                     {min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur'}
@@ -207,6 +268,62 @@
                 dom.href = '/room_main'
                 dom.target = '_parent'
                 dom.click()
+            },
+            // 修改房间信息方法
+            updateRoomDialog(room) {
+                // 将房间信息填充到修改表单中
+                this.updateRoomForm = {
+                    roomId: room.roomId,
+                    roomName: room.roomName,
+                    masterPort: room.masterPort,
+                    groundPort: room.groundPort,
+                    cavesPort: room.cavesPort
+                };
+                this.updateRoomDialogVisible = true;
+            },
+            // 关闭修改房间对话框方法
+            closeUpdateRoomDialog() {
+                // 清空修改表单
+                this.$refs.updateRoomForm.resetFields();
+                this.updateRoomDialogVisible = false;
+            },       // 修改房间信息提交方法
+            updateRoom() {
+                this.$refs.updateRoomForm.validate(valid => {
+                    if (valid) {
+                        // 提交修改的房间信息
+                        post('/room/update', this.updateRoomForm)
+                            .then(() => {
+                                this.$message.success('修改成功');
+                                this.fetchRoomList();
+                                this.closeUpdateRoomDialog();
+                            })
+                            .catch(error => {
+                                this.$message.error('修改失败: ' + error);
+                            });
+                    } else {
+                        return false;
+                    }
+                });
+            },
+            // 删除房间信息方法
+            deleteRoom(roomId) {
+                this.$confirm('确认删除该房间吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // 调用删除接口
+                    get(`/room/del?roomId=`+roomId)
+                        .then(() => {
+                            this.$message.success('删除成功');
+                            this.fetchRoomList();
+                        })
+                        .catch(error => {
+                            this.$message.error('删除失败: ' + error);
+                        });
+                }).catch(() => {
+                    this.$message.info('已取消删除');
+                });
             }
         }
     });
