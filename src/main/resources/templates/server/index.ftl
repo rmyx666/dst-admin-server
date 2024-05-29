@@ -29,22 +29,36 @@
         <el-table-column label="MOD总数" prop="totalModNum"></el-table-column>
         <el-table-column label="地面状态">
             <template slot-scope="scope">
-                {{ scope.row.masterStatus ? '启动' : '关闭' }}
+                <el-tag :type="scope.row.masterStatus ? 'success' : 'danger'">
+                    {{ scope.row.masterStatus ? '启动' : '关闭' }}
+                </el-tag>
             </template>
         </el-table-column>
         <el-table-column label="洞穴状态">
             <template slot-scope="scope">
-                {{ scope.row.cavesStatus ? '启动' : '关闭' }}
+                <el-tag :type="scope.row.cavesStatus ? 'success' : 'danger'">
+                    {{ scope.row.cavesStatus ? '启动' : '关闭' }}
+                </el-tag>
             </template>
         </el-table-column>
         <el-table-column label="CPU使用率">
             <template slot-scope="scope">
-                {{ scope.row.cpu ? scope.row.cpu.used.toFixed(2) : '-' }}
+                <el-progress
+                        :percentage="scope.row.cpu ? scope.row.cpu.used : 0"
+                        :text-inside="true"
+                        :stroke-width="18"
+                        :color="getColor(scope.row.cpu ? scope.row.cpu.used : 0)">
+                </el-progress>
             </template>
         </el-table-column>
         <el-table-column label="内存使用率">
             <template slot-scope="scope">
-                {{ scope.row.mem ? scope.row.mem.usage.toFixed(2) + '%' : '-' }}
+                <el-progress
+                        :percentage="scope.row.mem ? scope.row.mem.usage : 0"
+                        :text-inside="true"
+                        :stroke-width="18"
+                        :color="getColor(scope.row.mem ? scope.row.mem.usage : 0)">
+                </el-progress>
             </template>
         </el-table-column>
         <el-table-column label="在线情况">
@@ -121,6 +135,15 @@
             this.fetchRoomList();
         },
         methods: {
+            getColor(percentage) {
+                if (percentage < 50) {
+                    return '#67c23a'; // 绿色
+                } else if (percentage < 80) {
+                    return '#e6a23c'; // 黄色
+                } else {
+                    return '#f56c6c'; // 红色
+                }
+            },
             fetchRoomList() {
                 get("/server/infos").then((data) => {
                     this.serverList = data;
