@@ -79,6 +79,14 @@
 
                         <el-row>
                             <el-col :span="15">
+                                <el-form-item prop="slider" label="<@spring.message code="setting.game.max.whiteListSize"/>">
+                                    <el-slider v-model="model.whiteListSize" :min="0" :max="max" :show-input="labelPosition === 'left'"></el-slider>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
+                        <el-row>
+                            <el-col :span="15">
                                 <el-form-item prop="email"  label="<@spring.message code="setting.game.password"/>">
                                     <el-input v-model="model.clusterPassword" clearable maxlength="20"
                                               show-word-limit></el-input>
@@ -621,6 +629,7 @@
                 gameMode: 'survival',
                 pvp: false,
                 maxPlayers: 6,
+                whiteListSize: 0,
                 clusterPassword: undefined,
                 token: undefined,
                 masterMapData: undefined,
@@ -705,6 +714,7 @@
                     gameMode: 'survival',
                     pvp: false,
                     maxPlayers: 6,
+                    whiteListSize: 0,
                     clusterPassword: undefined,
                     token: undefined,
                     masterMapData: undefined,

@@ -128,6 +128,7 @@
                             <h5><@spring.message code="setting.room.name"/>：{{gameArchive.clusterName}} </h5>
                             <h5><@spring.message code="setting.game.mode"/>：{{transformGameMode(gameArchive.gameMode)}} </h5>
                             <h5><@spring.message code="setting.game.max.players"/>：{{gameArchive.maxPlayers}} </h5>
+                            <h5><@spring.message code="setting.game.max.whiteListSize"/>：{{gameArchive.whiteListSize}} </h5>
                             <h5><@spring.message code="setting.game.password"/>：{{gameArchive.clusterPassword}} </h5>
                             <h5><@spring.message code="home.pane1.card3.archive.day"/>：{{gameArchive.playDay}} </h5>
                             <h5><@spring.message code="home.pane1.card3.archive.season"/>：{{gameArchive.season}} </h5>

@@ -27,6 +27,10 @@ public class GameArchiveVO {
      * 最大玩家数量
      */
     private Integer maxPlayers;
+    /**
+     * 最大白名单数量
+     */
+    private Integer whiteListSize;
 
     /**
      * 房间密码
