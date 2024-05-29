@@ -13,6 +13,7 @@
 
 
     <el-table :data="serverList" style="width: 100%" stripe>
+
         <el-table-column label="房间ID" prop="roomId"></el-table-column>
         <el-table-column label="房间名称" prop="roomName"></el-table-column>
         <el-table-column label="主端口号" prop="masterPort"></el-table-column>
@@ -22,7 +23,6 @@
         <el-table-column label="在线情况">
             <template slot-scope="scope">
                 {{scope.row.nowPlayers}}/{{scope.row.maxPlayers}}
-                {{ scope.row.nowPlayers}}/{{scope.row.maxPlayers}}
             </template>
         </el-table-column>
         <el-table-column label="存档的天数" prop="playDay"></el-table-column>
@@ -149,7 +149,7 @@
         },
         methods: {
             fetchRoomList() {
-                get("/room/infos").then((data) => {
+                get("/server/infos").then((data) => {
                     this.serverList = data;
                     this.loading = false;
                 });

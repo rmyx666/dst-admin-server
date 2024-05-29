@@ -20,7 +20,7 @@ public class ServerParameterInterceptor implements HandlerInterceptor {
             if (StringUtils.isNotBlank(servers[0])) {
                 String originalPath = request.getRequestURI();
                 request.setAttribute("originalPath", originalPath);
-                request.getRequestDispatcher("/server").forward(request, response);
+                request.getRequestDispatcher("/httpRequest").forward(request, response);
                 return false; // 阻止原始请求继续处理
             }
             // 将请求转发到 /server 处理

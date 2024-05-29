@@ -6,9 +6,7 @@ import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
-import com.tugos.dst.admin.vo.DstServerInfoVO;
-import com.tugos.dst.admin.vo.GameArchiveVO;
-import com.tugos.dst.admin.vo.RoomInfoVO;
+import com.tugos.dst.admin.vo.*;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,8 +83,12 @@ public class RoomService {
                 systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
                 roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
                 roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
-                roomInfoVO.setCpu(systemInfo.getCpu());
-                roomInfoVO.setMem(systemInfo.getMem());
+                CpuVo cpuVo = new CpuVo();
+                BeanUtils.copyProperties(systemInfo.getCpu(),cpuVo);
+                roomInfoVO.setCpu(cpuVo);
+                MemVo memVo = new MemVo();
+                BeanUtils.copyProperties(systemInfo.getMem(),memVo);
+                roomInfoVO.setMem(memVo);
             } catch (Exception e) {
                 e.printStackTrace();
             }

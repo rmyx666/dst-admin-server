@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class DstServerInfoService {
+public class ServerInfoService {
 
     @Autowired
     EhcacheDataService ehcacheDataService;

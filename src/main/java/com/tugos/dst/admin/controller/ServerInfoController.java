@@ -1,7 +1,7 @@
 package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.service.DstServerInfoService;
+import com.tugos.dst.admin.service.ServerInfoService;
 import com.tugos.dst.admin.utils.DstServerInfoData;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/serverInfo")
@@ -24,7 +23,7 @@ public class ServerInfoController {
     }
 
     @Autowired
-    private DstServerInfoService serverInfoService;
+    private ServerInfoService serverInfoService;
 
     @ApiOperation(value = "获取服务器信息", notes = "获取所有服务器的信息")
     @GetMapping("/infos")

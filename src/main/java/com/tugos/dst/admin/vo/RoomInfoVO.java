@@ -16,6 +16,7 @@ import lombok.Data;
 
 @Data
 public class RoomInfoVO {
+    private Long serverId;
 
     @ApiModelProperty(value = "房间ID")
     private String roomId;
@@ -57,8 +58,8 @@ public class RoomInfoVO {
     private Boolean cavesStatus;
 
     @ApiModelProperty(value = "CPU相关信息")
-    private Cpu cpu;
+    private CpuVo cpu;
 
     @ApiModelProperty(value = "内存相关信息")
-    private Mem mem;
+    private MemVo mem;
 }
