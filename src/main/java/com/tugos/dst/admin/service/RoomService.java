@@ -139,6 +139,9 @@ public class RoomService {
         Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomInfo.getRoomId());
         dstConfigRoomData.setRoomName(roomInfo.getRoomName());
+        dstConfigRoomData.setMasterPort(roomInfo.getMasterPort());
+        dstConfigRoomData.setCavesPort(roomInfo.getCavesPort());
+        dstConfigRoomData.setGroundPort(roomInfo.getGroundPort());
         roomInfoMap.put(roomInfo.getRoomId(),dstConfigRoomData);
         ehcacheDataService.updateRoomInfoMap(roomInfoMap);
         return ResultVO.success();
