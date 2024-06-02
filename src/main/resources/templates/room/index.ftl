@@ -89,6 +89,16 @@
             width="30%"
             :before-close="closeAddRoomDialog">
         <el-form ref="form" :model="form" label-width="100px" :rules="addRoomRules">
+            <el-form-item label="服务器选择" prop="server">
+                <el-select v-model="selectedServer" placeholder="请选择服务器" @change="handleServerChange">
+                    <el-option
+                            v-for="server in serverList"
+                            :key="server.id"
+                            :label="server.name"
+                            :value="server">
+                    </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="房间id" prop="roomId">
                 <el-input v-model="form.roomId"></el-input>
             </el-form-item>
@@ -166,6 +176,7 @@
         data: {
             loading: true,
             serverList: [],
+            selectedServer: null,
             addRoomDialogVisible: false,
             form: {
                 masterPort: 10888,
@@ -225,8 +236,22 @@
         },
         created() {
             this.fetchRoomList();
+            this.fetchServerInfo();
         },
         methods: {
+            fetchServerInfo() {
+                axios.get('/serverInfo/infos')
+                    .then(response => {
+                        this.serverList = response.data.data;
+                    })
+                    .catch(error => {
+                        console.error("There was an error fetching the server info!", error);
+                    });
+            },
+            handleServerChange(server) {
+                this.form.roomId = server.id; // 将选择的服务器的id赋值给roomId
+            },
+
             getColor(percentage) {
                 if (percentage < 50) {
                     return '#67c23a'; // 绿色
