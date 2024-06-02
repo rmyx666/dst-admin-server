@@ -112,6 +112,7 @@
         el: '#player_index',
         data: {
             roomId: null,
+            serverId: null,
             activeName: 'first',
             adminList:[],
             blackList:[],
@@ -120,21 +121,22 @@
         },
         created() {
             this.roomId = RoomUtil.getRoomId()
+            this.serverId = RoomUtil.getServerId()
             this.init();
         },
         methods: {
             init(){
-                get("/player/getDstAdminList?roomId=" + this.roomId).then((data) => {
+                get("/player/getDstAdminList?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     if (data) {
                         this.adminList = data;
                     }
                 })
-                get("/player/getDstBlacklist?roomId=" + this.roomId).then((data) => {
+                get("/player/getDstBlacklist?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     if (data) {
                         this.blackList = data;
                     }
                 })
-                get("/player/getDstWhitelist?roomId=" + this.roomId).then((data) => {
+                get("/player/getDstWhitelist?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     if (data) {
                         this.whiteList = data;
                     }
@@ -162,7 +164,7 @@
                 param.adminList = this.adminList;
                 param.blackList = this.blackList;
                 param.whiteList = this.whiteList;
-                post("/player/saveAdminAndBlackList?roomId=" + this.roomId, param).then((data) => {
+                post("/player/saveAdminAndBlackList?roomId=" + this.roomId+"&serverId="+this.serverId, param).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});
                     } else {
@@ -179,7 +181,8 @@
             },
             getPlayerList(){
                 const roomId = RoomUtil.getRoomId()
-                get("/home/getPlayerList?roomId=" + roomId).then((data) => {
+                const serverId = RoomUtil.getServerId()
+                get("/home/getPlayerList?roomId=" + roomId+"&serverId="+serverId).then((data) => {
                     if (data) {
                         this.playerList = data;
                     }

@@ -26,6 +26,9 @@
             <el-form-item label="IP">
                 <el-input v-model="form.ip"></el-input>
             </el-form-item>
+            <el-form-item label="服务器名称">
+                <el-input v-model="form.name"></el-input>
+            </el-form-item>
             <el-form-item label="用户名">
                 <el-input v-model="form.username"></el-input>
             </el-form-item>
@@ -47,6 +50,7 @@
         <ul>
             <li>ID: {{ server.id }}</li>
             <li>IP: {{ server.ip }}</li>
+            <li>服务器名称: {{ server.name }}</li>
             <li>用户名: {{ server.username }}</li>
             <li>密码: {{ server.password }}</li>
         </ul>
@@ -67,6 +71,7 @@
             form: {
                 id: null,
                 ip: '',
+                name: '',
                 username: '',
                 password: ''
             }
@@ -130,6 +135,7 @@
                 this.form = {
                     id: null,
                     ip: '',
+                    name: '',
                     username: '',
                     password: ''
                 };

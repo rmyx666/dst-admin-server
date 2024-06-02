@@ -18,6 +18,10 @@ import lombok.Data;
 public class RoomInfoVO {
     private Long serverId;
 
+    private String serverIp;
+
+    private String serverName;
+
     @ApiModelProperty(value = "房间ID")
     private String roomId;
 

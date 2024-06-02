@@ -217,6 +217,7 @@
         el: '#setting_index_app',
         data: {
             roomId: null,
+            serverId: null,
             active: 0,
             max: 32,
             drawer: false,
@@ -642,6 +643,7 @@
         },
         created() {
             this.roomId = RoomUtil.getRoomId()
+            this.serverId = RoomUtil.getServerId()
             //拉取服务器信息
             this.getConfig();
             this.getLabelPosition()
@@ -689,7 +691,7 @@
             },
             save(type) {
                 this.model.type = type;
-                post("/setting/saveConfig?roomId=" + this.roomId, this.model).then((data) => {
+                post("/setting/saveConfig?roomId=" + this.roomId+"&serverId="+this.serverId, this.model).then((data) => {
                     if (data) {
                         this.warningMessage(data.message);
                     } else {
@@ -700,7 +702,7 @@
                 })
             },
             getConfig() {
-                get("/setting/getConfig?roomId=" + this.roomId).then((data) => {
+                get("/setting/getConfig?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     if (data) {
                         this.model = data;
                     }

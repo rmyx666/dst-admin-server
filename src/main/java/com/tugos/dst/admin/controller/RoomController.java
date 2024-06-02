@@ -35,9 +35,10 @@ public class RoomController {
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<List<RoomInfoVO>> getRoomInfos()  {
+    public ResultVO<List<RoomInfoVO>> getRoomInfos() throws Exception {
         return ResultVO.data(roomService.getRoomInfos());
     }
+
     @ApiOperation(value = "保存房间信息", notes = "保存房间的信息")
     @PostMapping("/save")
     @ResponseBody
@@ -45,6 +46,7 @@ public class RoomController {
     public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
         return roomService.saveRoomInfos(roomInfo);
     }
+
     @ApiOperation(value = "删除房间信息", notes = "根据房间ID删除房间信息")
 	@GetMapping("/del")
 	@ResponseBody
@@ -52,6 +54,7 @@ public class RoomController {
 	public ResultVO<String> delRoomInfos(@RequestParam String roomId) throws Exception {
 		return roomService.delRoomInfos(roomId);
 	}
+
     @ApiOperation(value = "更新房间信息", notes = "更新房间的信息 更新不能更改roomid，其他四个可以更改")
 	@PostMapping("/update")
 	@ResponseBody

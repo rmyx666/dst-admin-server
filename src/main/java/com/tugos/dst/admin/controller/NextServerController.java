@@ -55,7 +55,7 @@ public class NextServerController {
             response.put("params", params);
 
             //获取服务器信息
-            String[] servers = params.get("server");
+            String[] servers = params.get("serverId");
             Long serverId = Long.valueOf(servers[0]);
             //拼接ip获取cookie
             DstServerInfoData serverInfo = serverInfoService.getServerInfo(serverId);

@@ -14,6 +14,9 @@
 
     <el-table :data="serverList" style="width: 100%" stripe>
 
+        <el-table-column label="服务器ID" prop="serverId"></el-table-column>
+        <el-table-column label="服务器名称" prop="serverName"></el-table-column>
+        <el-table-column label="服务器IP" prop="serverIp"></el-table-column>
         <el-table-column label="房间ID" prop="roomId"></el-table-column>
         <el-table-column label="房间名称" prop="roomName"></el-table-column>
         <el-table-column label="主端口号" prop="masterPort"></el-table-column>
@@ -70,7 +73,7 @@
         <el-table-column label="操作">
             <template slot-scope="scope">
                 <el-button type="primary" @click="updateRoomDialog(scope.row)">修改</el-button>
-                <el-button type="danger" @click="deleteRoom(scope.row.roomId)">删除</el-button>
+                <el-button type="danger" @click="deleteRoom(scope.row)">删除</el-button>
             </template>
         </el-table-column>
         <el-table-column label="详情">
@@ -194,6 +197,7 @@
             // 修改房间信息的数据和校验规则
             updateRoomDialogVisible: false,
             updateRoomForm: {
+                serverId: '',
                 roomId: '',
                 roomName: '',
                 masterPort: '',
@@ -264,6 +268,7 @@
             },
             goDetail(room) {
                 RoomUtil.saveRoomId(room.roomId)
+                RoomUtil.saveServerId(room.serverId)
                 const dom = document.createElement('a')
                 dom.href = '/room_main'
                 dom.target = '_parent'
@@ -273,6 +278,7 @@
             updateRoomDialog(room) {
                 // 将房间信息填充到修改表单中
                 this.updateRoomForm = {
+                    serverId: room.serverId,
                     roomId: room.roomId,
                     roomName: room.roomName,
                     masterPort: room.masterPort,
@@ -291,7 +297,7 @@
                 this.$refs.updateRoomForm.validate(valid => {
                     if (valid) {
                         // 提交修改的房间信息
-                        post('/room/update', this.updateRoomForm)
+                        post('/room/update?serverId'+this.updateRoomForm.serverId, this.updateRoomForm)
                             .then(() => {
                                 this.$message.success('修改成功');
                                 this.fetchRoomList();
@@ -306,14 +312,14 @@
                 });
             },
             // 删除房间信息方法
-            deleteRoom(roomId) {
+            deleteRoom(room) {
                 this.$confirm('确认删除该房间吗?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     // 调用删除接口
-                    get(`/room/del?roomId=`+roomId)
+                    get(`/room/del?roomId=`+room.roomId+'&serverId='+room.serverId)
                         .then(() => {
                             this.$message.success('删除成功');
                             this.fetchRoomList();

@@ -20,6 +20,7 @@ public class DstServerInfoData implements Serializable {
     public Long id;
 
     public String ip;
+    public String name;
 
 
     public String username;

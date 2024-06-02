@@ -24,7 +24,7 @@
             <el-card>
                 <el-upload
                         class="upload-demo"
-                        :action="'/backup/upload?roomId=' + roomId"
+                        :action="'/backup/upload?roomId=' + roomId+'&serverId='+serverId"
                         :before-remove="beforeRemove"
                         :on-success="handleSuccess"
                         multiple
@@ -64,6 +64,7 @@
         el: '#backup_index_app',
         data: {
             roomId: null,
+            serverId: null,
             tableData: [],
             drawer: false,
             fileList: [],
@@ -72,6 +73,7 @@
         },
         created() {
             this.roomId = RoomUtil.getRoomId()
+            this.serverId = RoomUtil.getServerId()
             this.getBackupList();
         },
         methods: {
@@ -79,7 +81,7 @@
                 this.selectData = val;
             },
             getBackupList() {
-                get("/backup/getBackupList?roomId=" + this.roomId).then((data) => {
+                get("/backup/getBackupList?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     this.tableData = data ? data : [];
                     if (this.tableData.length > 0) {
                         let total = 0;
@@ -95,7 +97,7 @@
                     confirmButtonText: '<@spring.message code="home.pane1.card1.dst.confirm"/>',
                     cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                 }).then(({value}) => {
-                    get("/backup/rename?roomId=" + this.roomId, {fileName: val.fileName,newFileName:value}).then((data) => {
+                    get("/backup/rename?roomId=" + this.roomId+"&serverId="+this.serverId, {fileName: val.fileName,newFileName:value}).then((data) => {
                         this.getBackupList();
                         if (data){
                             this.warningMessage(data.message);
@@ -108,7 +110,7 @@
                 });
             },
             download(val){
-                window.location.href="/backup/download?fileName="+val.fileName + "&roomId=" + this.roomId;
+                window.location.href="/backup/download?fileName="+val.fileName + "&roomId=" + this.roomId+"&serverId="+this.serverId;
             },
             handleClose(done) {
                 this.$confirm('<@spring.message code="backup.js.close.window"/>？')
@@ -137,7 +139,7 @@
                     cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                     type: 'warning'
                 }).then(() => {
-                    post("/backup/deleteBackup?roomId=" + this.roomId, fileNames).then((data) => {
+                    post("/backup/deleteBackup?roomId=" + this.roomId+"&serverId="+this.serverId, fileNames).then((data) => {
                         this.successMessage('<@spring.message code="backup.js.del.success"/>');
                         this.getBackupList();
                     })

@@ -15,5 +15,22 @@ const RoomUtil = {
             return
         }
         return roomId;
+    },
+    serverId: null,
+    goServerIndex() {
+        const dom = document.createElement('a')
+        dom.href = '/'
+        dom.click()
+    },
+    saveServerId(serverId) {
+        window.localStorage.setItem('serverId', serverId)
+    },
+    getServerId() {
+        const serverId = window.localStorage.getItem('serverId');
+        if (serverId == null) {
+            this.goServerIndex()
+            return
+        }
+        return serverId;
     }
 }

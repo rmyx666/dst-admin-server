@@ -40,6 +40,9 @@ public class RoomService {
     @Autowired
     ShellService shellService;
 
+    @Autowired
+    ServerService serverService;
+
 
     public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
@@ -71,7 +74,9 @@ public class RoomService {
         return ResultVO.success();
     }
 
-    public List<RoomInfoVO> getRoomInfos()  {
+    public List<RoomInfoVO> getRoomInfos() throws Exception {
+
+        //获取本地数据
         List<DstConfigRoomData> roomInfoList = new ArrayList<>(ehcacheDataService.getRoomInfoMap().values());
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
@@ -81,20 +86,20 @@ public class RoomService {
             BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
 
-            DstServerInfoVO systemInfo = null;
-            try {
-                systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
-                roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
-                roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
-                CpuVo cpuVo = new CpuVo();
-                BeanUtils.copyProperties(systemInfo.getCpu(),cpuVo);
-                roomInfoVO.setCpu(cpuVo);
-                MemVo memVo = new MemVo();
-                BeanUtils.copyProperties(systemInfo.getMem(),memVo);
-                roomInfoVO.setMem(memVo);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            DstServerInfoVO systemInfo = null;
+//            try {
+//                systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
+//                roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
+//                roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
+//                CpuVo cpuVo = new CpuVo();
+//                BeanUtils.copyProperties(systemInfo.getCpu(),cpuVo);
+//                roomInfoVO.setCpu(cpuVo);
+//                MemVo memVo = new MemVo();
+//                BeanUtils.copyProperties(systemInfo.getMem(),memVo);
+//                roomInfoVO.setMem(memVo);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             List<String> playerList = null;
             try {
@@ -117,10 +122,14 @@ public class RoomService {
                 e.printStackTrace();
             }
 
-
+            roomInfoVO.setServerName("本机");
+            roomInfoVO.setServerIp("127.0.0.1");
             roomInfoVOS.add(roomInfoVO);
         }
 
+        //获取配置服务器的房间列表
+        List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
+        roomInfoVOS.addAll(serverInfoList);
 
         return roomInfoVOS;
     }

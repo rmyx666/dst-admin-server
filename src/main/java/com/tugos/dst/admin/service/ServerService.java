@@ -39,8 +39,13 @@ public class ServerService {
             headers.remove("Cookie");
             headers.put("Cookie", "JSESSIONID=" + jsessionId);
             String result = sendGet(ip + "/room/infos", convertMapToObject(headers));
-            List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {}, false);
-            roomInfoVOS.forEach(x->x.setServerId(serverInfo.getId()));
+            List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {
+            }, false);
+            roomInfoVOS.forEach(x -> {
+                x.setServerId(serverInfo.getId());
+                x.setServerIp(serverInfo.getIp());
+                x.setServerName(serverInfo.getName());
+            });
             serverRoomList.addAll(roomInfoVOS);
         }
         return serverRoomList;

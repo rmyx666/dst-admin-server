@@ -15,9 +15,9 @@ public class ServerParameterInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 检查请求参数是否包含 key 为 "server" 且value不为空
 
-        if (request.getParameterMap().containsKey("server") ) {
-            String[] servers = request.getParameterMap().get("server");
-            if (StringUtils.isNotBlank(servers[0])) {
+        if (request.getParameterMap().containsKey("serverId") ) {
+            String[] servers = request.getParameterMap().get("serverId");
+            if (StringUtils.isNotBlank(servers[0])&&!servers[0].equals("null")) {
                 String originalPath = request.getRequestURI();
                 request.setAttribute("originalPath", originalPath);
                 request.getRequestDispatcher("/httpRequest").forward(request, response);
