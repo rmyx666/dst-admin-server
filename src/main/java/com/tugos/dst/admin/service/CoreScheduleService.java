@@ -75,8 +75,8 @@ public class CoreScheduleService {
     @Scheduled(cron = "1 0 0 * * ?")
     public void resetScheduleMap() {
 
-
-        for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
+        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> backupKeySet = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             for (String key : backupKeySet) {
                 roomInfo.getValue().SCHEDULE_BACKUP_MAP.put(key, 0);
@@ -86,6 +86,7 @@ public class CoreScheduleService {
                 roomInfo.getValue().SCHEDULE_UPDATE_MAP.put(key, 0);
             }
         }
+        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
 
 
     }
