@@ -35,7 +35,7 @@ public class ServerInfoService {
         Map<Long, DstServerInfoData> serverInfoMap = ehcacheDataService.getServerInfoMap();
         DstServerInfoData dstServerInfoData = serverInfoMap.get(serverInfo.getId());
         dstServerInfoData.setIp(serverInfo.getIp());
-//        dstServerInfoData.setRoomId(serverInfo.getRoomId());
+        dstServerInfoData.setName(serverInfo.getName());
         dstServerInfoData.setUsername(serverInfo.getUsername());
         dstServerInfoData.setPassword(serverInfo.getPassword());
         serverInfoMap.put(serverInfo.getId(), dstServerInfoData);

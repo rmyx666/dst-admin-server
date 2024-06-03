@@ -89,13 +89,13 @@
             width="30%"
             :before-close="closeAddRoomDialog">
         <el-form ref="form" :model="form" label-width="100px" :rules="addRoomRules">
-            <el-form-item label="服务器选择" prop="server">
-                <el-select v-model="selectedServer" placeholder="请选择服务器" @change="handleServerChange">
+            <el-form-item label="服务器" prop="serverId">
+                <el-select v-model="form.serverId" placeholder="请选择服务器">
                     <el-option
-                            v-for="server in serverList"
+                            v-for="server in serverInfoList"
                             :key="server.id"
-                            :label="server.name"
-                            :value="server">
+                            :value="server.id">
+                        <span>ID: {{ server.id }}, IP: {{ server.ip }}, 服务器名称: {{ server.name }}</span>
                     </el-option>
                 </el-select>
             </el-form-item>
@@ -176,9 +176,11 @@
         data: {
             loading: true,
             serverList: [],
-            selectedServer: null,
+            serverInfoList: [],  // 新增
+            selectedServerId: '',  // 新增
             addRoomDialogVisible: false,
             form: {
+                serverId: '',  // 新增
                 masterPort: 10888,
                 groundPort: 10999,
                 cavesPort: 10998
@@ -203,6 +205,9 @@
                 cavesPort: [
                     {required: true, message: '请输入洞穴端口号', trigger: 'blur'},
                     {validator: validatePort, trigger: 'blur'}
+                ],
+                serverId: [  // 新增
+                    {required: true, message: '请选择服务器', trigger: 'change'}
                 ],
             },
             // 修改房间信息的数据和校验规则
@@ -236,22 +241,16 @@
         },
         created() {
             this.fetchRoomList();
-            this.fetchServerInfo();
+            this.fetchServerInfoList();  // 新增
         },
         methods: {
-            fetchServerInfo() {
-                axios.get('/serverInfo/infos')
-                    .then(response => {
-                        this.serverList = response.data.data;
-                    })
-                    .catch(error => {
-                        console.error("There was an error fetching the server info!", error);
-                    });
-            },
-            handleServerChange(server) {
-                this.form.roomId = server.id; // 将选择的服务器的id赋值给roomId
-            },
+            fetchServerInfoList() {  // 新增
+                get("/serverInfo/infos").then((data) => {
 
+                        this.serverInfoList = data;
+
+                });
+            },
             getColor(percentage) {
                 if (percentage < 50) {
                     return '#67c23a'; // 绿色
@@ -269,6 +268,7 @@
             },
             closeAddRoomDialog() {
                 this.form = {
+                    serverId: '',  // 修改
                     masterPort: 10888,
                     groundPort: 10999,
                     cavesPort: 10998
