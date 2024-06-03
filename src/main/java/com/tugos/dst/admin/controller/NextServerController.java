@@ -51,12 +51,23 @@ public class NextServerController {
             response.put("headers", headers);
 
             // 获取请求参数
-            Map<String, String[]> params = request.getParameterMap();
+            Map<String, String[]> modifiableParams = request.getParameterMap();
+            // 创建一个新的可修改的 HashMap
+            Map<String, String[]> params = new HashMap<>();
+
+            // 将原始映射的内容复制到新的可修改的 HashMap 中
+            for (Map.Entry<String, String[]> entry : modifiableParams.entrySet()) {
+                params.put(entry.getKey(), entry.getValue().clone());
+            }
+
             response.put("params", params);
+
 
             //获取服务器信息
             String[] servers = params.get("serverId");
             Long serverId = Long.valueOf(servers[0]);
+            //移除serverId
+            params.remove("serverId");
             //拼接ip获取cookie
             DstServerInfoData serverInfo = serverInfoService.getServerInfo(serverId);
             String ip = "http://" + serverInfo.getIp() + ":8080";
@@ -110,8 +121,8 @@ public class NextServerController {
             String result = "";
             String paramString = "";
             Map<String, Object> paramsMap = new HashMap<>();
+
             if (method.equals("GET")) {
-                paramsMap = convertMap(params);
                 String getQueryString = buildGetQueryString(params);
                 result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers));
 
@@ -123,7 +134,7 @@ public class NextServerController {
                     result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
                 } else if (contentType.contains("application/json")) {
                     paramsMap = (Map<String, Object>) response.get("body");
-                    result = sendPost(ip + uri, paramsMap, "application/json", convertMapToObject(headers));
+                    result = sendPost(ip + uri+"?"+buildGetQueryString(params), paramsMap, "application/json", convertMapToObject(headers));
                 } else {
                     //如果什么都匹配不到就按照application/x-www-form-urlencoded的调用方式走
                     paramsMap = convertMap(params);

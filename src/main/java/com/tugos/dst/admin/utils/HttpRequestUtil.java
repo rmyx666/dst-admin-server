@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.tugos.dst.admin.utils.TransCoderUtil.mapToJson;
@@ -33,7 +34,7 @@ public class HttpRequestUtil {
                 httpGet.addHeader(entry.getKey(), (String) entry.getValue());
             }
         }
-
+        httpGet.setHeader("Content-Type", "application/json;charset=UTF-8");
         HttpResponse response = httpClient.execute(httpGet);
         HttpEntity entity = response.getEntity();
         return entity != null ? EntityUtils.toString(entity) : null;
@@ -56,19 +57,19 @@ public class HttpRequestUtil {
                 for (Map.Entry<String, Object> entry : params.entrySet()) {
                     urlParameters.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));
                 }
-                httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+                httpPost.setEntity(new UrlEncodedFormEntity(urlParameters, StandardCharsets.UTF_8));
+                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             } else if ("application/json".equals(contentType)) {
-                StringEntity entity = new StringEntity(mapToJson(params));
+                StringEntity entity = new StringEntity(mapToJson(params),StandardCharsets.UTF_8);
                 httpPost.setEntity(entity);
-                httpPost.setHeader("Content-Type", "application/json");
+                httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
             }
 
         }
 
         HttpResponse response = httpClient.execute(httpPost);
         HttpEntity entity = response.getEntity();
-        return entity != null ? EntityUtils.toString(entity) : null;
+        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
     }
 
     public static String sendLoginRequest(String loginUrl) throws Exception {

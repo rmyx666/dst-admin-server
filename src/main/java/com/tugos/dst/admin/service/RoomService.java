@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author qinming
@@ -81,55 +84,74 @@ public class RoomService {
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
+        ExecutorService executorService = Executors.newFixedThreadPool(10); // 创建一个具有固定线程数的线程池
+        List<Future<?>> futures = new ArrayList<>();
+
         for (DstConfigRoomData dstConfigRoomData : roomInfoList) {
-            RoomInfoVO roomInfoVO = new RoomInfoVO();
-            BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
+            Future<?> future = executorService.submit(() -> {
+                RoomInfoVO roomInfoVO = new RoomInfoVO();
+                BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
+                try {
+                    DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
+                    roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
+                    roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
+                    CpuVo cpuVo = new CpuVo();
+                    BeanUtils.copyProperties(systemInfo.getCpu(), cpuVo);
+                    roomInfoVO.setCpu(cpuVo);
+                    MemVo memVo = new MemVo();
+                    BeanUtils.copyProperties(systemInfo.getMem(), memVo);
+                    roomInfoVO.setMem(memVo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-//            DstServerInfoVO systemInfo = null;
-//            try {
-//                systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
-//                roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
-//                roomInfoVO.setCavesStatus(systemInfo.getCavesStatus());
-//                CpuVo cpuVo = new CpuVo();
-//                BeanUtils.copyProperties(systemInfo.getCpu(),cpuVo);
-//                roomInfoVO.setCpu(cpuVo);
-//                MemVo memVo = new MemVo();
-//                BeanUtils.copyProperties(systemInfo.getMem(),memVo);
-//                roomInfoVO.setMem(memVo);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
+                try {
+                    List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
+                    roomInfoVO.setNowPlayers(playerList.size());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            List<String> playerList = null;
-            try {
-                playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
-                roomInfoVO.setNowPlayers(playerList.size());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                try {
+                    GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
+                    roomInfoVO.setClusterName(gameArchive.getClusterName());
+                    roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
+                    roomInfoVO.setPlayDay(gameArchive.getPlayDay());
+                    roomInfoVO.setSeason(gameArchive.getSeason());
+                    roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            GameArchiveVO gameArchive = null;
-            try {
-                gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
-                roomInfoVO.setClusterName(gameArchive.getClusterName());
-                roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
-                roomInfoVO.setPlayDay(gameArchive.getPlayDay());
-                roomInfoVO.setSeason(gameArchive.getSeason());
-                roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+                roomInfoVO.setServerName("本机");
+                roomInfoVO.setServerIp("127.0.0.1");
+                synchronized (roomInfoVOS) {
+                    roomInfoVOS.add(roomInfoVO);
+                }
+            });
 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            roomInfoVO.setServerName("本机");
-            roomInfoVO.setServerIp("127.0.0.1");
-            roomInfoVOS.add(roomInfoVO);
+            futures.add(future);
         }
+
+        // 等待所有任务完成
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        executorService.shutdown();
+
+        roomInfoVOS.sort((o1, o2) -> o1.getServerId().compareTo(o2.getServerId()));
 
         //获取配置服务器的房间列表
         List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
         roomInfoVOS.addAll(serverInfoList);
+
+
 
         return roomInfoVOS;
     }

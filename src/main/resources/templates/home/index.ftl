@@ -363,9 +363,10 @@
             this.serverId = RoomUtil.getServerId()
             //拉取服务器信息
             this.getSystemInfo();
-            this.timer = setInterval(function () {
-                vue.getSystemInfo();
-            }, 2000);
+            //刷新服务器信息，暂时关掉
+            // this.timer = setInterval(function () {
+            //     vue.getSystemInfo();
+            // }, 2000);
             this.getLabelPosition();
             this.getPlayerList();
             this.getGameArchive();
