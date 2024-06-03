@@ -57,6 +57,7 @@ public class HttpRequestUtil {
                     urlParameters.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));
                 }
                 httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
             } else if ("application/json".equals(contentType)) {
                 StringEntity entity = new StringEntity(mapToJson(params));
                 httpPost.setEntity(entity);

@@ -65,15 +65,15 @@ public class NextServerController {
             String jsessionId = sendLoginRequest(loginUrl);
 
             //更新cookie
-            headers.remove("Cookie");
+            headers.clear();
             headers.put("Cookie", "JSESSIONID=" + jsessionId);
 
-
+            String contentType = null;
             // 获取请求体（适用于 POST 方法）
             if (method.equals(RequestMethod.POST.name())) {
-                String contentType = request.getContentType();
+                contentType = request.getContentType();
                 if (contentType != null) {
-                    if (contentType.equals("application/x-www-form-urlencoded")) {
+                    if (contentType.contains("application/x-www-form-urlencoded")) {
                         // 解析 application/x-www-form-urlencoded
                         StringBuilder requestBody = new StringBuilder();
                         BufferedReader reader = request.getReader();
@@ -92,7 +92,7 @@ public class NextServerController {
                             }
                         }
                         response.put("body", formParams);
-                    } else if (contentType.equals("application/json")) {
+                    } else if (contentType.contains("application/json")) {
                         // 解析 application/json
                         StringBuilder requestBody = new StringBuilder();
                         BufferedReader reader = request.getReader();
@@ -118,12 +118,16 @@ public class NextServerController {
 
             } else if (method.equals("POST")) {
 
-                if (headers.get("content-type").equals("application/x-www-form-urlencoded")) {
+                if (contentType.contains("application/x-www-form-urlencoded")) {
                     paramsMap = convertMap(params);
                     result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
-                } else if (headers.get("content-type").equals("application/json")) {
+                } else if (contentType.contains("application/json")) {
                     paramsMap = (Map<String, Object>) response.get("body");
-                    result = sendPost(uri, paramsMap, "application/json", convertMapToObject(headers));
+                    result = sendPost(ip + uri, paramsMap, "application/json", convertMapToObject(headers));
+                } else {
+                    //如果什么都匹配不到就按照application/x-www-form-urlencoded的调用方式走
+                    paramsMap = convertMap(params);
+                    result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
                 }
 
             }

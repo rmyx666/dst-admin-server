@@ -89,7 +89,7 @@
             width="30%"
             :before-close="closeAddRoomDialog">
         <el-form ref="form" :model="form" label-width="100px" :rules="addRoomRules">
-            <el-form-item label="服务器" prop="serverId">
+            <el-form-item label="服务器">
                 <el-select v-model="form.serverId" placeholder="请选择服务器">
                     <el-option
                             v-for="server in serverInfoList"
@@ -280,7 +280,7 @@
                     if (!valid) {
                         return false;
                     }
-                    post("/room/save", this.form)
+                    post("/room/save?serverId="+this.form.serverId, this.form)
                         .then((data) => {
                             this.$message.success('新增成功')
                             this.fetchRoomList()

@@ -52,6 +52,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                 .addPathPatterns("/player/**")
                 .addPathPatterns("/setting/**")
                 .addPathPatterns("/system/**")
+                .addPathPatterns("/room/**")
                 .excludePathPatterns("/excludePath1/**", "/excludePath2/**"); // 排除指定路径 举个例，没有实际使用
     }
 
