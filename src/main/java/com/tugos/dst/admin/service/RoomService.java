@@ -54,10 +54,10 @@ public class RoomService {
 
 
         //配置每天6点更新游戏
-        roomInfo.SCHEDULE_UPDATE_MAP=new HashMap<>();
+        roomInfo.SCHEDULE_UPDATE_MAP = new HashMap<>();
         roomInfo.SCHEDULE_UPDATE_MAP.put("06:00:00", 0);
         //每天6点，18点备份
-        roomInfo.SCHEDULE_BACKUP_MAP=new HashMap<>();
+        roomInfo.SCHEDULE_BACKUP_MAP = new HashMap<>();
         roomInfo.SCHEDULE_BACKUP_MAP.put("06:00:00", 0);
         roomInfo.SCHEDULE_BACKUP_MAP.put("18:00:00", 0);
 
@@ -76,6 +76,20 @@ public class RoomService {
 
     public List<RoomInfoVO> getRoomInfos() throws Exception {
 
+
+        List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
+
+        List<RoomInfoVO> localRoomInfos = getLocalRoomInfos();
+        roomInfoVOS.addAll(localRoomInfos);
+        //获取配置服务器的房间列表
+        List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
+        roomInfoVOS.addAll(serverInfoList);
+
+
+        return roomInfoVOS;
+    }
+
+    public List<RoomInfoVO> getLocalRoomInfos() throws Exception {
         //获取本地数据
         List<DstConfigRoomData> roomInfoList = new ArrayList<>(ehcacheDataService.getRoomInfoMap().values());
 
@@ -142,12 +156,9 @@ public class RoomService {
 
         executorService.shutdown();
 
+
+        //排序
         roomInfoVOS.sort(Comparator.comparing(RoomInfoVO::getRoomId));
-
-        //获取配置服务器的房间列表
-        List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
-        roomInfoVOS.addAll(serverInfoList);
-
 
 
         return roomInfoVOS;
@@ -170,7 +181,7 @@ public class RoomService {
         dstConfigRoomData.setMasterPort(roomInfo.getMasterPort());
         dstConfigRoomData.setCavesPort(roomInfo.getCavesPort());
         dstConfigRoomData.setGroundPort(roomInfo.getGroundPort());
-        roomInfoMap.put(roomInfo.getRoomId(),dstConfigRoomData);
+        roomInfoMap.put(roomInfo.getRoomId(), dstConfigRoomData);
         ehcacheDataService.updateRoomInfoMap(roomInfoMap);
         return ResultVO.success();
     }
