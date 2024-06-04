@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -145,7 +142,7 @@ public class RoomService {
 
         executorService.shutdown();
 
-        roomInfoVOS.sort((o1, o2) -> o1.getServerId().compareTo(o2.getServerId()));
+        roomInfoVOS.sort(Comparator.comparing(RoomInfoVO::getRoomId));
 
         //获取配置服务器的房间列表
         List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
