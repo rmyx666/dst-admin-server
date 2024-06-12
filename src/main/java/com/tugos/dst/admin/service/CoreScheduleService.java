@@ -224,24 +224,7 @@ public class CoreScheduleService {
      */
     @PostConstruct
     public void initSystem() throws Exception {
-//        String data = DBUtils.readProjectData(DstConstant.DST_ADMIN_JSON);
-//        if (StringUtils.isNotBlank(data)) {
-        //本地有数据读取到缓存中
-//            DBUtils.readDataToCache(data);
-//        } else {
-        //配置每天6点更新游戏
-//            DstConfigData.SCHEDULE_UPDATE_MAP.put("06:00:00", 0);
-        //每天6点，18点备份
-//            DstConfigData.SCHEDULE_BACKUP_MAP.put("06:00:00", 0);
-//            DstConfigData.SCHEDULE_BACKUP_MAP.put("18:00:00", 0);
-//            DstConfigData.USER_INFO.setUsername(dstUser);
-//            DstConfigData.USER_INFO.setPassword(dstPassword);
-//            DstConfigData.USER_INFO.setNickname(nickname);
-//            DstConfigData.ROOM_INFO_MAP=new HashMap<>();
-//            DstConfigData.masterPort = masterPort;
-//            DstConfigData.groundPort = groundPort;
-//            DstConfigData.cavesPort = cavesPort;
-//        }
+
         //释放脚本并授权
         copyAndChmod(DstConstant.INSTALL_DST);
         copyAndChmod(DstConstant.DST_START);

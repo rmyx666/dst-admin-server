@@ -23,7 +23,7 @@ cp ~/steamcmd/linux32/libstdc++.so.6 ~/dst/bin/lib32/
 #chmod +x overworld.sh
 #chmod +x cave.sh
 
-mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer
+#mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer
 
 cd ~
 
