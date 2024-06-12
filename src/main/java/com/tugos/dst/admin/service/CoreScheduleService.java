@@ -65,7 +65,7 @@ public class CoreScheduleService {
     /**
      * 每十分钟发送一个公告广播
      */
-    @Scheduled(fixedDelay = 1000 * 60 * 10, initialDelay = 1000 * 60 * 10)
+    @Scheduled(fixedRate = 600000)
     public void sendMsg() throws InterruptedException {
 
         List<String> collect = dataService.getRoomInfoMap().values().stream().map(x -> x.getRoomId()).collect(Collectors.toList());
