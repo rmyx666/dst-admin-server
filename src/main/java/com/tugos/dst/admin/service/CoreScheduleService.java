@@ -121,8 +121,7 @@ public class CoreScheduleService {
     public void scheduleExe() {
         this.backupGame();
         this.updateGame();
-        //将数据存储到文件中
-//        DBUtils.saveDataToFile();
+
     }
 
 
