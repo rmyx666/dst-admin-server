@@ -5,6 +5,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Range;
+import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.utils.*;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author qinming
@@ -35,14 +38,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CoreScheduleService {
 
-    @Value("${dst.username:admin}")
-    private String dstUser;
-
-    @Value("${dst.password:123456}")
-    private String dstPassword;
-
-    @Value("${dst.nickname:管理员}")
-    private String nickname;
 
 
     private HomeService homeService;
@@ -66,6 +61,22 @@ public class CoreScheduleService {
 
     @Autowired
     DataService dataService;
+
+    /**
+     * 每十分钟发送一个公告广播
+     */
+    @Scheduled(fixedDelay = 1000 * 60 * 10, initialDelay = 1000 * 60 * 10)
+    public void sendMsg() throws InterruptedException {
+
+        List<String> collect = dataService.getRoomInfoMap().values().stream().map(x -> x.getRoomId()).collect(Collectors.toList());
+        String message="❤小辞宝宝爱你(๑′ᴗ‵๑)Ｉ Lᵒᵛᵉᵧₒᵤ❤";
+        for (String roomId : collect) {
+            log.info("发送公告：" + message);
+            shellService.sendBroadcast(message,roomId);
+            Thread.sleep(1000);
+        }
+
+    }
 
     /**
      * 每天更新清理一下定时任务的执行次数

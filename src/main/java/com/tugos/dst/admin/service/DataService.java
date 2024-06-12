@@ -8,13 +8,14 @@ import com.tugos.dst.admin.utils.DstServerInfoData;
 import com.tugos.dst.admin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ehcache缓存
+ * 文件存储数据
  * 全部都进行了持久化 当做数据库使用
  */
 @Service
@@ -22,6 +23,16 @@ public class DataService {
 
     @Autowired
     private DataService self;
+
+
+    @Value("${dst.username:admin}")
+    private String dstUser;
+
+    @Value("${dst.password:123456}")
+    private String dstPassword;
+
+    @Value("${dst.nickname:管理员}")
+    private String nickname;
 
 
 
@@ -40,9 +51,9 @@ public class DataService {
             return user;
         } else {
             User build = User.builder()
-                    .username("admin")
-                    .password("123456")
-                    .nickname("admin")
+                    .username(dstUser)
+                    .password(dstPassword)
+                    .nickname(nickname)
                     .build();
             return build;
         }
