@@ -1,17 +1,11 @@
 package com.tugos.dst.admin.service;
 
-import cn.hutool.core.lang.TypeReference;
-import cn.hutool.json.JSONUtil;
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstServerInfoData;
-import com.tugos.dst.admin.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,32 +13,32 @@ import java.util.Map;
 public class ServerInfoService {
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     public DstServerInfoData getServerInfo(Long id) {
-        DstServerInfoData dstServerInfoData = ehcacheDataService.getServerInfoMap().get(id);
+        DstServerInfoData dstServerInfoData = dataService.getServerInfoMap().get(id);
         return dstServerInfoData;
     }
 
     public List<DstServerInfoData> getServerInfoList() {
-        List<DstServerInfoData> dstServerInfoData = new ArrayList<>(ehcacheDataService.getServerInfoMap().values());
+        List<DstServerInfoData> dstServerInfoData = new ArrayList<>(dataService.getServerInfoMap().values());
         return dstServerInfoData;
     }
 
     public ResultVO<String> updateServerInfo(DstServerInfoData serverInfo) {
-        Map<Long, DstServerInfoData> serverInfoMap = ehcacheDataService.getServerInfoMap();
+        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
         DstServerInfoData dstServerInfoData = serverInfoMap.get(serverInfo.getId());
         dstServerInfoData.setIp(serverInfo.getIp());
         dstServerInfoData.setName(serverInfo.getName());
         dstServerInfoData.setUsername(serverInfo.getUsername());
         dstServerInfoData.setPassword(serverInfo.getPassword());
         serverInfoMap.put(serverInfo.getId(), dstServerInfoData);
-        ehcacheDataService.updateServerInfoMap(serverInfoMap);
+        dataService.updateServerInfoMap(serverInfoMap);
         return ResultVO.success();
     }
 
     public ResultVO<String> saveServerInfo(DstServerInfoData serverInfo) {
-        Map<Long, DstServerInfoData> serverInfoMap = ehcacheDataService.getServerInfoMap();
+        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
 
         if (serverInfoMap.containsKey(serverInfo.getId())) {
             return ResultVO.fail("Id重复");
@@ -54,14 +48,14 @@ public class ServerInfoService {
         }
 
         serverInfoMap.put(serverInfo.getId(), serverInfo);
-        ehcacheDataService.updateServerInfoMap(serverInfoMap);
+        dataService.updateServerInfoMap(serverInfoMap);
         return ResultVO.success();
     }
 
     public void deleteServerInfo(Long id) {
-        Map<Long, DstServerInfoData> serverInfoMap = ehcacheDataService.getServerInfoMap();
+        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
         serverInfoMap.remove(id);
-        ehcacheDataService.updateServerInfoMap(serverInfoMap);
+        dataService.updateServerInfoMap(serverInfoMap);
     }
 
 

@@ -8,6 +8,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * 拦截param中存在serverId参数的请求，转发到转发用的接口
+ */
 @Component
 public class ServerParameterInterceptor implements HandlerInterceptor {
 

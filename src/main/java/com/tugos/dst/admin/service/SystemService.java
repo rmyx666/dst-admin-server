@@ -26,7 +26,7 @@ import java.util.*;
 public class SystemService {
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     /**
      * 拉取dst游戏日志
@@ -65,31 +65,31 @@ public class SystemService {
      */
     public ScheduleVO getScheduleList(String roomId) {
         ScheduleVO data = new ScheduleVO();
-        Set<String> updateSet = ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.keySet();
+        Set<String> updateSet = dataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.keySet();
         if (CollectionUtils.isNotEmpty(updateSet)) {
             List<ScheduleVO.InnerData> updateTimeList = new ArrayList<>();
             updateSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.get(e));
+                innerData.setCount(dataService.getRoomInfoMap().get(roomId).SCHEDULE_UPDATE_MAP.get(e));
                 updateTimeList.add(innerData);
             });
             data.setUpdateTimeList(updateTimeList);
         }
-        Set<String> backupSet = ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.keySet();
+        Set<String> backupSet = dataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.keySet();
         if (CollectionUtils.isNotEmpty(backupSet)) {
             List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
             backupSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(ehcacheDataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.get(e));
+                innerData.setCount(dataService.getRoomInfoMap().get(roomId).SCHEDULE_BACKUP_MAP.get(e));
                 backupTimeList.add(innerData);
             });
             data.setBackupTimeList(backupTimeList);
         }
-        data.setNotStartMaster(ehcacheDataService.getRoomInfoMap().get(roomId).notStartMaster);
-        data.setNotStartCaves(ehcacheDataService.getRoomInfoMap().get(roomId).notStartCaves);
-        data.setSmartUpdate(ehcacheDataService.getSmartUpdate());
+        data.setNotStartMaster(dataService.getRoomInfoMap().get(roomId).notStartMaster);
+        data.setNotStartCaves(dataService.getRoomInfoMap().get(roomId).notStartCaves);
+        data.setSmartUpdate(dataService.getSmartUpdate());
         return data;
     }
 
@@ -99,7 +99,7 @@ public class SystemService {
      * @param vo 提交的数据
      */
     public void saveSchedule(ScheduleVO vo,String roomId) {
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
         dstConfigRoomData.clearAllData();
 
@@ -139,7 +139,7 @@ public class SystemService {
 //            dstConfigRoomData.smartUpdate = false;
 //        }
         roomInfoMap.put(roomId,dstConfigRoomData);
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
     }
 
     /**
@@ -159,7 +159,7 @@ public class SystemService {
 
     public GamePortVO getGamePort(String roomId) {
         GamePortVO gamePortVO = new GamePortVO();
-        DstConfigRoomData dstConfigRoomData = ehcacheDataService.getRoomInfoMap().get(roomId);
+        DstConfigRoomData dstConfigRoomData = dataService.getRoomInfoMap().get(roomId);
         gamePortVO.setMasterPort(dstConfigRoomData.masterPort);
         gamePortVO.setGroundPort(dstConfigRoomData.groundPort);
         gamePortVO.setCavesPort(dstConfigRoomData.cavesPort);
@@ -167,7 +167,7 @@ public class SystemService {
     }
 
     public void saveGamePort(GamePortVO gamePortVO,String roomId) {
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
 
         dstConfigRoomData.masterPort = gamePortVO.getMasterPort();
@@ -175,7 +175,7 @@ public class SystemService {
         dstConfigRoomData.cavesPort = gamePortVO.getCavesPort();
 
         roomInfoMap.put(roomId,dstConfigRoomData);
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
 //        DBUtils.saveDataToFile();
     }
 }

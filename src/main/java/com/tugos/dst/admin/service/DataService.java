@@ -2,19 +2,14 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
-import cn.hutool.json.ObjectMapper;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.utils.DstConfigRoomData;
-import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.DstServerInfoData;
 import com.tugos.dst.admin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,13 +18,13 @@ import java.util.Map;
  * 全部都进行了持久化 当做数据库使用
  */
 @Service
-public class EhcacheDataService {
+public class DataService {
 
     @Autowired
-    private EhcacheDataService self;
+    private DataService self;
 
 
-    //    @Cacheable(value = "defaultCache", key = "'user'")
+
     public User getUser() {
 
         String path = "data/user.json";
@@ -55,7 +50,7 @@ public class EhcacheDataService {
     }
 
 
-    //    @CachePut(value = "defaultCache", key = "'user'")
+
     public User updatePassword(String password) {
         User user = self.getUser();
         user.setPassword(password);
@@ -76,12 +71,12 @@ public class EhcacheDataService {
     /**
      * 智能更新标志
      */
-//    @Cacheable(value = "defaultCache", key = "'smartUpdate'")
+
     public Boolean getSmartUpdate() {
         return true;
     }
 
-    //    @Cacheable(value = "defaultCache", key = "'roomInfoMap'")
+
     public Map<String, DstConfigRoomData> getRoomInfoMap() {
 
         String path = "data/roomInfoMap.json";
@@ -103,7 +98,7 @@ public class EhcacheDataService {
 
     }
 
-    //    @CachePut(value = "defaultCache", key = "'roomInfoMap'")
+
     public Map<String, DstConfigRoomData> updateRoomInfoMap(Map<String, DstConfigRoomData> roomInfoMap) {
         String path = "data/roomInfoMap.json";
         String userString = JSONUtil.toJsonStr(roomInfoMap);

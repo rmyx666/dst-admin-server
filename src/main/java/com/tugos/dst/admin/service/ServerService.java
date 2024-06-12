@@ -2,7 +2,6 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
-import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.utils.DstServerInfoData;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import static com.tugos.dst.admin.utils.TransCoderUtil.convertMapToObject;
 public class ServerService {
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     @Autowired
     ServerInfoService serverInfoService;

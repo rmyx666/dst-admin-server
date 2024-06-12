@@ -1,19 +1,16 @@
 package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.config.I18nResourcesConfig;
 
 import com.tugos.dst.admin.utils.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.vo.*;
 import lombok.extern.log4j.Log4j2;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +26,7 @@ import java.util.concurrent.Future;
 public class RoomService {
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     @Autowired
     HomeService homeService;
@@ -47,7 +44,7 @@ public class RoomService {
     public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
 
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         if (roomInfoMap.containsKey(roomInfo.roomId)) {
             return ResultVO.fail("roomId重复");
         }
@@ -65,7 +62,7 @@ public class RoomService {
         roomInfo.setNotStartCaves(false);
 
         roomInfoMap.put(roomInfo.roomId, roomInfo);
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
         //创建新房间的文件夹
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomInfo.getRoomId();
         FileUtils.mkdirs(basePath);
@@ -91,7 +88,7 @@ public class RoomService {
 
     public List<RoomInfoVO> getLocalRoomInfos() throws Exception {
         //获取本地数据
-        List<DstConfigRoomData> roomInfoList = new ArrayList<>(ehcacheDataService.getRoomInfoMap().values());
+        List<DstConfigRoomData> roomInfoList = new ArrayList<>(dataService.getRoomInfoMap().values());
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
@@ -166,23 +163,23 @@ public class RoomService {
 
     public ResultVO<String> delRoomInfos(String roomId) {
 
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         roomInfoMap.remove(roomId);
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
         //删除房间的文件夹
         backupService.delRoomDir(roomId);
         return ResultVO.success();
     }
 
     public ResultVO<String> updateRoomInfos(DstConfigRoomData roomInfo) {
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomInfo.getRoomId());
         dstConfigRoomData.setRoomName(roomInfo.getRoomName());
         dstConfigRoomData.setMasterPort(roomInfo.getMasterPort());
         dstConfigRoomData.setCavesPort(roomInfo.getCavesPort());
         dstConfigRoomData.setGroundPort(roomInfo.getGroundPort());
         roomInfoMap.put(roomInfo.getRoomId(), dstConfigRoomData);
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
         return ResultVO.success();
     }
 }

@@ -4,7 +4,7 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultCodeEnum;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.entity.User;
-import com.tugos.dst.admin.service.EhcacheDataService;
+import com.tugos.dst.admin.service.DataService;
 import com.tugos.dst.admin.vo.UpdatePwdVO;
 import com.tugos.dst.admin.vo.UpdateUserDetailVO;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ import java.io.IOException;
 public class UserController {
 
     @Autowired
-    private EhcacheDataService ehcacheDataService;
+    private DataService dataService;
 
     /**
      * 用户信息页
@@ -71,7 +71,7 @@ public class UserController {
         if (vo.getNewPwd().length() <= weakPsw) {
             return ResultVO.fail(ResultCodeEnum.UPDATE_PWD_ERROR4);
         }
-        ehcacheDataService.updatePassword(vo.getNewPwd());
+        dataService.updatePassword(vo.getNewPwd());
         //退出登录
         SecurityUtils.getSubject().logout();
         return ResultVO.success("success");

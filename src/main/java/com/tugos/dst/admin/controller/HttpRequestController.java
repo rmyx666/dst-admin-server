@@ -19,9 +19,13 @@ import java.util.Map;
 import static com.tugos.dst.admin.utils.HttpRequestUtil.*;
 import static com.tugos.dst.admin.utils.TransCoderUtil.*;
 
+
+/**
+ * 通过拦截器拦截请求后，符合条件的统一走这个转发接口
+ */
 @Log4j2
 @RestController
-public class NextServerController {
+public class HttpRequestController {
 
     @Autowired
     ServerInfoService serverInfoService;

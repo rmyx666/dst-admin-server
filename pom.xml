@@ -150,24 +150,6 @@
         </dependency>
 
 
-        <!-- EhCache相关组件 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/javax.cache/cache-api -->
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.ehcache/ehcache -->
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>3.10.6</version>
-        </dependency>
-        <!-- EhCache相关组件 -->
-
 
         <dependency>
             <groupId>com.github.xiaoymin</groupId>

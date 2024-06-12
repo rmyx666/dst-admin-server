@@ -10,7 +10,6 @@ import com.tugos.dst.admin.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +65,7 @@ public class CoreScheduleService {
     public int upper = 3 * 60 * 1000;
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     /**
      * 每天更新清理一下定时任务的执行次数
@@ -75,7 +73,7 @@ public class CoreScheduleService {
     @Scheduled(cron = "1 0 0 * * ?")
     public void resetScheduleMap() {
 
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> backupKeySet = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             for (String key : backupKeySet) {
@@ -86,7 +84,7 @@ public class CoreScheduleService {
                 roomInfo.getValue().SCHEDULE_UPDATE_MAP.put(key, 0);
             }
         }
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
 
 
     }
@@ -96,7 +94,7 @@ public class CoreScheduleService {
      */
     @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
     public void smartUpdateGame() {
-        Boolean smartUpdate = ehcacheDataService.getSmartUpdate();
+        Boolean smartUpdate = dataService.getSmartUpdate();
         if (smartUpdate != null && smartUpdate) {
             String steamVersion = DstVersionUtils.getSteamVersionV3();
             String localVersion = DstVersionUtils.getLocalVersion();
@@ -105,7 +103,7 @@ public class CoreScheduleService {
                 long lv = Long.parseLong(localVersion);
                 if (sv > lv) {
                     log.info("智能更新进行...");
-                    for (Map.Entry<String, DstConfigRoomData> roomInfo : ehcacheDataService.getRoomInfoMap().entrySet()) {
+                    for (Map.Entry<String, DstConfigRoomData> roomInfo : dataService.getRoomInfoMap().entrySet()) {
                         onlyUpdateGame(roomInfo.getValue());
                     }
 
@@ -134,7 +132,7 @@ public class CoreScheduleService {
     public void updateGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> updateListTime = roomInfo.getValue().SCHEDULE_UPDATE_MAP.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
@@ -156,7 +154,7 @@ public class CoreScheduleService {
             }
         }
 
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
     }
 
     private void onlyUpdateGame(DstConfigRoomData roomInfo) {
@@ -194,7 +192,7 @@ public class CoreScheduleService {
     public void backupGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        Map<String, DstConfigRoomData> roomInfoMap = ehcacheDataService.getRoomInfoMap();
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         for (Map.Entry<String, DstConfigRoomData> roomInfo : roomInfoMap.entrySet()) {
             Set<String> backupListTime = roomInfo.getValue().SCHEDULE_BACKUP_MAP.keySet();
             //执行备份任务
@@ -215,7 +213,7 @@ public class CoreScheduleService {
                 });
             }
         }
-        ehcacheDataService.updateRoomInfoMap(roomInfoMap);
+        dataService.updateRoomInfoMap(roomInfoMap);
 
     }
 

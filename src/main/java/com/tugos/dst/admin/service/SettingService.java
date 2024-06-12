@@ -54,7 +54,7 @@ public class SettingService {
     private String cavesPort;
 
     @Autowired
-    EhcacheDataService ehcacheDataService;
+    DataService dataService;
 
     /**
      * 保存戏设置 如果type为2 会启动新游戏
@@ -82,7 +82,7 @@ public class SettingService {
             //启动新游戏
             homeService.delRecord(roomId);
 
-            DstConfigRoomData roomInfo = ehcacheDataService.getRoomInfoMap().get(roomId);
+            DstConfigRoomData roomInfo = dataService.getRoomInfoMap().get(roomId);
             boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
             boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
             if (!notStartMaster && !notStartCaves) {
@@ -103,7 +103,7 @@ public class SettingService {
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
-            DstConfigRoomData roomInfo = ehcacheDataService.getRoomInfoMap().get(roomId);
+            DstConfigRoomData roomInfo = dataService.getRoomInfoMap().get(roomId);
             boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
             boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
             if (!notStartMaster && !notStartCaves) {
@@ -267,9 +267,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
+            network.put("server_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getGroundPort(), this.groundPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -324,9 +324,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
+            network.put("server_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getCavesPort(), this.cavesPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -466,13 +466,13 @@ public class SettingService {
             ini.add("SHARD", "shard_enabled", "true");
             ini.add("SHARD", "bind_ip", "127.0.0.1");
             ini.add("SHARD", "master_ip", "127.0.0.1");
-            ini.add("SHARD", "master_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
+            ini.add("SHARD", "master_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
             ini.add("SHARD", "cluster_key", "defaultPass");
         } else {
             //shard.put("shard_enabled",  "127.0.0.1");
             //shard.put("bind_ip",  "127.0.0.1");
             //shard.put("master_ip",  "127.0.0.1");
-            shard.put("master_port", StrUtils.ofNULL(ehcacheDataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
+            shard.put("master_port", StrUtils.ofNULL(dataService.getRoomInfoMap().get(roomId).getMasterPort(), this.masterPort));
             //shard.put("cluster_key", "defaultPass");
         }
         ini.store();
