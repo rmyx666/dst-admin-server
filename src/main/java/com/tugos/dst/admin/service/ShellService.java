@@ -380,7 +380,7 @@ public class ShellService {
         String cmd = DstConstant.MASTER_PLAYLIST_CMD.replace("99999999", timeMillis);
         ShellUtil.runShell(cmd.replace("DST_MASTER", "Master_" + roomId));
         //睡眠一秒
-        TimeUnit.SECONDS.sleep(1);
+//        TimeUnit.SECONDS.sleep(1);
         List<String> dstLog = systemService.getDstLog(DstLogTypeEnum.MASTER_LOG.type, 100, roomId);
         List<String> playList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dstLog)) {

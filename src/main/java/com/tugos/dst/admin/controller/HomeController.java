@@ -64,6 +64,19 @@ public class HomeController {
 
     }
 
+    /**
+     * 获取服务器的信息
+     * 包括饥荒状态和硬件信息
+     */
+    @GetMapping("/getHardwareInfo")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<DstServerInfoVO> getHardwareInfo() throws Exception {
+        log.debug("获取服务器的信息");
+        return ResultVO.data(homeService.getHardwareInfo());
+
+    }
+
     @GetMapping("/start")
     @RequiresAuthentication
     @ResponseBody

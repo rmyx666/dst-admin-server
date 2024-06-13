@@ -363,7 +363,7 @@
             this.serverId = RoomUtil.getServerId()
             //拉取服务器信息
             this.getSystemInfo();
-            //刷新服务器信息，暂时关掉
+            //刷新服务器信息
             this.timer = setInterval(function () {
                 vue.getSystemInfo();
             }, 2000);

@@ -162,6 +162,30 @@ public class HomeService {
         return data;
     }
 
+    /**
+     *
+     * 硬件信息
+     */
+    public DstServerInfoVO getHardwareInfo() throws Exception {
+        DstServerInfoVO data = new DstServerInfoVO();
+        //获取硬件信息
+        Server server = new Server();
+        server.copyTo();
+        data.setCpu(server.getCpu());
+        data.setMem(server.getMem());
+        return data;
+    }
+    /**
+     *
+     * 饥荒状态
+     */
+    public DstServerInfoVO getDstInfo(String roomId) throws Exception {
+        DstServerInfoVO data = new DstServerInfoVO();
+        //饥荒状态
+        data.setMasterStatus(shellService.getMasterStatus(roomId));
+        data.setCavesStatus(shellService.getCavesStatus(roomId));
+        return data;
+    }
 
     /**
      * 更新游戏 需要停止地面和洞穴进程

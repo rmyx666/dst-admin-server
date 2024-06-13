@@ -45,23 +45,43 @@
                 </el-tag>
             </template>
         </el-table-column>
+<#--        <el-table-column label="CPU使用率">-->
+<#--            <template slot-scope="scope">-->
+<#--                <el-progress-->
+<#--                        :percentage="scope.row.cpu ? scope.row.cpu.used : 0"-->
+<#--                        :text-inside="true"-->
+<#--                        :stroke-width="18"-->
+<#--                        :color="getColor(scope.row.cpu ? scope.row.cpu.used : 0)">-->
+<#--                </el-progress>-->
+<#--            </template>-->
+<#--        </el-table-column>-->
+<#--        <el-table-column label="内存使用率">-->
+<#--            <template slot-scope="scope">-->
+<#--                <el-progress-->
+<#--                        :percentage="scope.row.mem ? scope.row.mem.usage : 0"-->
+<#--                        :text-inside="true"-->
+<#--                        :stroke-width="18"-->
+<#--                        :color="getColor(scope.row.mem ? scope.row.mem.usage : 0)">-->
+<#--                </el-progress>-->
+<#--            </template>-->
+<#--        </el-table-column>-->
         <el-table-column label="CPU使用率">
             <template slot-scope="scope">
                 <el-progress
-                        :percentage="scope.row.cpu ? scope.row.cpu.used : 0"
+                        :percentage="cpuInfo"
                         :text-inside="true"
                         :stroke-width="18"
-                        :color="getColor(scope.row.cpu ? scope.row.cpu.used : 0)">
+                        :color="getColor(cpuInfo)">
                 </el-progress>
             </template>
         </el-table-column>
         <el-table-column label="内存使用率">
             <template slot-scope="scope">
                 <el-progress
-                        :percentage="scope.row.mem ? scope.row.mem.usage : 0"
+                        :percentage="menInfo"
                         :text-inside="true"
                         :stroke-width="18"
-                        :color="getColor(scope.row.mem ? scope.row.mem.usage : 0)">
+                        :color="getColor(menInfo)">
                 </el-progress>
             </template>
         </el-table-column>
@@ -171,9 +191,14 @@
         }
         callback()
     }
-    new Vue({
+    let vue = new Vue({
         el: '#server_info',
         data: {
+            cpuInfo: 0,
+            cpuNum: 0,
+            menInfo: 0,
+            menTotal: 0,
+
             loading: true,
             serverList: [],
             serverInfoList: [],  // 新增
@@ -241,14 +266,30 @@
         },
         created() {
             this.fetchRoomList();
-            this.fetchServerInfoList();  // 新增
+            this.fetchServerInfoList();
+            //刷新服务器信息，暂时关掉
+            this.timer = setInterval(function () {
+                vue.getHardwareInfo();
+            }, 2000);
+        },
+        destroyed() {
+            clearInterval(this.timer)
         },
         methods: {
-            fetchServerInfoList() {  // 新增
+            getHardwareInfo() {
+                get("/home/getHardwareInfo").then((data) => {
+                    if (data) {
+                        this.menInfo = data.mem.usage;
+                        this.cpuInfo = data.cpu.used;
+                        this.menTotal = data.mem.total;
+                        this.cpuNum = data.cpu.cpuNum;
+                    }
+                })
+            },
+
+            fetchServerInfoList() {
                 get("/serverInfo/infos").then((data) => {
-
-                        this.serverInfoList = data;
-
+                    this.serverInfoList = data;
                 });
             },
             getColor(percentage) {
@@ -261,7 +302,7 @@
                 }
             },
             fetchRoomList() {
-                get("/room/infos").then((data) => {
+                get("/room/localInfos").then((data) => {
                     this.serverList = data;
                     this.loading = false;
                 });
@@ -280,7 +321,7 @@
                     if (!valid) {
                         return false;
                     }
-                    post("/room/save?serverId="+this.form.serverId, this.form)
+                    post("/room/save?serverId=" + this.form.serverId, this.form)
                         .then((data) => {
                             this.$message.success('新增成功')
                             this.fetchRoomList()
@@ -322,7 +363,7 @@
                 this.$refs.updateRoomForm.validate(valid => {
                     if (valid) {
                         // 提交修改的房间信息
-                        post('/room/update?serverId'+this.updateRoomForm.serverId, this.updateRoomForm)
+                        post('/room/update?serverId' + this.updateRoomForm.serverId, this.updateRoomForm)
                             .then(() => {
                                 this.$message.success('修改成功');
                                 this.fetchRoomList();
@@ -344,7 +385,7 @@
                     type: 'warning'
                 }).then(() => {
                     // 调用删除接口
-                    get(`/room/del?roomId=`+room.roomId+'&serverId='+room.serverId)
+                    get(`/room/del?roomId=` + room.roomId + '&serverId=' + room.serverId)
                         .then(() => {
                             this.$message.success('删除成功');
                             this.fetchRoomList();

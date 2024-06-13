@@ -42,7 +42,7 @@ public class ServerService {
 
                     // 更新cookie
                     headers.put("Cookie", "JSESSIONID=" + jsessionId);
-                    String result = sendGet(ip + "/room/localInfos", convertMapToObject(headers));
+                    String result = sendGet(ip + "/room/localInfosWithHardware", convertMapToObject(headers));
 
                     List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {}, false);
                     roomInfoVOS.forEach(x -> {

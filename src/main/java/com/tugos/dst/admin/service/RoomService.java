@@ -71,7 +71,7 @@ public class RoomService {
         return ResultVO.success();
     }
 
-    public List<RoomInfoVO> getRoomInfos() throws Exception {
+    public List<RoomInfoVO> getServerRoomInfos() throws Exception {
 
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
@@ -84,7 +84,7 @@ public class RoomService {
         return roomInfoVOS;
     }
 
-    public List<RoomInfoVO> getLocalRoomInfos() throws Exception {
+    public List<RoomInfoVO> getLocalRoomInfos() {
         //获取本地数据
         List<DstConfigRoomData> roomInfoList = new ArrayList<>(dataService.getRoomInfoMap().values());
 
@@ -98,8 +98,77 @@ public class RoomService {
                 RoomInfoVO roomInfoVO = new RoomInfoVO();
                 BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
-                // 开始时间 (纳秒)
-                long startTime = System.nanoTime();
+                try {
+                    DstServerInfoVO dstInfo = homeService.getDstInfo(roomInfoVO.getRoomId());
+                    roomInfoVO.setMasterStatus(dstInfo.getMasterStatus());
+                    roomInfoVO.setCavesStatus(dstInfo.getCavesStatus());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+                    List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
+                    roomInfoVO.setNowPlayers(playerList.size());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+                    GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
+                    roomInfoVO.setClusterName(gameArchive.getClusterName());
+                    roomInfoVO.setMaxPlayers(gameArchive.getMaxPlayers());
+                    roomInfoVO.setPlayDay(gameArchive.getPlayDay());
+                    roomInfoVO.setSeason(gameArchive.getSeason());
+                    roomInfoVO.setTotalModNum(gameArchive.getTotalModNum());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                roomInfoVO.setServerName("本机");
+                roomInfoVO.setServerIp("127.0.0.1");
+                synchronized (roomInfoVOS) {
+                    roomInfoVOS.add(roomInfoVO);
+                }
+            });
+
+            futures.add(future);
+        }
+
+        // 等待所有任务完成
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        executorService.shutdown();
+
+
+        //排序
+        roomInfoVOS.sort(Comparator.comparing(RoomInfoVO::getRoomId));
+
+
+        return roomInfoVOS;
+    }
+
+    public List<RoomInfoVO> getLocalRoomInfosWithHardware() throws Exception {
+        //获取本地数据
+        List<DstConfigRoomData> roomInfoList = new ArrayList<>(dataService.getRoomInfoMap().values());
+
+        List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
+
+        ExecutorService executorService = Executors.newFixedThreadPool(10); // 创建一个具有固定线程数的线程池
+        List<Future<?>> futures = new ArrayList<>();
+
+        for (DstConfigRoomData dstConfigRoomData : roomInfoList) {
+            Future<?> future = executorService.submit(() -> {
+                RoomInfoVO roomInfoVO = new RoomInfoVO();
+                BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
                 try {
                     DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
@@ -115,24 +184,15 @@ public class RoomService {
                     e.printStackTrace();
                 }
 
-                // 结束时间 (纳秒)
-                long endTime = System.nanoTime();
-                log.info("cpu时间间隔: " + (endTime - startTime) / 1_000_000 + " 毫秒");
 
-                // 开始时间 (纳秒)
-                long startTime1 = System.nanoTime();
                 try {
                     List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
                     roomInfoVO.setNowPlayers(playerList.size());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                // 结束时间 (纳秒)
-                long endTime1 = System.nanoTime();
-                log.info("playerList时间间隔: " + (endTime1 - startTime1) / 1_000_000 + " 毫秒");
 
-                // 开始时间 (纳秒)
-                long startTime2 = System.nanoTime();
+
                 try {
                     GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
                     roomInfoVO.setClusterName(gameArchive.getClusterName());
@@ -143,9 +203,7 @@ public class RoomService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                // 结束时间 (纳秒)
-                long endTime2 = System.nanoTime();
-                log.info("gameArchive时间间隔: " + (endTime2 - startTime2) / 1_000_000 + " 毫秒");
+
                 roomInfoVO.setServerName("本机");
                 roomInfoVO.setServerIp("127.0.0.1");
                 synchronized (roomInfoVOS) {
