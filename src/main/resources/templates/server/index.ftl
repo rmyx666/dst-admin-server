@@ -322,7 +322,7 @@
                 this.$refs.updateRoomForm.validate(valid => {
                     if (valid) {
                         // 提交修改的房间信息
-                        post('/room/update?serverId'+this.updateRoomForm.serverId, this.updateRoomForm)
+                        post('/room/update?serverId='+this.updateRoomForm.serverId, this.updateRoomForm)
                             .then(() => {
                                 this.$message.success('修改成功');
                                 this.fetchRoomList();
