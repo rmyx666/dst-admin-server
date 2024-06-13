@@ -21,10 +21,10 @@
 
 <div id="about_page">
     <el-card>
-        <h3>关于dst-admin 当前版本号：V1.5.0</h3>
-        <h3>Copyright © 2020-2023 Qinming. All rights reserved.</h3>
-
         <h3>QQ群：683251529</h3>
+        <br/>
+        <img width="500px" src="/images/code.JPG"/>
+        <br/>
 
     </el-card>
 

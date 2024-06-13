@@ -233,6 +233,7 @@
         },
         created() {
             this.fetchRoomList();
+            this.getHardwareInfo();
             //刷新服务器信息
             this.timer = setInterval(function () {
                 vue.getHardwareInfo();
