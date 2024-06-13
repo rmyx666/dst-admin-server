@@ -14,9 +14,6 @@
 
     <el-table :data="serverList" style="width: 100%" stripe>
 
-        <el-table-column label="服务器ID" prop="serverId"></el-table-column>
-        <el-table-column label="服务器名称" prop="serverName"></el-table-column>
-        <el-table-column label="服务器IP" prop="serverIp"></el-table-column>
         <el-table-column label="房间ID" prop="roomId"></el-table-column>
         <el-table-column label="房间名称" prop="roomName"></el-table-column>
         <el-table-column label="主端口号" prop="masterPort"></el-table-column>
@@ -45,26 +42,6 @@
                 </el-tag>
             </template>
         </el-table-column>
-<#--        <el-table-column label="CPU使用率">-->
-<#--            <template slot-scope="scope">-->
-<#--                <el-progress-->
-<#--                        :percentage="scope.row.cpu ? scope.row.cpu.used : 0"-->
-<#--                        :text-inside="true"-->
-<#--                        :stroke-width="18"-->
-<#--                        :color="getColor(scope.row.cpu ? scope.row.cpu.used : 0)">-->
-<#--                </el-progress>-->
-<#--            </template>-->
-<#--        </el-table-column>-->
-<#--        <el-table-column label="内存使用率">-->
-<#--            <template slot-scope="scope">-->
-<#--                <el-progress-->
-<#--                        :percentage="scope.row.mem ? scope.row.mem.usage : 0"-->
-<#--                        :text-inside="true"-->
-<#--                        :stroke-width="18"-->
-<#--                        :color="getColor(scope.row.mem ? scope.row.mem.usage : 0)">-->
-<#--                </el-progress>-->
-<#--            </template>-->
-<#--        </el-table-column>-->
         <el-table-column label="CPU使用率">
             <template slot-scope="scope">
                 <el-progress
@@ -109,16 +86,6 @@
             width="30%"
             :before-close="closeAddRoomDialog">
         <el-form ref="form" :model="form" label-width="100px" :rules="addRoomRules">
-            <el-form-item label="服务器">
-                <el-select v-model="form.serverId" placeholder="请选择服务器">
-                    <el-option
-                            v-for="server in serverInfoList"
-                            :key="server.id"
-                            :value="server.id">
-                        <span>ID: {{ server.id }}, IP: {{ server.ip }}, 服务器名称: {{ server.name }}</span>
-                    </el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item label="房间id" prop="roomId">
                 <el-input v-model="form.roomId"></el-input>
             </el-form-item>
@@ -266,11 +233,10 @@
         },
         created() {
             this.fetchRoomList();
-            this.fetchServerInfoList();
-            //刷新服务器信息，暂时关掉
+            //刷新服务器信息
             this.timer = setInterval(function () {
                 vue.getHardwareInfo();
-            }, 2000);
+            }, 5000);
         },
         destroyed() {
             clearInterval(this.timer)
@@ -285,12 +251,6 @@
                         this.cpuNum = data.cpu.cpuNum;
                     }
                 })
-            },
-
-            fetchServerInfoList() {
-                get("/serverInfo/infos").then((data) => {
-                    this.serverInfoList = data;
-                });
             },
             getColor(percentage) {
                 if (percentage < 50) {

@@ -89,7 +89,7 @@
             width="30%"
             :before-close="closeAddRoomDialog">
         <el-form ref="form" :model="form" label-width="100px" :rules="addRoomRules">
-            <el-form-item label="服务器">
+            <el-form-item label="服务器" prop="serverId">
                 <el-select v-model="form.serverId" placeholder="请选择服务器">
                     <el-option
                             v-for="server in serverInfoList"
