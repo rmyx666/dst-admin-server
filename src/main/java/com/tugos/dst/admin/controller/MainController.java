@@ -38,6 +38,8 @@ public class MainController {
         Menu menu6 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(6).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu7.name")).type(1).url("/room/index").build();
 
+        Menu menu7 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(7).
+                children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu8.name")).type(1).url("/server/index").build();
 
         Menu menu8 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(8).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu9.name")).type(1).url("/serverInfo/index").build();
@@ -45,6 +47,7 @@ public class MainController {
         Map<String, Menu> treeMenu = new HashMap<>(16);
 
         treeMenu.put("1", menu6);
+        treeMenu.put("2", menu7);
         treeMenu.put("3", menu8);
 
         Locale locale = LocaleContextHolder.getLocale();
@@ -92,7 +95,6 @@ public class MainController {
         model.addAttribute("treeMenu2", treeMenu2);
         return "room_main";
     }
-
 
 
     /**

@@ -40,7 +40,7 @@ public class RoomController {
     }
 
     @ApiOperation(value = "获取房间信息", notes = "获取所有房间的信息 概览展示房间id 房间名称 服务器名称 季节 天数 在线情况 cpu 内存 地面和洞穴是否启动 三个端口号")
-    @GetMapping("/infos")
+    @GetMapping("/serverInfos")
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<List<RoomInfoVO>> getRoomInfos() throws Exception {

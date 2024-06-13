@@ -76,8 +76,6 @@ public class RoomService {
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
-        List<RoomInfoVO> localRoomInfos = getLocalRoomInfos();
-        roomInfoVOS.addAll(localRoomInfos);
         //获取配置服务器的房间列表
         List<RoomInfoVO> serverInfoList = serverService.getServerInfoList();
         roomInfoVOS.addAll(serverInfoList);
@@ -100,6 +98,9 @@ public class RoomService {
                 RoomInfoVO roomInfoVO = new RoomInfoVO();
                 BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
 
+                // 开始时间 (纳秒)
+                long startTime = System.nanoTime();
+
                 try {
                     DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
                     roomInfoVO.setMasterStatus(systemInfo.getMasterStatus());
@@ -114,13 +115,24 @@ public class RoomService {
                     e.printStackTrace();
                 }
 
+                // 结束时间 (纳秒)
+                long endTime = System.nanoTime();
+                log.info("cpu时间间隔: " + (endTime - startTime) / 1_000_000 + " 毫秒");
+
+                // 开始时间 (纳秒)
+                long startTime1 = System.nanoTime();
                 try {
                     List<String> playerList = shellService.getPlayerList(roomInfoVO.getRoomId());
                     roomInfoVO.setNowPlayers(playerList.size());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                // 结束时间 (纳秒)
+                long endTime1 = System.nanoTime();
+                log.info("playerList时间间隔: " + (endTime1 - startTime1) / 1_000_000 + " 毫秒");
 
+                // 开始时间 (纳秒)
+                long startTime2 = System.nanoTime();
                 try {
                     GameArchiveVO gameArchive = homeService.getGameArchive(roomInfoVO.getRoomId());
                     roomInfoVO.setClusterName(gameArchive.getClusterName());
@@ -131,7 +143,9 @@ public class RoomService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                // 结束时间 (纳秒)
+                long endTime2 = System.nanoTime();
+                log.info("gameArchive时间间隔: " + (endTime2 - startTime2) / 1_000_000 + " 毫秒");
                 roomInfoVO.setServerName("本机");
                 roomInfoVO.setServerIp("127.0.0.1");
                 synchronized (roomInfoVOS) {

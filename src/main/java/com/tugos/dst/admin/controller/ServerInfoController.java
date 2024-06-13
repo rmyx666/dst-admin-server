@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 远程操作服务器用的配置
+ */
 @Controller
 @RequestMapping("/serverInfo")
 public class ServerInfoController {
