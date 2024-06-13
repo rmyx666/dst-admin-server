@@ -23,7 +23,7 @@
     <el-card>
         <h3>QQ群：683251529</h3>
         <br/>
-        <img width="500px" src="/images/code.JPG"/>
+        <img width="300px" src="/images/code.JPG"/>
         <br/>
 
     </el-card>
