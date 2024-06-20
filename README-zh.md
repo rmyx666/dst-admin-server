@@ -39,7 +39,7 @@ java -version
 ###  下载最新版dst-admin安装包
 
 ```bash
-wget http://clouddn.tugos.cn/release/dst-admin-1.5.0.jar -O dst-admin.jar
+wget http://156.236.75.110:9090/browser/download/dst-admin-1.5.0.jar -O dst-admin.jar
 ```
 
 
