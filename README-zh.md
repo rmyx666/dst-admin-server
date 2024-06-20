@@ -68,23 +68,3 @@ chmod +x ./startDst.sh
      
 ```
 
-## 预览图
-
-![img](https://github.com/qinming99/dst-admin/blob/master/images/image1.png)
-![img](https://github.com/qinming99/dst-admin/blob/master/images/image2.png)
-![img](https://github.com/qinming99/dst-admin/blob/master/images/yanshi.gif)
-## 饥荒交流群
-
-QQ群： **1005887957(被屏蔽?)**
-![img](https://github.com/qinming99/dst-admin/blob/master/images/qq_class.png)
-
-
-## END
-
-- 如果有任何建议或者 Bug:sob: 可以提 issue ，或者可以直接加群联系
-
-
-## 感谢
-
-- <a href="https://www.jetbrains.com/?from=dst-admin"><img src="https://github.com/qinming99/dst-admin/blob/master/images/jet-logo.jpg" width="100px" alt="jetbrains">**感谢 JetBrains 提供的免费开源 License**</a>
-
