@@ -1,4 +1,6 @@
 #!/bin/bash
+#jar包名称
+server_name="dst-admin"
 
 # 下载 dst-admin-1.5.0.jar 文件并重命名为 dst-admin.jar
 wget http://156.236.75.110:9000/download/dst-admin-1.5.0.jar -O dst-admin.jar
@@ -8,12 +10,12 @@ if [ $? -ne 0 ]; then
   echo "下载失败"
   exit 1
 fi
-
+# 停止程序
 ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}' | xargs kill -9
 if [[ -z $(ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}') ]]; then
   echo -e "\033[32m ##: 已停止(stopped) ... \033[0m"
 fi
-
+# 启动程序
 if [[ -z $(ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}') ]]; then
   #    停止了
   nohup java -jar -Xms100m -Xmx100m ${server_name}'.jar' --server.port=8080  >>server.log 2>&1 &

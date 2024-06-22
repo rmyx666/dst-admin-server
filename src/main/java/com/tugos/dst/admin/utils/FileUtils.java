@@ -184,11 +184,12 @@ public class FileUtils {
     public static boolean fileShellCopy(String fileName) throws Exception {
         //创建新的脚本文件
         File file = new File(fileName);
-        if (file.exists()) {
-            //存在不管它
-            log.info("脚本已经存在,{}", fileName);
-            return false;
-        }
+        //存在也要更新
+//        if (file.exists()) {
+//            //存在不管它
+//            log.info("脚本已经存在,{}", fileName);
+//            return false;
+//        }
         ClassPathResource classPathResource = new ClassPathResource(DstConstant.SHELL_PROJECT_PATH + fileName);
         InputStream inputStream = classPathResource.getInputStream();
         OutputStream outputStream = new FileOutputStream(file);

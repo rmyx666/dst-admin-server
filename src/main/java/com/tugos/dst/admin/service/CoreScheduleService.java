@@ -96,8 +96,14 @@ public class CoreScheduleService {
             }
         }
         dataService.updateRoomInfoMap(roomInfoMap);
+    }
 
-
+    /**
+     * 每天0点更新java程序
+     */
+    @Scheduled(cron = "1 0 0 * * ?")
+    public void updateJavaProgram() {
+        ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
     }
 
     /**

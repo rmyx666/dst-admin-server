@@ -249,6 +249,11 @@ public final class DstConstant {
      */
     public static final String ROOT_PATH;
 
+    /**
+     * 运行jar程序更新命令
+     */
+    public static final String UPDATE_JAVAPROGRAM = "cd ~ ; ./update.sh";
+
     static {
         String fileName = "shell";
         String projectPath = System.getProperty("user.dir");
