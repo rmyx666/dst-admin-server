@@ -238,6 +238,8 @@ public class CoreScheduleService {
         //释放脚本并授权
         copyAndChmod(DstConstant.INSTALL_DST);
         copyAndChmod(DstConstant.DST_START);
+        ShellUtil.runShell("sed -i 's/\\r//' ~/dstStart.sh");
+        ShellUtil.runShell("sed -i 's/\\r//' ~/install.sh");
     }
 
     /**
