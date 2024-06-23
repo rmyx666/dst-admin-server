@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
+/**
+ * 获取远程配置的服务器的房间信息
+ */
 @Controller
 @RequestMapping("/server")
 public class ServerController {

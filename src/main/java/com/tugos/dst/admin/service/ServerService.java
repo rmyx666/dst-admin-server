@@ -44,7 +44,8 @@ public class ServerService {
                     headers.put("Cookie", "JSESSIONID=" + jsessionId);
                     String result = sendGet(ip + "/room/localInfosWithHardware", convertMapToObject(headers));
 
-                    List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {}, false);
+                    List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {
+                    }, false);
                     roomInfoVOS.forEach(x -> {
                         x.setServerId(serverInfo.getId());
                         x.setServerIp(serverInfo.getIp());
@@ -73,6 +74,9 @@ public class ServerService {
 
         executorService.shutdown();
 
+
+        serverRoomList.sort(Comparator.comparing(RoomInfoVO::getServerId)
+                .thenComparing(RoomInfoVO::getRoomId));
 
         return serverRoomList;
     }
