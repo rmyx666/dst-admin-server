@@ -148,7 +148,7 @@ public class HttpRequestController {
             }
 
 
-            log.info("uri:" + uri + "       params:" + paramString + "    结果：" + result);
+//            log.info("uri:" + uri + "       params:" + paramString + "    结果：" + result);
 
             Object json = JSON.parse(result);
             return json;

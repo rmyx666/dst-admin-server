@@ -71,7 +71,6 @@ public class CoreScheduleService {
         List<String> collect = dataService.getRoomInfoMap().values().stream().map(x -> x.getRoomId()).collect(Collectors.toList());
         String message="\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
         for (String roomId : collect) {
-            log.info("发送公告：" + message);
             shellService.sendBroadcast(message,roomId);
             Thread.sleep(1000);
         }

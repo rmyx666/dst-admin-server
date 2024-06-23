@@ -83,7 +83,7 @@ public class HttpRequestUtil {
         List<String> cookies = getAllCookies(connection);
 
         // 输出完整的响应头
-        System.out.println("Response Headers: " + connection.getHeaderFields());
+//        System.out.println("Response Headers: " + connection.getHeaderFields());
 
         // 解析 JSESSIONID 的值
         String jsessionId = extractJSessionId(cookies);
