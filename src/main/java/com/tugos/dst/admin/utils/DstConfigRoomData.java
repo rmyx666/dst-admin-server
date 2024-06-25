@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author qinming
@@ -24,10 +25,10 @@ public class DstConfigRoomData implements Serializable {
     public String roomName;
 
     @ApiModelProperty(value = "定时更新游戏任务", required = false, hidden = true)
-    public Map<String, Integer> SCHEDULE_UPDATE_MAP;
+    public TreeMap<String, Integer> SCHEDULE_UPDATE_MAP;
 
     @ApiModelProperty(value = "定时备份游戏任务", required = false, hidden = true)
-    public Map<String, Integer> SCHEDULE_BACKUP_MAP;
+    public TreeMap<String, Integer> SCHEDULE_BACKUP_MAP;
 
     @ApiModelProperty(value = "不启动地面标志", required = false, hidden = true)
     public Boolean notStartMaster;

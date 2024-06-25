@@ -105,23 +105,29 @@ public class SystemService {
 
         if (CollectionUtils.isNotEmpty(vo.getBackupTimeList())) {
             //写入缓存
-            vo.getBackupTimeList().forEach(e -> {
+            List<ScheduleVO.InnerData> backupTimeList = vo.getBackupTimeList();
+            for (ScheduleVO.InnerData e : backupTimeList) {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
                     dstConfigRoomData.SCHEDULE_BACKUP_MAP.put(format, e.getCount());
                 }
-            });
+            }
+
+
         }
         if (CollectionUtils.isNotEmpty(vo.getUpdateTimeList())) {
             //写入缓存
-            vo.getUpdateTimeList().forEach(e -> {
+            List<ScheduleVO.InnerData> updateTimeList = vo.getUpdateTimeList();
+            for (ScheduleVO.InnerData e : updateTimeList) {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
                     dstConfigRoomData.SCHEDULE_UPDATE_MAP.put(format, e.getCount());
                 }
-            });
+
+            }
+
         }
         if (vo.getNotStartCaves() != null) {
             dstConfigRoomData.notStartMaster = vo.getNotStartMaster();

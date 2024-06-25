@@ -213,7 +213,7 @@ public class HomeController {
     @RequiresAuthentication
     @ResponseBody
     public ResultVO<String> delMyDediServer(@RequestParam(required = true) String roomId) {
-        log.info("删除MyDediServer目录");
+        log.info("删除room目录");
         homeService.delMyDediServer(roomId);
         return ResultVO.success();
     }

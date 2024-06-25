@@ -62,6 +62,23 @@
                     <el-col :span="5">
                         <el-button :size="size" type="primary" @click="addUpdateTime()"><@spring.message code="setting.player.admin.add"/> <@spring.message code="setting.system.task.execution.time"/></el-button>
                     </el-col>
+                    <!-- 新增按钮代码 START -->
+                    <el-col :span="5" style="margin-left: 10px;">
+                        <el-button :size="size" type="primary" @click="setIntervalTimes(1)">
+                            间隔一小时执行
+                        </el-button>
+                    </el-col>
+                    <el-col :span="5" style="margin-left: 10px;">
+                        <el-button :size="size" type="primary" @click="setIntervalTimes(2)">
+                            间隔两小时执行
+                        </el-button>
+                    </el-col>
+                    <el-col :span="5" style="margin-left: 10px;">
+                        <el-button :size="size" type="primary" @click="setIntervalTimes(3)">
+                            间隔三小时执行
+                        </el-button>
+                    </el-col>
+                    <!-- 新增按钮代码 END -->
                 </el-row>
 
                 <tempate v-for="(item,key) in updateTimeList">
@@ -231,6 +248,21 @@
             }
           },
         methods: {
+            // 新增方法用来新增更新间隔时间 START
+            setIntervalTimes(intervalHours) {
+                // 清空当前的 updateTimeList
+                this.updateTimeList = [];
+
+                // 创建新的时间点，间隔 intervalHours 小时
+                for (let i = 0; i < 24; i += intervalHours) {
+
+                    let timeStr = '2020-10-23 ' + i.toString().padStart(2, '0')+':00:00';
+                    console.log(timeStr);
+                    this.updateTimeList.push({ count: 0, time: timeStr });
+
+                }
+            },
+            // 新增方法 END
             getLabelPosition(){
                 let windowWidth = window.innerWidth
                     console.log('getLabelPosition',windowWidth)
