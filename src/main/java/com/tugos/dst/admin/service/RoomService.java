@@ -254,4 +254,24 @@ public class RoomService {
         dataService.updateRoomInfoMap(roomInfoMap);
         return ResultVO.success();
     }
+
+    /**
+     * 更新房间在自动更新时，是否自动启动地面或者洞穴的标志位
+     *
+     * @param roomId
+     */
+    public void updateStartFlag(String roomId, Boolean startMsater, Boolean startCaves) {
+        Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
+        DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
+
+        if (startMsater != null) {
+            dstConfigRoomData.notStartMaster = !startMsater;
+        }
+        if (startCaves != null) {
+            dstConfigRoomData.notStartCaves = !startCaves;
+        }
+
+        roomInfoMap.put(roomId, dstConfigRoomData);
+        dataService.updateRoomInfoMap(roomInfoMap);
+    }
 }

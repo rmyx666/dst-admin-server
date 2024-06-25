@@ -37,6 +37,8 @@ public class HomeService {
     private ShellService shellService;
     private BackupService backupService;
     private SettingService settingService;
+    @Autowired
+    private RoomService roomService;
 
     /**
      * 启动服务器进程
@@ -57,16 +59,19 @@ public class HomeService {
                 shellService.stopCaves(roomId);
                 shellService.startMaster(roomId);
                 shellService.startCaves(roomId);
+                roomService.updateStartFlag(roomId,true,true);
                 break;
             case START_MASTER:
                 //启动地面
                 shellService.stopMaster(roomId);
                 shellService.startMaster(roomId);
+                roomService.updateStartFlag(roomId,true,null);
                 break;
             case START_CAVES:
                 //启动洞穴
                 shellService.stopCaves(roomId);
                 shellService.startCaves(roomId);
+                roomService.updateStartFlag(roomId,null,true);
                 break;
             default:
         }
@@ -96,14 +101,17 @@ public class HomeService {
                 //停止所有,优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
                 shellService.elegantShutdownCaves(roomId);
+                roomService.updateStartFlag(roomId,false,false);
                 break;
             case STOP_MASTER:
                 //停止地面 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
+                roomService.updateStartFlag(roomId,false,null);
                 break;
             case STOP_CAVES:
                 //停止洞穴 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownCaves(roomId);
+                roomService.updateStartFlag(roomId,null,false);
                 break;
             default:
         }

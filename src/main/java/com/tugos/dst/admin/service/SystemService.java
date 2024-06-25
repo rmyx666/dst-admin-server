@@ -98,7 +98,7 @@ public class SystemService {
      *
      * @param vo 提交的数据
      */
-    public void saveSchedule(ScheduleVO vo,String roomId) {
+    public void saveSchedule(ScheduleVO vo, String roomId) {
         Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
         dstConfigRoomData.clearAllData();
@@ -138,7 +138,7 @@ public class SystemService {
 //        } else {
 //            dstConfigRoomData.smartUpdate = false;
 //        }
-        roomInfoMap.put(roomId,dstConfigRoomData);
+        roomInfoMap.put(roomId, dstConfigRoomData);
         dataService.updateRoomInfoMap(roomInfoMap);
     }
 
@@ -166,7 +166,7 @@ public class SystemService {
         return gamePortVO;
     }
 
-    public void saveGamePort(GamePortVO gamePortVO,String roomId) {
+    public void saveGamePort(GamePortVO gamePortVO, String roomId) {
         Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         DstConfigRoomData dstConfigRoomData = roomInfoMap.get(roomId);
 
@@ -174,8 +174,10 @@ public class SystemService {
         dstConfigRoomData.groundPort = gamePortVO.getGroundPort();
         dstConfigRoomData.cavesPort = gamePortVO.getCavesPort();
 
-        roomInfoMap.put(roomId,dstConfigRoomData);
+        roomInfoMap.put(roomId, dstConfigRoomData);
         dataService.updateRoomInfoMap(roomInfoMap);
 //        DBUtils.saveDataToFile();
     }
+
+
 }
