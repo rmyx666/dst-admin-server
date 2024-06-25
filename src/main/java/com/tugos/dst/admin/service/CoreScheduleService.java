@@ -131,9 +131,9 @@ public class CoreScheduleService {
     }
 
     /**
-     * 定时任务每5秒执行一次,第一次延长10秒
+     * 定时任务每60秒执行一次,第一次延长10秒
      */
-    @Scheduled(fixedDelay = 5 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
     public void scheduleExe() {
         this.backupGame();
         this.updateGame();
