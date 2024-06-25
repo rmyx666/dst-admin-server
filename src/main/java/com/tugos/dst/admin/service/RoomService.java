@@ -238,6 +238,8 @@ public class RoomService {
         Map<String, DstConfigRoomData> roomInfoMap = dataService.getRoomInfoMap();
         roomInfoMap.remove(roomId);
         dataService.updateRoomInfoMap(roomInfoMap);
+        //删除房间之前停止服务器
+        homeService.stopServer(roomId);
         //删除房间的文件夹
         backupService.delRoomDir(roomId);
         return ResultVO.success();

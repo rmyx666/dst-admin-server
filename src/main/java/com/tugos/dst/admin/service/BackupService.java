@@ -140,11 +140,11 @@ public class BackupService {
     }
 
     /**
-     * 删除MyDediServer目录
+     * 删除room目录
      */
     public void delRoomDir(String roomId) {
         String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
-        log.warn("删除MyDediServer目录:{}", path);
+        log.warn("删除room目录:{}", path);
         FileUtil.del(path);
     }
 
