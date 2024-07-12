@@ -98,9 +98,9 @@ public class CoreScheduleService {
     }
 
     /**
-     * 每天0点更新java程序
+     * 每天1点更新java程序
      */
-    @Scheduled(cron = "1 0 0 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void updateJavaProgram() {
         ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
     }
