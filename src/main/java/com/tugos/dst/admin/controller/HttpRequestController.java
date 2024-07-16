@@ -76,8 +76,8 @@ public class HttpRequestController {
             DstServerInfoData serverInfo = serverInfoService.getServerInfo(serverId);
             String ip = "http://" + serverInfo.getIp() + ":8080";
 
-            String loginUrl = ip + "/login?username=" + serverInfo.getUsername() + "&password=" + serverInfo.getPassword();
-            String jsessionId = sendLoginRequest(loginUrl);
+
+            String jsessionId = sendLoginRequest(ip,serverInfo.getUsername(),serverInfo.getPassword());
 
             //更新cookie
             headers.clear();

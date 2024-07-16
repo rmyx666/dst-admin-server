@@ -1,8 +1,11 @@
 package com.tugos.dst.admin.config.shiro;
 
 
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.DataService;
+import lombok.extern.log4j.Log4j2;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -20,6 +23,7 @@ import javax.annotation.PostConstruct;
  * <p> 自定义身份校验 </p>
  */
 @Component
+@Log4j2
 public class AuthRealm extends AuthorizingRealm {
 
     @Autowired
@@ -42,7 +46,7 @@ public class AuthRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+        LoginToken token = (LoginToken) authenticationToken;
         User user = new User();
         user.setUsername(token.getUsername());
         user.setPassword(String.valueOf(token.getPassword()));
@@ -57,15 +61,20 @@ public class AuthRealm extends AuthorizingRealm {
         setCredentialsMatcher(new SimpleCredentialsMatcher() {
             @Override
             public boolean doCredentialsMatch(AuthenticationToken authenticationToken, AuthenticationInfo authenticationInfo) {
-                UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+                LoginToken token = (LoginToken) authenticationToken;
                 SimpleAuthenticationInfo info = (SimpleAuthenticationInfo) authenticationInfo;
                 // 获取明文密码及密码盐
                 String password = String.valueOf(token.getPassword());
                 String username = token.getUsername();
-                if (dataService.getUser().getUsername().equals(username)
-                        && dataService.getUser().getPassword().equals(password)) {
+                String timestamp = token.getTimestamp();
+                String host = token.getHost();
+
+                if (DigestUtil.md5Hex("user" + dataService.getUser().getUsername() + timestamp).equals(username)
+                        && DigestUtil.md5Hex("password" + dataService.getUser().getPassword() + timestamp).equals(password)) {
+                    log.info(host+"登录成功");
                     return true;
                 }
+                log.info(host+"登陆失败");
                 return false;
             }
         });

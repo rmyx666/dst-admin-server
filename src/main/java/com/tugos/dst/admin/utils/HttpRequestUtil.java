@@ -1,5 +1,6 @@
 package com.tugos.dst.admin.utils;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -60,7 +61,7 @@ public class HttpRequestUtil {
                 httpPost.setEntity(new UrlEncodedFormEntity(urlParameters, StandardCharsets.UTF_8));
                 httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             } else if ("application/json".equals(contentType)) {
-                StringEntity entity = new StringEntity(mapToJson(params),StandardCharsets.UTF_8);
+                StringEntity entity = new StringEntity(mapToJson(params), StandardCharsets.UTF_8);
                 httpPost.setEntity(entity);
                 httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
             }
@@ -69,10 +70,14 @@ public class HttpRequestUtil {
 
         HttpResponse response = httpClient.execute(httpPost);
         HttpEntity entity = response.getEntity();
-        return entity != null ? EntityUtils.toString(entity,StandardCharsets.UTF_8) : null;
+        return entity != null ? EntityUtils.toString(entity, StandardCharsets.UTF_8) : null;
     }
 
-    public static String sendLoginRequest(String loginUrl) throws Exception {
+    public static String sendLoginRequest(String ip, String username, String password) throws Exception {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String loginUrl = ip + "/login?username=" + DigestUtil.md5Hex("user" + username + timestamp) +
+                "&password=" + DigestUtil.md5Hex("password" + password + timestamp) +
+                "&timestamp=" + timestamp;
         java.net.URL url = new URL(loginUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 

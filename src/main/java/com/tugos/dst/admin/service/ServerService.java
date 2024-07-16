@@ -37,8 +37,7 @@ public class ServerService {
                     Map<String, String> headers = new HashMap<>();
                     // 拼接ip获取cookie
                     String ip = "http://" + serverInfo.getIp() + ":8080";
-                    String loginUrl = ip + "/login?username=" + serverInfo.getUsername() + "&password=" + serverInfo.getPassword();
-                    String jsessionId = sendLoginRequest(loginUrl);
+                    String jsessionId = sendLoginRequest(ip, serverInfo.getUsername(), serverInfo.getPassword());
 
                     // 更新cookie
                     headers.put("Cookie", "JSESSIONID=" + jsessionId);

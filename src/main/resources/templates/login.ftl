@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/css/ele/index.css"/>
     <script src="/js/vue.js" defer="defer"></script>
     <script src="/css/ele/index.js" defer="defer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 </head>
 <body class="layui-layout-login">
 <div class="login-bg">
@@ -74,10 +75,30 @@
         });
         $(document).on('click', '.ajax-login', function (e) {
             e.preventDefault();
-            let form = $(this).parents("form");
-            let url = form.attr("action");
-            let serializeArray = form.serializeArray();
-            $.post(url, serializeArray, function (result) {
+
+            // 获取当前时间戳
+            let timestamp = Date.now();
+
+            // 获取用户输入的用户名和密码
+            let username = $("#username").val();
+            let password = $("#password").val();
+
+            // 进行MD5加密
+            let encryptedUsername = CryptoJS.MD5(CryptoJS.enc.Utf8.parse("user" + username + timestamp)).toString();
+            let encryptedPassword = CryptoJS.MD5(CryptoJS.enc.Utf8.parse("password" + password + timestamp)).toString();
+
+            // 创建表单数据对象
+            let formData = {
+                username: encryptedUsername,
+                password: encryptedPassword,
+                timestamp: timestamp
+            };
+
+            // 获取表单的action URL
+            let url = $(this).parents("form").attr("action");
+
+            // 发送POST请求
+            $.post(url, formData, function (result) {
                 if (result.code !== 0) {
                     $('.captcha-img').click();
                 }

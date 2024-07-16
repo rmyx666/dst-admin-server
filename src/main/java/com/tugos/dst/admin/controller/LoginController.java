@@ -4,6 +4,7 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultCodeEnum;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
+import com.tugos.dst.admin.config.shiro.LoginToken;
 import com.tugos.dst.admin.exception.ResultException;
 import com.tugos.dst.admin.utils.SafeLoginCheckUtils;
 import com.tugos.dst.admin.utils.URL;
@@ -39,15 +40,16 @@ public class LoginController {
      */
     @PostMapping("/login")
     @ResponseBody
-    public ResultVO<URL> login(HttpServletRequest request, String username, String password) {
+    public ResultVO<URL> login(HttpServletRequest request, String username, String password,String timestamp) {
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             throw new ResultException(ResultCodeEnum.USER_NAME_PWD_NULL);
         }
         if (!SafeLoginCheckUtils.isAllowLogin(request)) {
             throw new ResultException(ResultCodeEnum.USER_HAS_FREEZE);
         }
+        String clientIp = getClientIp(request);
         Subject subject = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+        LoginToken token = new LoginToken(username, password,clientIp,timestamp);
         subject.login(token);
         SafeLoginCheckUtils.cleanErrorRecord(request);
         //登录成功，跳转至首页
@@ -77,6 +79,32 @@ public class LoginController {
     @GetMapping("/noAuth")
     public String noAuth() {
         return "system/main/noAuth";
+    }
+
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 如果通过多级反向代理，X-Forwarded-For值为多个时取第一个非unknown的有效IP字符串
+        if (ip != null && ip.length() > 15 && ip.contains(",")) {
+            if (ip.indexOf(",") > 0) {
+                ip = ip.substring(0, ip.indexOf(","));
+            }
+        }
+        return ip;
     }
 
 }
