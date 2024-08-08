@@ -174,9 +174,9 @@
                 })
             },
             restart(){
-                get("/home/stop", {type: 0}).then((data) => {
+                get("/home/stop?roomId=" + this.roomId, {type: 0}).then((data) => {
                 })
-                get("/home/start", {type: 0}).then((data) => {
+                get("/home/start?roomId=" + this.roomId, {type: 0}).then((data) => {
                 })
             },
             getPlayerList(){
