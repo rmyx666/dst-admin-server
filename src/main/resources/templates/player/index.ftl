@@ -173,11 +173,22 @@
                     }
                 })
             },
-            restart(){
-                get("/home/stop?roomId=" + this.roomId, {type: 0}).then((data) => {
-                })
-                get("/home/start?roomId=" + this.roomId, {type: 0}).then((data) => {
-                })
+
+            restart() {
+                get("/home/stop?roomId=" + this.roomId, { type: 0 })
+                    .then((data) => {
+                        // 可以在这里处理第一个请求的响应
+                    })
+                    .then(() => {
+                        return get("/home/start?roomId=" + this.roomId, { type: 0 });
+                    })
+                    .then((data) => {
+                        // 在这里处理第二个请求的响应
+                    })
+                    .catch((error) => {
+                        // 处理可能发生的错误
+                        console.error("Error during restart:", error);
+                    });
             },
             getPlayerList(){
                 const roomId = RoomUtil.getRoomId()
