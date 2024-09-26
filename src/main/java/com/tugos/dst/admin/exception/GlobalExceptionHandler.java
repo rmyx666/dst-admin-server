@@ -83,4 +83,15 @@ public class GlobalExceptionHandler {
         return ResultVO.fail(e.getCode(), e.getMessage());
     }
 
+
+    /**
+     * 处理所有未捕获的异常
+     */
+    @ExceptionHandler(Exception.class)
+    public ResultVO<String> handleException(Exception e) {
+        // 处理所有其他类型的异常，记录日志等
+        log.error("未处理异常抛出", e);
+        return ResultVO.fail(ResultCodeEnum.SYSTEM_ERR);
+    }
+
 }
