@@ -1,25 +1,15 @@
 package com.tugos.dst.admin.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.tugos.dst.admin.service.HttpRequestService;
-import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.service.impl.HttpRequestDefaultServiceImpl;
 import lombok.extern.log4j.Log4j2;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.tugos.dst.admin.utils.HttpRequestUtil.*;
-import static com.tugos.dst.admin.utils.TransCoderUtil.*;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -30,29 +20,43 @@ import static com.tugos.dst.admin.utils.TransCoderUtil.*;
 public class HttpRequestController {
 
     @Autowired
-    ServerInfoService serverInfoService;
+    @Qualifier("HttpRequestDefaultServiceImpl")
+    private HttpRequestService defaultService;
 
     @Autowired
-    HttpRequestService httpRequestService;
+    @Qualifier("HttpRequestFileDownloadServiceImpl")
+    private HttpRequestService fileDownloadService;
+
+    @Autowired
+    @Qualifier("HttpRequestFileUploadServiceImpl")
+    private HttpRequestService fileUploadService;
+
+    public HttpRequestService getService(String url) {
+        if (url.contains("/download")) {
+            return fileDownloadService;
+        } else if (url.contains("/upload")) {
+            return fileUploadService;
+        } else {
+            return defaultService;
+        }
+    }
+
+    @Autowired
+    HttpRequestDefaultServiceImpl httpRequestDefaultServiceImpl;
 
 
     @RequestMapping("/httpRequest")
-    public Object handleAllRequests(HttpServletRequest request) {
-
+    public Object handleAllRequests(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         // 获取 URL
         String uri = (String) request.getAttribute("originalPath");
 
 
-        try {
+            HttpRequestService service = getService(uri);
 
-            return httpRequestService.sendHttpRequest(request);
+            return service.sendHttpRequest(request, response);
 
-        } catch (Exception e) {
-            log.error("接口查询失败uri:" + uri, e);
-        }
 
-        return "接口查询失败uri:" + uri;
     }
 
 

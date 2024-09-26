@@ -30,7 +30,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setFilters(myFilters);
         LinkedHashMap<String, String> filterMap = new LinkedHashMap<>();
         filterMap.put("/login", "anon");
-//        filterMap.put("/room/**", "anon");
+//        filterMap.put("/backup/**", "anon");
 //        filterMap.put("/room_main/**", "anon");
 //        filterMap.put("/server/**", "anon");
 //        filterMap.put("/serverinfo/**", "anon");
