@@ -32,8 +32,10 @@ public class ServerInfoController {
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<List<DstServerInfoData> > getServerInfos() throws Exception {
-        return ResultVO.data(serverInfoService.getServerInfoList());
+    public ResultVO<List<DstServerInfoData>> getServerInfos() throws Exception {
+        List<DstServerInfoData> serverInfoList = serverInfoService.getServerInfoList();
+        serverInfoList.forEach(x -> x.setPassword("***"));
+        return ResultVO.data(serverInfoList);
     }
 
     @ApiOperation(value = "保存服务器信息", notes = "保存服务器的信息")
@@ -42,7 +44,7 @@ public class ServerInfoController {
     @RequiresAuthentication
     public ResultVO<String> saveServerInfo(@RequestBody DstServerInfoData serverInfo) {
 
-        return         serverInfoService.saveServerInfo(serverInfo);
+        return serverInfoService.saveServerInfo(serverInfo);
     }
 
     @ApiOperation(value = "删除服务器信息", notes = "根据IP删除服务器信息")

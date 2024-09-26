@@ -22,7 +22,7 @@ public class ServerInfoService {
 
     public List<DstServerInfoData> getServerInfoList() {
         List<DstServerInfoData> dstServerInfoData = new ArrayList<>(dataService.getServerInfoMap().values());
-        dstServerInfoData.forEach(x->x.setPassword("***"));
+
         return dstServerInfoData;
     }
 

@@ -17,68 +17,62 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.tugos.dst.admin.utils.TransCoderUtil.mapToJson;
 
+/**
+ * @author wgr
+ * @Title 获取cookie
+ * @Description
+ * @return
+ * @date 2024/9/25 11:55
+ */
+public class GetCookieUtil {
 
-public class HttpRequestUtil {
 
+    private static HashMap<String, String> cookieMap = new HashMap();
 
-    public static String sendGet(String url, Map<String, Object> headers) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(url);
+    /**
+     * @param serverInfo
+     * @param refresh    为true重新刷新 为false 丛map中取
+     * @return java.lang.String
+     * @author wgr
+     * @Title 获取cookie 如果map中有就直接从map中取 没有就重新获取
+     * @Description
+     * @date 2024/9/25 14:55
+     */
+    public static String getCookie(DstServerInfoData serverInfo, Boolean refresh) throws Exception {
 
-        // Add headers
-        if (headers != null) {
-            for (Map.Entry<String, Object> entry : headers.entrySet()) {
-                httpGet.addHeader(entry.getKey(), (String) entry.getValue());
+        if (refresh) {
+            String ip = "http://" + serverInfo.getIp() + ":8080";
+            String cookie = getCookie(ip, serverInfo.getUsername(), serverInfo.getPassword());
+            cookieMap.put(serverInfo.getIp(), cookie);
+            return cookie;
+        } else {
+
+            if (cookieMap.containsKey(serverInfo.getIp())) {
+                return cookieMap.get(serverInfo.getIp());
+            } else {
+                String ip = "http://" + serverInfo.getIp() + ":8080";
+                String cookie = getCookie(ip, serverInfo.getUsername(), serverInfo.getPassword());
+                cookieMap.put(serverInfo.getIp(), cookie);
+                return cookie;
             }
         }
-        httpGet.setHeader("Content-Type", "application/json;charset=UTF-8");
-        HttpResponse response = httpClient.execute(httpGet);
-        HttpEntity entity = response.getEntity();
-        return entity != null ? EntityUtils.toString(entity) : null;
+
+
     }
 
-    public static String sendPost(String url, Map<String, Object> params, String contentType, Map<String, Object> headers) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-
-        // Add headers
-        if (headers != null) {
-            for (Map.Entry<String, Object> entry : headers.entrySet()) {
-                httpPost.addHeader(entry.getKey(), (String) entry.getValue());
-            }
-        }
-
-        if (!params.isEmpty()) {
-            if ("application/x-www-form-urlencoded".equals(contentType)) {
-                List<BasicNameValuePair> urlParameters = new ArrayList<>();
-                for (Map.Entry<String, Object> entry : params.entrySet()) {
-                    urlParameters.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));
-                }
-                httpPost.setEntity(new UrlEncodedFormEntity(urlParameters, StandardCharsets.UTF_8));
-                httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-            } else if ("application/json".equals(contentType)) {
-                StringEntity entity = new StringEntity(mapToJson(params), StandardCharsets.UTF_8);
-                httpPost.setEntity(entity);
-                httpPost.setHeader("Content-Type", "application/json;charset=UTF-8");
-            }
-
-        }
-
-        HttpResponse response = httpClient.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return entity != null ? EntityUtils.toString(entity, StandardCharsets.UTF_8) : null;
-    }
-
-    public static String sendLoginRequest(String ip, String username, String password) throws Exception {
+    public static String getCookie(String ip, String username, String password) throws Exception {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String loginUrl = ip + "/login?username=" + DigestUtil.md5Hex("user" + username + timestamp) +
                 "&password=" + DigestUtil.md5Hex("password" + password + timestamp) +
                 "&timestamp=" + timestamp;
-        java.net.URL url = new URL(loginUrl);
+        URL url = new URL(loginUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         // 设置请求方法为GET
@@ -87,6 +81,8 @@ public class HttpRequestUtil {
         // 获取所有的Set-Cookie头字段
         List<String> cookies = getAllCookies(connection);
 
+        // 输出完整的响应头
+//        System.out.println("Response Headers: " + connection.getHeaderFields());
 
         // 解析 JSESSIONID 的值
         String jsessionId = extractJSessionId(cookies);

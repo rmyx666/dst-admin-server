@@ -12,7 +12,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static com.tugos.dst.admin.utils.GetCookieUtil.getCookie;
 import static com.tugos.dst.admin.utils.HttpRequestUtil.*;
+import static com.tugos.dst.admin.utils.JsonUtils.isValidJson;
 import static com.tugos.dst.admin.utils.TransCoderUtil.convertMapToObject;
 
 @Service
@@ -36,12 +38,22 @@ public class ServerService {
                 try {
                     Map<String, String> headers = new HashMap<>();
                     // 拼接ip获取cookie
+
                     String ip = "http://" + serverInfo.getIp() + ":8080";
-                    String jsessionId = sendLoginRequest(ip, serverInfo.getUsername(), serverInfo.getPassword());
+                    String jsessionId = getCookie(serverInfo,false);
 
                     // 更新cookie
                     headers.put("Cookie", "JSESSIONID=" + jsessionId);
                     String result = sendGet(ip + "/room/localInfosWithHardware", convertMapToObject(headers));
+
+                    boolean isJson = isValidJson(result);
+                    if (!isJson){
+                        jsessionId = getCookie(serverInfo,true);
+
+                        // 更新cookie
+                        headers.put("Cookie", "JSESSIONID=" + jsessionId);
+                        result = sendGet(ip + "/room/localInfosWithHardware", convertMapToObject(headers));
+                    }
 
                     List<RoomInfoVO> roomInfoVOS = JSONUtil.toBean(JSONUtil.toJsonStr(JSONUtil.parseObj(result).get("data")), new TypeReference<List<RoomInfoVO>>() {
                     }, false);
