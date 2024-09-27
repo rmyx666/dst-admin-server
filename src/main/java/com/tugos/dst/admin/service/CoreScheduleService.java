@@ -11,6 +11,7 @@ import com.tugos.dst.admin.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,19 +40,13 @@ import java.util.stream.Collectors;
 public class CoreScheduleService {
 
 
-
     private HomeService homeService;
     private ShellService shellService;
     private BackupService backupService;
 
-    @Value("${dst.master.port:10888}")
-    private String masterPort;
+    @Autowired
+    JavaProgramUpdateUtil javaProgramUpdateUtil;
 
-    @Value("${dst.ground.port:10998}")
-    private String groundPort;
-
-    @Value("${dst.caves.port:10999}")
-    private String cavesPort;
 
     /**
      * 最大阈值 3分钟
@@ -69,9 +64,9 @@ public class CoreScheduleService {
     public void sendMsg() throws InterruptedException {
 
         List<String> collect = dataService.getRoomInfoMap().values().stream().map(x -> x.getRoomId()).collect(Collectors.toList());
-        String message="\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
+        String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
         for (String roomId : collect) {
-            shellService.sendBroadcast(message,roomId);
+            shellService.sendBroadcast(message, roomId);
             Thread.sleep(1000);
         }
 
@@ -100,9 +95,9 @@ public class CoreScheduleService {
     /**
      * 每天1点更新java程序
      */
-//    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void updateJavaProgram() {
-        ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
+        javaProgramUpdateUtil.updateJavaProgram();
     }
 
     /**
@@ -164,12 +159,12 @@ public class CoreScheduleService {
                             List<String> playerList = null;
                             try {
                                 playerList = shellService.getPlayerList(roomInfo.getValue().getRoomId());
-                                if (CollectionUtils.isEmpty(playerList)){
+                                if (CollectionUtils.isEmpty(playerList)) {
                                     this.onlyUpdateGame(roomInfo.getValue());
                                     //记录执行次数
                                     roomInfo.getValue().SCHEDULE_UPDATE_MAP.put(time, 1);
-                                }else {
-                                    log.info("当前时间："+new Date().toString()+"房间ID："+roomInfo.getValue().getRoomId()+"房间内存在玩家正在游玩，暂不更新");
+                                } else {
+                                    log.info("当前时间：" + new Date().toString() + "房间ID：" + roomInfo.getValue().getRoomId() + "房间内存在玩家正在游玩，暂不更新");
                                 }
                             } catch (Exception e) {
                                 log.error("更新时获取玩家列表失败或者其他原因导致失败");
