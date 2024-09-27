@@ -66,45 +66,6 @@ public class HttpRequestFileDownloadServiceImpl implements HttpRequestService {
         response.put("params", params);
 
 
-        String contentType = null;
-        // 获取请求体（适用于 POST 方法）
-        if (method.equals(RequestMethod.POST.name())) {
-            contentType = request.getContentType();
-            if (contentType != null) {
-                if (contentType.contains("application/x-www-form-urlencoded")) {
-                    // 解析 application/x-www-form-urlencoded
-                    StringBuilder requestBody = new StringBuilder();
-                    BufferedReader reader = request.getReader();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        requestBody.append(line);
-                    }
-                    String[] pairs = requestBody.toString().split("&");
-                    Map<String, String> formParams = new HashMap<>();
-                    for (String pair : pairs) {
-                        String[] keyValue = pair.split("=");
-                        if (keyValue.length > 1) {
-                            formParams.put(keyValue[0], keyValue[1]);
-                        } else {
-                            formParams.put(keyValue[0], "");
-                        }
-                    }
-                    response.put("body", formParams);
-                } else if (contentType.contains("application/json")) {
-                    // 解析 application/json
-                    StringBuilder requestBody = new StringBuilder();
-                    BufferedReader reader = request.getReader();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        requestBody.append(line);
-                    }
-                    ObjectMapper mapper = new ObjectMapper();
-                    Map<String, Object> jsonParams = mapper.readValue(requestBody.toString(), Map.class);
-                    response.put("body", jsonParams);
-                }
-            }
-        }
-
         String result = "";
         Map<String, Object> paramsMap = new HashMap<>();
 
@@ -128,19 +89,7 @@ public class HttpRequestFileDownloadServiceImpl implements HttpRequestService {
 
         if (method.equals("GET")) {
             String getQueryString = buildGetQueryString(params);
-            result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers));
-        } else if (method.equals("POST")) {
-            if (contentType.contains("application/x-www-form-urlencoded")) {
-                paramsMap = convertMap(params);
-                result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
-            } else if (contentType.contains("application/json")) {
-                paramsMap = (Map<String, Object>) response.get("body");
-                result = sendPost(ip + uri + "?" + buildGetQueryString(params), paramsMap, "application/json", convertMapToObject(headers));
-            } else {
-                //如果什么都匹配不到就按照application/x-www-form-urlencoded的调用方式走
-                paramsMap = convertMap(params);
-                result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
-            }
+            result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers), httpServletResponse);
         }
 
         boolean isJson = isValidJson(result);
@@ -154,26 +103,14 @@ public class HttpRequestFileDownloadServiceImpl implements HttpRequestService {
 
             if (method.equals("GET")) {
                 String getQueryString = buildGetQueryString(params);
-                result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers));
-            } else if (method.equals("POST")) {
-                if (contentType.contains("application/x-www-form-urlencoded")) {
-                    paramsMap = convertMap(params);
-                    result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
-                } else if (contentType.contains("application/json")) {
-                    paramsMap = (Map<String, Object>) response.get("body");
-                    result = sendPost(ip + uri + "?" + buildGetQueryString(params), paramsMap, "application/json", convertMapToObject(headers));
-                } else {
-                    //如果什么都匹配不到就按照application/x-www-form-urlencoded的调用方式走
-                    paramsMap = convertMap(params);
-                    result = sendPost(ip + uri, paramsMap, "application/x-www-form-urlencoded", convertMapToObject(headers));
-                }
+                result = sendGet(ip + uri + "?" + getQueryString, convertMapToObject(headers), httpServletResponse);
             }
 
 
         }
 
-        Object json = JSON.parse(result);
-        return json;
+
+        return null;
 
     }
 

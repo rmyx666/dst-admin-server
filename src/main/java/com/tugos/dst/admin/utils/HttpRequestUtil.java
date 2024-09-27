@@ -1,6 +1,8 @@
 package com.tugos.dst.admin.utils;
 
 
+import com.alibaba.fastjson.JSON;
+import com.tugos.dst.admin.common.ResultVO;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -16,8 +18,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -121,12 +128,12 @@ public class HttpRequestUtil {
         // Handle file upload with multipart/form-data
         if (file != null && !file.isEmpty() && contentType.contains("multipart/form-data")) {
 
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.RFC6532);;
-
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create().setMode(HttpMultipartMode.RFC6532);
+            ;
 
 
             // Add file to the request with correct filename encoding
-            builder.addBinaryBody("file", file.getInputStream(),  ContentType.MULTIPART_FORM_DATA, file.getOriginalFilename());
+            builder.addBinaryBody("file", file.getInputStream(), ContentType.MULTIPART_FORM_DATA, file.getOriginalFilename());
 
             // Add additional parameters (non-file form fields)
             if (params != null && !params.isEmpty()) {
@@ -144,5 +151,60 @@ public class HttpRequestUtil {
         HttpResponse response = httpClient.execute(httpPost);
         HttpEntity entity = response.getEntity();
         return entity != null ? EntityUtils.toString(entity, StandardCharsets.UTF_8) : null;
+    }
+
+    public static String sendGet(String url, Map<String, Object> headers, HttpServletResponse httpServletResponse) throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+
+        // Add headers
+        if (headers != null) {
+            for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                httpGet.addHeader(entry.getKey(), (String) entry.getValue());
+            }
+        }
+
+        // Execute the request
+        HttpResponse response = httpClient.execute(httpGet);
+        HttpEntity entity = response.getEntity();
+
+        // Handle file download
+        if (entity != null) {
+            String fileName = "下载文件"; // Default file name
+            if (response.getFirstHeader("Content-Disposition") != null) {
+                String disposition = response.getFirstHeader("Content-Disposition").getValue();
+                String[] parts = disposition.split(";");
+                for (String part : parts) {
+                    if (part.trim().startsWith("filename")) {
+                        fileName = part.split("=")[1].trim().replace("\"", "");
+                        break;
+                    }
+                }
+            }
+            // URL encode the file name
+            String encodedFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString())
+                    .replace("+", "%20"); // 处理空格
+
+            httpServletResponse.setHeader("content-type", "application/octet-stream");
+            httpServletResponse.setContentType("application/octet-stream");
+            httpServletResponse.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(encodedFileName, "UTF-8").replaceAll("\\+", "%20"));
+
+
+
+            try (InputStream inputStream = entity.getContent();
+                 OutputStream outputStream = httpServletResponse.getOutputStream()) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+
+            ResultVO<Object> success = ResultVO.success();
+            return JSON.toJSONString(success);
+
+        }
+
+        return null;
     }
 }
