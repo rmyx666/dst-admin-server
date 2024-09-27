@@ -22,9 +22,12 @@ download_file() {
 # 初始下载
 download_file
 
+max_retries=5
+attempt=1
+
 # 如果下载失败，进入循环
-while [ $? -ne 0 ]; do
-    echo "$(date): 下载失败，准备重试。" | tee -a $log_file
+while [ $? -ne 0 ] && [ $attempt -le $max_retries ]; do
+    echo "$(date): 第 $attempt 次下载失败，准备重试。" | tee -a $log_file
 
     # 生成 1 到 60 分钟的随机等待时间（以秒为单位）
     sleep_time=$(( (RANDOM % 60 + 1) * 60 ))
@@ -35,7 +38,14 @@ while [ $? -ne 0 ]; do
 
     # 再次尝试下载
     download_file
+
+    # 增加尝试次数
+    attempt=$((attempt + 1))
 done
+
+if [ $attempt -gt $max_retries ]; then
+    echo "$(date): 超过最大重试次数，下载失败。" | tee -a $log_file
+fi
 
 # 如果下载成功
 echo "$(date): 下载成功。" | tee -a $log_file
