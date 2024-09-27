@@ -134,12 +134,16 @@
             },
             deleteBackup(val){
                 let fileNames =[val.fileName];
+
+                // 包装成对象格式
+                const fileNamesVO = { fileNames: fileNames };
+
                 this.$confirm('<@spring.message code="backup.js.confirm.del"/>:'+val.fileName+'?', '<@spring.message code="backup.js.tip"/>', {
                     confirmButtonText: '<@spring.message code="home.pane1.card1.dst.confirm"/>',
                     cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                     type: 'warning'
                 }).then(() => {
-                    post("/backup/deleteBackup?roomId=" + this.roomId+"&serverId="+this.serverId, fileNames).then((data) => {
+                    post("/backup/deleteBackup?roomId=" + this.roomId+"&serverId="+this.serverId, fileNamesVO).then((data) => {
                         this.successMessage('<@spring.message code="backup.js.del.success"/>');
                         this.getBackupList();
                     })
@@ -147,28 +151,33 @@
 
                 });
             },
-            batchDelBackup(){
+            batchDelBackup() {
                 if (this.selectData.length <= 0) {
-                    this.warningMessage('<@spring.message code="backup.js.select.data"/>')
+                    this.warningMessage('<@spring.message code="backup.js.select.data"/>');
                 } else {
                     let fileNames = [];
                     this.selectData.forEach(e => {
                         fileNames.push(e.fileName);
-                    })
-                    this.$confirm('<@spring.message code="backup.js.confirm.del"/>:'+'?', '<@spring.message code="backup.js.tip"/>', {
+                    });
+
+                    // 包装成对象格式
+                    const fileNamesVO = { fileNames: fileNames };
+
+                    this.$confirm('<@spring.message code="backup.js.confirm.del"/>:' + '?', '<@spring.message code="backup.js.tip"/>', {
                         confirmButtonText: '<@spring.message code="home.pane1.card1.dst.confirm"/>',
                         cancelButtonText: '<@spring.message code="home.pane1.card1.dst.cancel"/>',
                         type: 'warning'
                     }).then(() => {
-                        post("/backup/deleteBackup", fileNames).then((data) => {
+                        post("/backup/deleteBackup?roomId=" + this.roomId+"&serverId="+this.serverId, fileNamesVO).then((data) => {
                             this.successMessage('<@spring.message code="backup.js.del.success"/>');
                             this.getBackupList();
-                        })
+                        });
                     }).catch(() => {
-
+                        // Handle cancellation
                     });
                 }
-            },
+            }
+,
             formatFileSize(value) {
                 if (null == value || value == '') {
                     return "0 Bytes";

@@ -9,7 +9,9 @@ import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.service.BackupService;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.vo.BackupFileVO;
+import com.tugos.dst.admin.vo.FileNamesVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -72,14 +74,17 @@ public class BackupController {
     @PostMapping("/deleteBackup")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> deleteBackup(@RequestBody String[] fileNames,
+    public ResultVO<String> deleteBackup(@RequestBody FileNamesVO fileNames,
                                          @RequestParam(required = true) String roomId) {
         log.info("删除备份:{}", JSONUtil.toJsonStr(fileNames));
-        if (fileNames != null && fileNames.length > 0) {
-            for (String s : fileNames) {
+
+        List<String> fileNamesList = fileNames.getFileNames();
+        if (CollectionUtils.isNotEmpty(fileNamesList)){
+            for (String s : fileNamesList) {
                 backupService.deleteBackup(s, roomId);
             }
         }
+
         return ResultVO.success();
     }
 
