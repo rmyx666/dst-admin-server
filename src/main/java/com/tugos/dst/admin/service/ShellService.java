@@ -81,30 +81,6 @@ public class ShellService {
 
 
     /**
-     * 备份游戏存档
-     */
-//    @Deprecated
-//    public void createBackup(String fileName, String roomId) {
-//        StringBuilder command = new StringBuilder();
-//        command.append("cd $HOME/.klei/DoNotStarveTogether ").append(" ; ");
-//        command.append("tar zcvf ").append(fileName).append(" MyDediServer/");
-//        ShellUtil.runShell(command.toString().replace("MyDediServer", "MyDediServer_" + roomId));
-//    }
-
-
-    /**
-     * 创建一个新room的文件夹
-     *
-
-     * @param roomId
-     */
-//    public void createServer( String roomId) {
-//        StringBuilder command = new StringBuilder();
-//        command.append("mkdir -p ~/.klei/DoNotStarveTogether/MyDediServer");
-//        ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
-//    }
-
-    /**
      * 恢复游戏存档
      *
      * @param fileName 备份的游戏名称
@@ -118,23 +94,6 @@ public class ShellService {
         ShellUtil.runShell(command.toString().replace("MyDediServer", roomId));
     }
 
-    /**
-     * 获取备份路径下的备份文件名称
-     */
-//    public List<String> getBackupList() {
-//        String backupPath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
-//        File file = new File(backupPath);
-//        if (!file.exists()) {
-//            return new ArrayList<>();
-//        }
-//        List<String> files = FileUtils.getFileNames(backupPath);
-//        if (CollectionUtils.isNotEmpty(files)) {
-//            return files.stream()
-//                    .filter(e -> e.contains(DstConstant.BACKUP_FILE_EXTENSION)).collect(Collectors.toList());
-//
-//        }
-//        return new ArrayList<>();
-//    }
 
     /**
      * 启动地面进程
@@ -321,12 +280,7 @@ public class ShellService {
         masterBroadcast.append("\\\")\\n\"");
         //发送地面广播
         ShellUtil.execShellBin(masterBroadcast.toString().replace("DST_MASTER", "Master_" + roomId));
-       /* StringBuilder CavesBroadcast = new StringBuilder();
-        CavesBroadcast.append("screen -S \"DST_CAVES\" -p 0 -X stuff \"c_announce(\\\"");
-        CavesBroadcast.append(message);
-        CavesBroadcast.append("\\\")\\n\"");
-        //发送洞穴广播
-        ShellUtil.execShellBin(CavesBroadcast.toString());*/
+
     }
 
     /**
