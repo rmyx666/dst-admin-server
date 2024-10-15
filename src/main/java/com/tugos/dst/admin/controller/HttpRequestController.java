@@ -52,9 +52,9 @@ public class HttpRequestController {
         String uri = (String) request.getAttribute("originalPath");
 
 
-            HttpRequestService service = getService(uri);
+        HttpRequestService service = getService(uri);
 
-            return service.sendHttpRequest(request, response);
+        return service.sendHttpRequest(request, response);
 
 
     }

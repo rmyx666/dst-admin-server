@@ -84,6 +84,9 @@ public class MainController {
         Menu menu5 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(5).
                 children(new HashMap<>()).title(I18nResourcesConfig.getMessage("main.menu6.name")).type(1).url("/system/index").build();
 
+        Menu menu6 = Menu.builder().id(4L).icon("layui-icon layui-icon-util").sort(6).
+                children(new HashMap<>()).title("用户监控").type(1).url("/monitor/index").build();
+
         Map<String, Menu> treeMenu2 = new HashMap<>(16);
         treeMenu2.put("0", menu);
         treeMenu2.put("1", menu1);
@@ -91,6 +94,7 @@ public class MainController {
         treeMenu2.put("3", menu3);
         treeMenu2.put("4", menu4);
         treeMenu2.put("5", menu5);
+        treeMenu2.put("6", menu6);
 
         model.addAttribute("treeMenu2", treeMenu2);
         return "room_main";
