@@ -141,7 +141,6 @@ public class PlayerService {
                 }
             });
         }
-        playList.add("KU_***** nickname wendy 13");
         return playList;
     }
 
