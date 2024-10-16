@@ -63,7 +63,7 @@
             // 设置默认的时间范围为最近三天
             const now = new Date();
             this.endTime = now;
-            this.startTime = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);  // 三天前
+            this.startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);  // 三天前
         },
         mounted() {
             // 初始化ECharts
