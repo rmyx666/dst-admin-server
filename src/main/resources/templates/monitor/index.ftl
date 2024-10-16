@@ -50,6 +50,7 @@
         data() {
             return {
                 roomId: RoomUtil.getRoomId(), // 获取 roomId
+                serverId: RoomUtil.getServerId(), // 获取 roomId
                 startTime: '',  // 开始时间
                 endTime: '',    // 结束时间
                 type: 'hour',   // 默认粒度为小时
@@ -78,7 +79,7 @@
                     type: this.type
                 };
 
-                axios.post('/monitor/getPlayerOnlineTrend', param)
+                axios.post("/monitor/getPlayerOnlineTrend?roomId=" + this.roomId+"&serverId="+this.serverId, param)
                     .then(response => {
                         this.trendData = response.data.data;  // 将接口返回的趋势数据赋值给 trendData
                         this.renderChart();
@@ -94,7 +95,7 @@
                     roomId: this.roomId
                 };
 
-                axios.post('/monitor/getPlayerOnlineAge', param)
+                axios.post("/monitor/getPlayerOnlineAge?roomId=" + this.roomId+"&serverId="+this.serverId, param)
                     .then(response => {
                         this.playerData = response.data.data; // 将接口返回的玩家数据赋值给 playerData
                     })
