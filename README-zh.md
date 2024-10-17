@@ -67,4 +67,9 @@ chmod +x ./startDst.sh
 ./startDst.sh
      
 ```
+初代内存占用
+ubuntu   15200  4.0  1.6 3623152 258848 pts/6  Sl   11:03   0:29 java -jar -Xms100m -Xmx100m dst-admin.jar --server.port=8080
+
+添加sqlite之后的内存占用
+ubuntu   23457  1.0  1.8 3627476 286636 pts/6  Sl   09:22   0:57 java -jar -Xms100m -Xmx100m dst-admin.jar --server.port=8080
 
