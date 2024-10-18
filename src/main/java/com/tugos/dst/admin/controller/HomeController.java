@@ -214,7 +214,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> delMyDediServer(@RequestParam(required = true) String roomId) {
         log.info("删除room目录");
-        homeService.delMyDediServer(roomId);
+        homeService.delRoomPath(roomId);
         return ResultVO.success();
     }
 

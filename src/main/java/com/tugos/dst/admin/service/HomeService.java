@@ -2,8 +2,11 @@ package com.tugos.dst.admin.service;
 
 
 import cn.hutool.core.io.FileUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
+import com.tugos.dst.admin.dao.PlayerLogMapper;
+import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.systementity.Server;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.enums.StopTypeEnum;
@@ -35,6 +38,8 @@ public class HomeService {
     private SettingService settingService;
     @Autowired
     private RoomService roomService;
+    @Autowired
+    PlayerLogMapper playerLogMapper;
 
     /**
      * 启动服务器进程
@@ -55,19 +60,19 @@ public class HomeService {
                 shellService.stopCaves(roomId);
                 shellService.startMaster(roomId);
                 shellService.startCaves(roomId);
-                roomService.updateStartFlag(roomId,true,true);
+                roomService.updateStartFlag(roomId, true, true);
                 break;
             case START_MASTER:
                 //启动地面
                 shellService.stopMaster(roomId);
                 shellService.startMaster(roomId);
-                roomService.updateStartFlag(roomId,true,null);
+                roomService.updateStartFlag(roomId, true, null);
                 break;
             case START_CAVES:
                 //启动洞穴
                 shellService.stopCaves(roomId);
                 shellService.startCaves(roomId);
-                roomService.updateStartFlag(roomId,null,true);
+                roomService.updateStartFlag(roomId, null, true);
                 break;
             default:
         }
@@ -97,17 +102,17 @@ public class HomeService {
                 //停止所有,优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
                 shellService.elegantShutdownCaves(roomId);
-                roomService.updateStartFlag(roomId,false,false);
+                roomService.updateStartFlag(roomId, false, false);
                 break;
             case STOP_MASTER:
                 //停止地面 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
-                roomService.updateStartFlag(roomId,false,null);
+                roomService.updateStartFlag(roomId, false, null);
                 break;
             case STOP_CAVES:
                 //停止洞穴 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownCaves(roomId);
-                roomService.updateStartFlag(roomId,null,false);
+                roomService.updateStartFlag(roomId, null, false);
                 break;
             default:
         }
@@ -167,7 +172,6 @@ public class HomeService {
     }
 
     /**
-     *
      * 硬件信息
      */
     public DstServerInfoVO getHardwareInfo() throws Exception {
@@ -179,8 +183,8 @@ public class HomeService {
         data.setMem(server.getMem());
         return data;
     }
+
     /**
-     *
      * 饥荒状态
      */
     public DstServerInfoVO getDstInfo(String roomId) throws Exception {
@@ -203,77 +207,6 @@ public class HomeService {
         return ResultVO.success();
     }
 
-    /**
-     * 备份游戏存档
-     *
-     * @param name 存档名称
-     * @return 信息
-     */
-//    @Deprecated
-//    public ResultVO<String> backup(String name, String roomId) {
-//        if (!this.checkGameFileIsExists(roomId)) {
-//            //未安装dst
-//            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error"));
-//        }
-//        String weekStr = DateUtil.thisDayOfWeekEnum().toString();
-//        String fileName;
-//        if (StringUtils.isNotBlank(name)) {
-//            fileName = name + ".tar";
-//        } else {
-//            //未设置名称
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-//            String format = sdf.format(new Date());
-//            format += weekStr;
-//            fileName = format + ".tar";
-//        }
-//        shellService.createBackup(fileName, roomId);
-//        return ResultVO.success();
-//    }
-
-    /**
-     * 校验游戏存档文件是否存在
-     *
-     * @return true 存在
-     */
-//    private boolean checkGameFileIsExists(String roomId) {
-//        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
-//        File file = new File(path);
-//        return file.exists();
-//    }
-
-    /**
-     * 恢复存档 需要暂停游戏，清空之前的记录
-     *
-     * @param name 备份的文件名称全称
-     */
-//    @Deprecated
-//    public ResultVO<String> restore(String name, String roomId) {
-//        if (!this.checkBackupIsExists(name)) {
-//            //未安装dst
-//            return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error2") + name);
-//        }
-//        //清空在恢复
-//        this.delRecord(roomId);
-//        //释放打包好的存档文件
-//        shellService.revertBackup(name, roomId);
-//        return ResultVO.success();
-//    }
-
-    /**
-     * 校验存档文件是否存在
-     *
-     * @param name 文件名称 全称
-     * @return true 存在
-     */
-//    private boolean checkBackupIsExists(String name) {
-//        boolean flag = false;
-//        if (StringUtils.isNotBlank(name)) {
-//            String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH;
-//            File file = new File(path);
-//            flag = file.exists();
-//        }
-//        return flag;
-//    }
 
     /**
      * 清理地面和洞穴游戏进度，需要停止服务
@@ -281,16 +214,37 @@ public class HomeService {
     public void delRecord(String roomId) {
         shellService.delCavesRecord(roomId);
         shellService.delMasterRecord(roomId);
+
+        delRoomPlayerLog(roomId);
     }
 
     /**
-     * 删除MyDediServer目录
+     * 删除room文件夹
      */
-    public void delMyDediServer(String roomId) {
+    public void delRoomPath(String roomId) {
         this.stopServer(roomId);
-        String path = DstConstant.ROOT_PATH +  DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
-        log.warn("删除MyDediServer目录:{}", path);
+        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
+        log.warn("删除room文件夹:{}", path);
         FileUtil.del(path);
+
+        delRoomPlayerLog(roomId);
+    }
+
+    /**
+     * @param roomId
+     * @return void
+     * @Title delRoomPlayerLog
+     * @Description 删除roomId对应的日志文件
+     * @author wgr
+     * @date 2024/10/18 13:52
+     */
+
+
+    public void delRoomPlayerLog(String roomId) {
+        // 查询数据库获取玩家日志
+        QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("room_id", roomId);
+        int delete = playerLogMapper.delete(queryWrapper);
     }
 
     /**
