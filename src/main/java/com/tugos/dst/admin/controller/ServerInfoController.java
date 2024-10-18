@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;

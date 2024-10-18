@@ -1,4 +1,4 @@
-package com.tugos.dst.admin.entity;
+package com.tugos.dst.admin.systementity;
 
 
 import lombok.Builder;

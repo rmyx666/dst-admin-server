@@ -1,7 +1,7 @@
 package com.tugos.dst.admin.vo;
 
-import com.tugos.dst.admin.entity.serverInfo.Cpu;
-import com.tugos.dst.admin.entity.serverInfo.Mem;
+import com.tugos.dst.admin.systementity.serverInfo.Cpu;
+import com.tugos.dst.admin.systementity.serverInfo.Mem;
 import lombok.Data;
 
 import java.util.List;

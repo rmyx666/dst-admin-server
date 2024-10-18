@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
-import com.tugos.dst.admin.entity.Menu;
+import com.tugos.dst.admin.systementity.Menu;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.utils.URL;
 import org.apache.shiro.authz.annotation.RequiresPermissions;

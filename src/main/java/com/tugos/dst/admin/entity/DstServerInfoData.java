@@ -1,7 +1,12 @@
-package com.tugos.dst.admin.utils;
+package com.tugos.dst.admin.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -13,10 +18,14 @@ import java.util.Map;
  */
 
 @Data
+@TableName("server_info")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DstServerInfoData implements Serializable {
 
 
-
+    @TableId
     public Long id;
 
     public String ip;

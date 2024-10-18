@@ -1,7 +1,8 @@
 package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,48 +16,46 @@ public class ServerInfoService {
     @Autowired
     DataService dataService;
 
+    @Autowired
+    DstServerInfoDataMapper dstServerInfoDataMapper;
+
+
     public DstServerInfoData getServerInfo(Long id) {
-        DstServerInfoData dstServerInfoData = dataService.getServerInfoMap().get(id);
-        return dstServerInfoData;
+        return dstServerInfoDataMapper.selectById(id);
     }
 
     public List<DstServerInfoData> getServerInfoList() {
-        List<DstServerInfoData> dstServerInfoData = new ArrayList<>(dataService.getServerInfoMap().values());
 
-        return dstServerInfoData;
+        return new ArrayList<>(dstServerInfoDataMapper.selectList(null));
     }
 
     public ResultVO<String> updateServerInfo(DstServerInfoData serverInfo) {
-        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
-        DstServerInfoData dstServerInfoData = serverInfoMap.get(serverInfo.getId());
+        DstServerInfoData dstServerInfoData = dstServerInfoDataMapper.selectById(serverInfo.getId());
+
         dstServerInfoData.setIp(serverInfo.getIp());
         dstServerInfoData.setName(serverInfo.getName());
         dstServerInfoData.setUsername(serverInfo.getUsername());
         dstServerInfoData.setPassword(serverInfo.getPassword());
-        serverInfoMap.put(serverInfo.getId(), dstServerInfoData);
-        dataService.updateServerInfoMap(serverInfoMap);
+        dstServerInfoDataMapper.updateById(dstServerInfoData);
         return ResultVO.success();
     }
 
     public ResultVO<String> saveServerInfo(DstServerInfoData serverInfo) {
-        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
+        List<DstServerInfoData> dstServerInfoData = dstServerInfoDataMapper.selectList(null);
 
-        if (serverInfoMap.containsKey(serverInfo.getId())) {
+        if (dstServerInfoData.stream().anyMatch(x -> x.getId().equals(serverInfo.getId()))) {
             return ResultVO.fail("Id重复");
         }
-        if (serverInfoMap.values().stream().anyMatch(x -> x.getIp().equals(serverInfo.getIp()))) {
+        if (dstServerInfoData.stream().anyMatch(x -> x.getIp().equals(serverInfo.getIp()))) {
             return ResultVO.fail("IP重复");
         }
 
-        serverInfoMap.put(serverInfo.getId(), serverInfo);
-        dataService.updateServerInfoMap(serverInfoMap);
+        dstServerInfoDataMapper.insert(serverInfo);
         return ResultVO.success();
     }
 
     public void deleteServerInfo(Long id) {
-        Map<Long, DstServerInfoData> serverInfoMap = dataService.getServerInfoMap();
-        serverInfoMap.remove(id);
-        dataService.updateServerInfoMap(serverInfoMap);
+        dstServerInfoDataMapper.deleteById(id);
     }
 
 

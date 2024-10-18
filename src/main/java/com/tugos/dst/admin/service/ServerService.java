@@ -2,7 +2,7 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

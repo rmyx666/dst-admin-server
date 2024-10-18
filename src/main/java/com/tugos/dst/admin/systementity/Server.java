@@ -1,7 +1,8 @@
-package com.tugos.dst.admin.entity;
+package com.tugos.dst.admin.systementity;
 
 
-import com.tugos.dst.admin.entity.serverInfo.*;
+
+import com.tugos.dst.admin.systementity.serverInfo.*;
 import com.tugos.dst.admin.utils.Arith;
 import com.tugos.dst.admin.utils.IpUtils;
 import oshi.SystemInfo;

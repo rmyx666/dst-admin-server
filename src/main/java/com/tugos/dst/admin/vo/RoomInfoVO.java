@@ -1,7 +1,5 @@
 package com.tugos.dst.admin.vo;
 
-import com.tugos.dst.admin.entity.serverInfo.Cpu;
-import com.tugos.dst.admin.entity.serverInfo.Mem;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

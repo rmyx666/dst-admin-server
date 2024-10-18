@@ -1,18 +1,14 @@
 package com.tugos.dst.admin.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tugos.dst.admin.service.HttpRequestService;
 import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;

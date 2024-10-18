@@ -2,14 +2,16 @@ package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
+import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.enums.DstLogTypeEnum;
-import com.tugos.dst.admin.utils.DstConfigRoomData;
+import com.tugos.dst.admin.entity.DstConfigRoomData;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.ShellUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,9 @@ public class PlayerService {
 
     @Autowired
     DataService dataService;
+
+    @Autowired
+    DstConfigRoomDataMapper dstConfigRoomDataMapper;
 
     /**
      * 读取游戏管理员列表
@@ -133,7 +138,7 @@ public class PlayerService {
             dstLog.forEach(e -> {
                 if (e.contains(timeMillis)) {
                     if (e.contains(playerPrefix)) {
-                        String tmp = e.substring(e.indexOf(playerPrefix)).replace("\t","");
+                        String tmp = e.substring(e.indexOf(playerPrefix)).replace("\t", "");
                         if (!tmp.contains(host)) {
                             playList.add(tmp);
                         }
@@ -186,7 +191,8 @@ public class PlayerService {
     @Async
     public void savePlayerLog() throws Exception {
         //获取本地数据
-        List<DstConfigRoomData> roomInfoList = new ArrayList<>(dataService.getRoomInfoMap().values());
+        List<DstConfigRoomData> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+
 
         for (DstConfigRoomData roomData : roomInfoList) {
             saveRoomPlayerLog(roomData.getRoomId());

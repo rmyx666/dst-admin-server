@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.RoomService;
-import com.tugos.dst.admin.utils.DstConfigRoomData;
+import com.tugos.dst.admin.entity.DstConfigRoomData;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

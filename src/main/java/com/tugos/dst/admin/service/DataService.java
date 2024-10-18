@@ -2,11 +2,13 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
+import com.tugos.dst.admin.dao.UserMapper;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import com.tugos.dst.admin.entity.User;
-import com.tugos.dst.admin.utils.DstConfigRoomData;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.entity.DstConfigRoomData;
 import com.tugos.dst.admin.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,8 @@ public class DataService {
 
     @Autowired
     private DataService self;
-
+    @Autowired
+    UserMapper userMapper;
 
     @Value("${dst.username:admin}")
     private String dstUser;
@@ -38,45 +41,19 @@ public class DataService {
 
     public User getUser() {
 
-        String path = "data/user.json";
+        User admin = userMapper.selectById(dstUser);
+        return admin;
 
-        String userString = null;
-        try {
-            userString = FileUtils.readFile(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (StringUtils.isNotBlank(userString)) {
-            User user = JSONUtil.toBean(userString, User.class);
-            return user;
-        } else {
-            User build = User.builder()
-                    .username(dstUser)
-                    .password(dstPassword)
-                    .nickname(nickname)
-                    .build();
-            return build;
-        }
 
     }
 
 
 
-    public User updatePassword(String password) {
-        User user = self.getUser();
-        user.setPassword(password);
+    public void updatePassword(String password) {
+        User admin = userMapper.selectById(dstUser);
+        admin.setPassword(password);
+        userMapper.updateById(admin);
 
-        String path = "data/user.json";
-
-        String userString = JSONUtil.toJsonStr(user);
-
-        try {
-            FileUtils.createFile(path);
-            FileUtils.writeFile(path, userString);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return user;
     }
 
     /**

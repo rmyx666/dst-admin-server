@@ -2,16 +2,14 @@ package com.tugos.dst.admin.dao;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.tugos.dst.admin.entity.PlayerLog;
-
+import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
 @Component
 @Mapper
-public interface PlayerLogMapper extends BaseMapper<PlayerLog>{
+public interface DstConfigRoomDataMapper extends BaseMapper<DstConfigRoomData>{
 
 
 }

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tugos.dst.admin.service.HttpRequestService;
 import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.utils.DstServerInfoData;
+import com.tugos.dst.admin.entity.DstServerInfoData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
