@@ -3,7 +3,7 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.PlayerService;
 import com.tugos.dst.admin.vo.PlayerSettingVO;
-import io.swagger.annotations.ApiOperation;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class PlayerController {
 
     }
 
-    @ApiOperation(value = "获取白名单", notes = "获取白名单")
+    //@ApiOperation(value = "获取白名单", notes = "获取白名单")
     @GetMapping("/getDstWhitelist")
     @RequiresAuthentication
     @ResponseBody
@@ -89,7 +89,7 @@ public class PlayerController {
 
     }
 
-    @ApiOperation(value = "保存管理员和黑名单和白名单", notes = "保存管理员和黑名单和白名单 新增了白名单")
+    //@ApiOperation(value = "保存管理员和黑名单和白名单", notes = "保存管理员和黑名单和白名单 新增了白名单")
     @PostMapping("/saveAdminAndBlackList")
     @RequiresAuthentication
     @ResponseBody

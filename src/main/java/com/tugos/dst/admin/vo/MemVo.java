@@ -2,7 +2,7 @@ package com.tugos.dst.admin.vo;
 
 
 import com.tugos.dst.admin.utils.Arith;
-import io.swagger.annotations.ApiModelProperty;
+
 import lombok.Data;
 
 /**
@@ -10,13 +10,13 @@ import lombok.Data;
  */
 @Data
 public class MemVo {
-    @ApiModelProperty(value = "内存总量")
+    //@ApiModelProperty(value = "内存总量")
     private double total;
 
-    @ApiModelProperty(value = "已用内存")
+    //@ApiModelProperty(value = "已用内存")
     private double used;
 
-    @ApiModelProperty(value = "剩余内存")
+    //@ApiModelProperty(value = "剩余内存")
     private double free;
     private double usage;
 

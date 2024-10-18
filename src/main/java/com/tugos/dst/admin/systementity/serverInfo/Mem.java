@@ -2,7 +2,7 @@ package com.tugos.dst.admin.systementity.serverInfo;
 
 
 import com.tugos.dst.admin.utils.Arith;
-import io.swagger.annotations.ApiModelProperty;
+
 import lombok.Data;
 
 /**
@@ -11,13 +11,13 @@ import lombok.Data;
  */
 @Data
 public class Mem {
-    @ApiModelProperty(value = "内存总量")
+    //@ApiModelProperty(value = "内存总量")
     private double total;
 
-    @ApiModelProperty(value = "已用内存")
+    //@ApiModelProperty(value = "已用内存")
     private double used;
 
-    @ApiModelProperty(value = "剩余内存")
+    //@ApiModelProperty(value = "剩余内存")
     private double free;
     public double getTotal() {
         return Arith.div(total, (1024 * 1024 * 1024), 2);

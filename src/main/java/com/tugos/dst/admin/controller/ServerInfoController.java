@@ -3,7 +3,7 @@ package com.tugos.dst.admin.controller;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.ServerInfoService;
 import com.tugos.dst.admin.entity.DstServerInfoData;
-import io.swagger.annotations.ApiOperation;
+
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ServerInfoController {
     @Autowired
     private ServerInfoService serverInfoService;
 
-    @ApiOperation(value = "获取服务器信息", notes = "获取所有服务器的信息")
+    //@ApiOperation(value = "获取服务器信息", notes = "获取所有服务器的信息")
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
@@ -38,7 +38,7 @@ public class ServerInfoController {
         return ResultVO.data(serverInfoList);
     }
 
-    @ApiOperation(value = "保存服务器信息", notes = "保存服务器的信息")
+    //@ApiOperation(value = "保存服务器信息", notes = "保存服务器的信息")
     @PostMapping("/save")
     @ResponseBody
     @RequiresAuthentication
@@ -47,7 +47,7 @@ public class ServerInfoController {
         return serverInfoService.saveServerInfo(serverInfo);
     }
 
-    @ApiOperation(value = "删除服务器信息", notes = "根据IP删除服务器信息")
+    //@ApiOperation(value = "删除服务器信息", notes = "根据IP删除服务器信息")
     @GetMapping("/del")
     @ResponseBody
     @RequiresAuthentication
@@ -56,7 +56,7 @@ public class ServerInfoController {
         return ResultVO.success("服务器信息删除成功");
     }
 
-    @ApiOperation(value = "更新服务器信息", notes = "更新服务器的信息")
+    //@ApiOperation(value = "更新服务器信息", notes = "更新服务器的信息")
     @PostMapping("/update")
     @ResponseBody
     @RequiresAuthentication
