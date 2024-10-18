@@ -38,7 +38,6 @@ public class DataService {
     private String nickname;
 
 
-
     public User getUser() {
 
         User admin = userMapper.selectById(dstUser);
@@ -46,7 +45,6 @@ public class DataService {
 
 
     }
-
 
 
     public void updatePassword(String password) {
@@ -64,73 +62,5 @@ public class DataService {
         return true;
     }
 
-
-    public Map<String, DstConfigRoomData> getRoomInfoMap() {
-
-        String path = "data/roomInfoMap.json";
-
-        String userString = null;
-        try {
-            userString = FileUtils.readFile(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (StringUtils.isNotBlank(userString)) {
-//            Map<String, DstConfigRoomData> roomInfoMap = JSONUtil.(userString, Map.class);
-            Map<String, DstConfigRoomData> roomInfoMap = JSONUtil.toBean(userString, new TypeReference<Map<String, DstConfigRoomData>>() {
-            }, false);
-            return roomInfoMap;
-        } else {
-            return new HashMap<>();
-        }
-
-    }
-
-
-    public Map<String, DstConfigRoomData> updateRoomInfoMap(Map<String, DstConfigRoomData> roomInfoMap) {
-        String path = "data/roomInfoMap.json";
-        String userString = JSONUtil.toJsonStr(roomInfoMap);
-        try {
-            FileUtils.createFile(path);
-            FileUtils.writeFile(path, userString);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return roomInfoMap;
-    }
-
-
-    public Map<Long, DstServerInfoData> getServerInfoMap() {
-
-        String path = "data/serverInfoMap.json";
-
-        String serverInfo = null;
-        try {
-            serverInfo = FileUtils.readFile(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (StringUtils.isNotBlank(serverInfo)) {
-            Map<Long, DstServerInfoData> serverInfoMap = JSONUtil.toBean(serverInfo, new TypeReference<Map<Long, DstServerInfoData>>() {
-            }, false);
-            return serverInfoMap;
-        } else {
-            return new HashMap<>();
-        }
-
-    }
-
-
-    public Map<Long, DstServerInfoData> updateServerInfoMap(Map<Long, DstServerInfoData> serverInfoMap) {
-        String path = "data/serverInfoMap.json";
-        String serverInfo = JSONUtil.toJsonStr(serverInfoMap);
-        try {
-            FileUtils.createFile(path);
-            FileUtils.writeFile(path, serverInfo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return serverInfoMap;
-    }
 
 }
