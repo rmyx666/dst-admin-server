@@ -246,7 +246,16 @@ public class BackupService {
             fileName = String.format("%s_%s_%s_%s.zip", DateUtil.format(new Date(), "yyyyMMddHHmmss"), serverName, playDate, season);
         }
         fileName = roomId + "_" + fileName;
-        createBackup(fileName, roomId);
+
+        //如果相同日期有一样的存档就不保存
+        if (CollectionUtils.isNotEmpty(backupList)) {
+            if (!backupList.get(0).getFileName().equals(fileName)){
+                createBackup(fileName, roomId);
+            }
+        }else {
+            createBackup(fileName, roomId);
+        }
+
         return ResultVO.success();
     }
 
