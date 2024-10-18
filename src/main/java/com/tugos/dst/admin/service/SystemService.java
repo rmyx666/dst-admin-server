@@ -69,24 +69,24 @@ public class SystemService {
     public ScheduleVO getScheduleList(String roomId) {
         DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
         ScheduleVO data = new ScheduleVO();
-        Set<String> updateSet = dstConfigRoomData.SCHEDULE_UPDATE_MAP.keySet();
+        Set<String> updateSet = dstConfigRoomData.scheduleUpdateMap.keySet();
         if (CollectionUtils.isNotEmpty(updateSet)) {
             List<ScheduleVO.InnerData> updateTimeList = new ArrayList<>();
             updateSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(dstConfigRoomData.SCHEDULE_UPDATE_MAP.get(e));
+                innerData.setCount(dstConfigRoomData.scheduleUpdateMap.get(e));
                 updateTimeList.add(innerData);
             });
             data.setUpdateTimeList(updateTimeList);
         }
-        Set<String> backupSet = dstConfigRoomData.SCHEDULE_BACKUP_MAP.keySet();
+        Set<String> backupSet = dstConfigRoomData.scheduleBackupMap.keySet();
         if (CollectionUtils.isNotEmpty(backupSet)) {
             List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
             backupSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(dstConfigRoomData.SCHEDULE_BACKUP_MAP.get(e));
+                innerData.setCount(dstConfigRoomData.scheduleBackupMap.get(e));
                 backupTimeList.add(innerData);
             });
             data.setBackupTimeList(backupTimeList);
@@ -114,7 +114,7 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    dstConfigRoomData.SCHEDULE_BACKUP_MAP.put(format, e.getCount());
+                    dstConfigRoomData.scheduleBackupMap.put(format, e.getCount());
                 }
             }
 
@@ -127,7 +127,7 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    dstConfigRoomData.SCHEDULE_UPDATE_MAP.put(format, e.getCount());
+                    dstConfigRoomData.scheduleUpdateMap.put(format, e.getCount());
                 }
 
             }

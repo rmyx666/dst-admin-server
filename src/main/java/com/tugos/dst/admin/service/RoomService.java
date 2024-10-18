@@ -53,12 +53,12 @@ public class RoomService {
 
 
         //配置每天6点更新游戏
-        roomInfo.SCHEDULE_UPDATE_MAP = new TreeMap<>();
-        roomInfo.SCHEDULE_UPDATE_MAP.put("06:00:00", 0);
+        roomInfo.scheduleUpdateMap = new TreeMap<>();
+        roomInfo.scheduleUpdateMap.put("06:00:00", 0);
         //每天6点，18点备份
-        roomInfo.SCHEDULE_BACKUP_MAP = new TreeMap<>();
-        roomInfo.SCHEDULE_BACKUP_MAP.put("06:00:00", 0);
-        roomInfo.SCHEDULE_BACKUP_MAP.put("18:00:00", 0);
+        roomInfo.scheduleBackupMap = new TreeMap<>();
+        roomInfo.scheduleBackupMap.put("06:00:00", 0);
+        roomInfo.scheduleBackupMap.put("18:00:00", 0);
 
         roomInfo.setNotStartMaster(false);
         roomInfo.setNotStartCaves(false);

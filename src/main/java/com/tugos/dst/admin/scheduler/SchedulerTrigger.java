@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -94,13 +93,13 @@ public class SchedulerTrigger {
 
         List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
         for (DstConfigRoomData roomInfo : dstConfigRoomData) {
-            Set<String> backupKeySet = roomInfo.SCHEDULE_BACKUP_MAP.keySet();
+            Set<String> backupKeySet = roomInfo.scheduleBackupMap.keySet();
             for (String key : backupKeySet) {
-                roomInfo.SCHEDULE_BACKUP_MAP.put(key, 0);
+                roomInfo.scheduleBackupMap.put(key, 0);
             }
-            Set<String> updateKeySet = roomInfo.SCHEDULE_UPDATE_MAP.keySet();
+            Set<String> updateKeySet = roomInfo.scheduleUpdateMap.keySet();
             for (String key : updateKeySet) {
-                roomInfo.SCHEDULE_UPDATE_MAP.put(key, 0);
+                roomInfo.scheduleUpdateMap.put(key, 0);
             }
             dstConfigRoomDataMapper.updateById(roomInfo);
         }
@@ -161,10 +160,10 @@ public class SchedulerTrigger {
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
         List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
         for (DstConfigRoomData roomInfo : dstConfigRoomData) {
-            Set<String> updateListTime = roomInfo.SCHEDULE_UPDATE_MAP.keySet();
+            Set<String> updateListTime = roomInfo.scheduleUpdateMap.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
                 updateListTime.forEach(time -> {
-                    Integer count = roomInfo.SCHEDULE_UPDATE_MAP.get(time);
+                    Integer count = roomInfo.scheduleUpdateMap.get(time);
                     if (count < 1) {
                         DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
                         long execTime = parse.getTime();
@@ -179,7 +178,7 @@ public class SchedulerTrigger {
                                 if (CollectionUtils.isEmpty(playerList)) {
                                     this.onlyUpdateGame(roomInfo);
                                     //记录执行次数
-                                    roomInfo.SCHEDULE_UPDATE_MAP.put(time, 1);
+                                    roomInfo.scheduleUpdateMap.put(time, 1);
                                 } else {
                                     log.info("当前时间：" + new Date().toString() + "房间ID：" + roomInfo.getRoomId() + "房间内存在玩家正在游玩，暂不更新");
                                 }
@@ -235,11 +234,11 @@ public class SchedulerTrigger {
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
         List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
         for (DstConfigRoomData roomInfo : dstConfigRoomData) {
-            Set<String> backupListTime = roomInfo.SCHEDULE_BACKUP_MAP.keySet();
+            Set<String> backupListTime = roomInfo.scheduleBackupMap.keySet();
             //执行备份任务
             if (CollectionUtils.isNotEmpty(backupListTime)) {
                 backupListTime.forEach(time -> {
-                    Integer count = roomInfo.SCHEDULE_BACKUP_MAP.get(time);
+                    Integer count = roomInfo.scheduleBackupMap.get(time);
                     if (count < 1) {
                         DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
                         long execTime = parse.getTime();
@@ -248,7 +247,7 @@ public class SchedulerTrigger {
                         if (Range.open(0, upper).contains((int) subTime)) {
                             log.info("定时备份游戏");
                             backupService.backup(null, roomInfo.getRoomId());
-                            roomInfo.SCHEDULE_BACKUP_MAP.put(time, 1);
+                            roomInfo.scheduleBackupMap.put(time, 1);
                         }
                     }
                 });

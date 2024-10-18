@@ -3,14 +3,16 @@ package com.tugos.dst.admin.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -20,7 +22,7 @@ import java.util.TreeMap;
  */
 
 @Data
-@TableName("room_info")
+@TableName(value = "room_info",autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,13 +34,16 @@ public class DstConfigRoomData implements Serializable {
     //@ApiModelProperty(value = "房间名称", required = true, hidden = false)
     public String roomName;
 
-    @TableField(value = "schedule_update_map",typeHandler = JacksonTypeHandler.class)  // 指定使用 JSON 序列化
+    @TableField(typeHandler = JacksonTypeHandler.class)  // 指定使用 JSON 序列化
     //@ApiModelProperty(value = "定时更新游戏任务", required = false, hidden = true)
-    public TreeMap<String, Integer> SCHEDULE_UPDATE_MAP;
+    public TreeMap<String, Integer> scheduleUpdateMap;
 
-    @TableField(value = "schedule_backup_map", typeHandler = JacksonTypeHandler.class)
+
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
     //@ApiModelProperty(value = "定时备份游戏任务", required = false, hidden = true)
-    public TreeMap<String, Integer> SCHEDULE_BACKUP_MAP;
+    public TreeMap<String, Integer> scheduleBackupMap;
+
 
     //@ApiModelProperty(value = "不启动地面标志", required = false, hidden = true)
     public Boolean notStartMaster;
@@ -59,8 +64,8 @@ public class DstConfigRoomData implements Serializable {
      * 清理所有数据
      */
     public void clearAllData() {
-        SCHEDULE_UPDATE_MAP.clear();
-        SCHEDULE_BACKUP_MAP.clear();
+        scheduleUpdateMap.clear();
+        scheduleBackupMap.clear();
     }
 
 }
