@@ -64,27 +64,6 @@ public class InitUtil {
         ShellUtil.runShell("sed -i 's/\\r//' ~/update.sh");
 
 
-        Collection<DstConfigRoomData> values = dataService.getRoomInfoMap().values();
-        for (DstConfigRoomData value : values) {
-            if (dstConfigRoomDataMapper.selectById(value.roomId)==null){
-                dstConfigRoomDataMapper.insert(value);
-            }
-
-        }
-        Collection<DstServerInfoData> values1 = dataService.getServerInfoMap().values();
-        for (DstServerInfoData dstServerInfoData : values1) {
-            if (dstServerInfoDataMapper.selectById(dstServerInfoData.id)==null){
-                dstServerInfoDataMapper.insert(dstServerInfoData);
-            }
-
-        }
-
-        User build = User.builder()
-                .username(dstUser)
-                .password("Wang_guanru1234")
-                .nickname(nickname)
-                .build();
-        userMapper.insert(build);
 
         if (userMapper.selectById(dstUser)==null){
             User user = User.builder()
