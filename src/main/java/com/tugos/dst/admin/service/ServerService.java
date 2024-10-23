@@ -2,7 +2,7 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
-import com.tugos.dst.admin.entity.DstServerInfoData;
+import com.tugos.dst.admin.entity.ServerInfo;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,11 +29,11 @@ public class ServerService {
 
     public List<RoomInfoVO> getServerInfoList() throws Exception {
         List<RoomInfoVO> serverRoomList = new LinkedList<>();
-        List<DstServerInfoData> serverInfoList = serverInfoService.getServerInfoList();
+        List<ServerInfo> serverInfoList = serverInfoService.getServerInfoList();
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<Future<?>> futures = new ArrayList<>();
-        for (DstServerInfoData serverInfo : serverInfoList) {
+        for (ServerInfo serverInfo : serverInfoList) {
             Future<?> future = executorService.submit(() -> {
                 try {
                     Map<String, String> headers = new HashMap<>();

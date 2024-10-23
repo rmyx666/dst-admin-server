@@ -3,8 +3,6 @@ package com.tugos.dst.admin.init;
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
 import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
 import com.tugos.dst.admin.dao.UserMapper;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
-import com.tugos.dst.admin.entity.DstServerInfoData;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.DataService;
 import com.tugos.dst.admin.utils.DstConstant;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Collection;
 
 
 /**

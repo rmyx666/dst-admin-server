@@ -24,14 +24,19 @@ public class ScheduleVO {
     private List<InnerData> updateTimeList;
 
     /**
-     * 不启动地面标志
+     * 自动启动地面标志
      */
-    private Boolean notStartMaster;
+    private Boolean autoStartMaster;
 
     /**
-     * 不启动洞穴标志
+     * 自动启动洞穴标志
      */
-    private Boolean notStartCaves;
+    private Boolean autoStartCaves;
+
+    /**
+     * 自动重置世界
+     */
+    private Boolean autoRegenerate;
 
     /**
      * 智能更新标志

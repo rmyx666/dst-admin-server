@@ -1,20 +1,10 @@
 package com.tugos.dst.admin.service;
 
-import cn.hutool.core.lang.TypeReference;
-import cn.hutool.json.JSONUtil;
 import com.tugos.dst.admin.dao.UserMapper;
-import com.tugos.dst.admin.entity.DstServerInfoData;
 import com.tugos.dst.admin.entity.User;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
-import com.tugos.dst.admin.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 文件存储数据
@@ -23,8 +13,7 @@ import java.util.Map;
 @Service
 public class DataService {
 
-    @Autowired
-    private DataService self;
+
     @Autowired
     UserMapper userMapper;
 

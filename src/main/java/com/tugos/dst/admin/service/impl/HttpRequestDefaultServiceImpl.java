@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tugos.dst.admin.service.HttpRequestService;
 import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.entity.DstServerInfoData;
+import com.tugos.dst.admin.entity.ServerInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,7 +116,7 @@ public class HttpRequestDefaultServiceImpl implements HttpRequestService {
         //移除serverId
         params.remove("serverId");
         //拼接ip获取cookie
-        DstServerInfoData serverInfo = serverInfoService.getServerInfo(serverId);
+        ServerInfo serverInfo = serverInfoService.getServerInfo(serverId);
         String ip = "http://" + serverInfo.getIp() + ":8080";
 
 

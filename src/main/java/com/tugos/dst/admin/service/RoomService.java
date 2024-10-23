@@ -3,7 +3,7 @@ package com.tugos.dst.admin.service;
 import com.tugos.dst.admin.common.ResultVO;
 
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.vo.*;
@@ -43,11 +43,11 @@ public class RoomService {
     @Autowired
     DstConfigRoomDataMapper dstConfigRoomDataMapper;
 
-    public ResultVO<String> saveRoomInfos(DstConfigRoomData roomInfo) {
+    public ResultVO<String> saveRoomInfos(RoomInfo roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
 
-        List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
-        if (dstConfigRoomData.stream().anyMatch(x->x.getRoomId().equals(roomInfo.roomId))) {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        if (roomData.stream().anyMatch(x->x.getRoomId().equals(roomInfo.roomId))) {
             return ResultVO.fail("roomId重复");
         }
 
@@ -60,8 +60,9 @@ public class RoomService {
         roomInfo.scheduleBackupMap.put("06:00:00", 0);
         roomInfo.scheduleBackupMap.put("18:00:00", 0);
 
-        roomInfo.setNotStartMaster(false);
-        roomInfo.setNotStartCaves(false);
+        roomInfo.setAutoStartMaster(true);
+        roomInfo.setAutoStartCaves(true);
+        roomInfo.setAutoRegenerate(false);
 
         dstConfigRoomDataMapper.insert(roomInfo);
         //创建新房间的文件夹
@@ -87,17 +88,17 @@ public class RoomService {
 
     public List<RoomInfoVO> getLocalRoomInfos() {
         //获取本地数据
-        List<DstConfigRoomData> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
         ExecutorService executorService = Executors.newFixedThreadPool(10); // 创建一个具有固定线程数的线程池
         List<Future<?>> futures = new ArrayList<>();
 
-        for (DstConfigRoomData dstConfigRoomData : roomInfoList) {
+        for (RoomInfo roomInfo : roomInfoList) {
             Future<?> future = executorService.submit(() -> {
                 RoomInfoVO roomInfoVO = new RoomInfoVO();
-                BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
+                BeanUtils.copyProperties(roomInfo, roomInfoVO);
 
                 try {
                     DstServerInfoVO dstInfo = homeService.getDstInfo(roomInfoVO.getRoomId());
@@ -159,17 +160,17 @@ public class RoomService {
 
     public List<RoomInfoVO> getLocalRoomInfosWithHardware() throws Exception {
         //获取本地数据
-        List<DstConfigRoomData> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
         ExecutorService executorService = Executors.newFixedThreadPool(10); // 创建一个具有固定线程数的线程池
         List<Future<?>> futures = new ArrayList<>();
 
-        for (DstConfigRoomData dstConfigRoomData : roomInfoList) {
+        for (RoomInfo roomInfo : roomInfoList) {
             Future<?> future = executorService.submit(() -> {
                 RoomInfoVO roomInfoVO = new RoomInfoVO();
-                BeanUtils.copyProperties(dstConfigRoomData, roomInfoVO);
+                BeanUtils.copyProperties(roomInfo, roomInfoVO);
 
                 try {
                     DstServerInfoVO systemInfo = homeService.getSystemInfo(roomInfoVO.getRoomId());
@@ -244,8 +245,8 @@ public class RoomService {
         return ResultVO.success();
     }
 
-    public ResultVO<String> updateRoomInfos(DstConfigRoomData roomInfo) {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomInfo.roomId);
+    public ResultVO<String> updateRoomInfos(RoomInfo roomInfo) {
+        RoomInfo dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomInfo.roomId);
         dstConfigRoomData.setRoomName(roomInfo.getRoomName());
         dstConfigRoomData.setMasterPort(roomInfo.getMasterPort());
         dstConfigRoomData.setCavesPort(roomInfo.getCavesPort());
@@ -261,15 +262,15 @@ public class RoomService {
      * @param roomId
      */
     public void updateStartFlag(String roomId, Boolean startMsater, Boolean startCaves) {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
 
         if (startMsater != null) {
-            dstConfigRoomData.notStartMaster = !startMsater;
+            roomInfo.autoStartMaster = startMsater;
         }
         if (startCaves != null) {
-            dstConfigRoomData.notStartCaves = !startCaves;
+            roomInfo.autoStartCaves = startCaves;
         }
 
-        dstConfigRoomDataMapper.updateById(dstConfigRoomData);
+        dstConfigRoomDataMapper.updateById(roomInfo);
     }
 }

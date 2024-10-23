@@ -2,7 +2,7 @@ package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.service.ServerInfoService;
-import com.tugos.dst.admin.entity.DstServerInfoData;
+import com.tugos.dst.admin.entity.ServerInfo;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -32,8 +32,8 @@ public class ServerInfoController {
     @GetMapping("/infos")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<List<DstServerInfoData>> getServerInfos() throws Exception {
-        List<DstServerInfoData> serverInfoList = serverInfoService.getServerInfoList();
+    public ResultVO<List<ServerInfo>> getServerInfos() throws Exception {
+        List<ServerInfo> serverInfoList = serverInfoService.getServerInfoList();
         serverInfoList.forEach(x -> x.setPassword("***"));
         return ResultVO.data(serverInfoList);
     }
@@ -42,7 +42,7 @@ public class ServerInfoController {
     @PostMapping("/save")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> saveServerInfo(@RequestBody DstServerInfoData serverInfo) {
+    public ResultVO<String> saveServerInfo(@RequestBody ServerInfo serverInfo) {
 
         return serverInfoService.saveServerInfo(serverInfo);
     }
@@ -60,7 +60,7 @@ public class ServerInfoController {
     @PostMapping("/update")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> updateServerInfo(@RequestBody DstServerInfoData serverInfo) throws Exception {
+    public ResultVO<String> updateServerInfo(@RequestBody ServerInfo serverInfo) throws Exception {
         serverInfoService.updateServerInfo(serverInfo);
         return ResultVO.success("服务器信息更新成功");
     }

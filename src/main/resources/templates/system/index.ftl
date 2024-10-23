@@ -46,9 +46,9 @@
             <el-card class="card">
                 <div slot="header" class="clearfix">
                     <span><@spring.message code="setting.system.time.task.update.game"/></span>
-                    <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.time.task.update.game.not.start"/>：</span>
-                        <el-checkbox v-model="notStartMaster"><@spring.message code="setting.system.ground"/></el-checkbox>
-                        <el-checkbox v-model="notStartCaves"><@spring.message code="setting.system.cave"/></el-checkbox>
+<#--                    <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.time.task.update.game.not.start"/>：</span>-->
+<#--                        <el-checkbox v-model="notStartMaster"><@spring.message code="setting.system.ground"/></el-checkbox>-->
+<#--                        <el-checkbox v-model="notStartCaves"><@spring.message code="setting.system.cave"/></el-checkbox>-->
 
                     <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.smart.update"/>：</span>
                     <el-switch v-model="smartUpdate" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
@@ -88,6 +88,31 @@
                     </div>
                 </tempate>
             </el-card>
+
+            <el-card class="card">
+                <div slot="header" class="clearfix">
+                    <span>自动启动设置</span>
+                </div>
+
+                <el-row style="margin: 5px">
+                    <el-col :span="8">
+                        <el-switch v-model="autoStartMaster" active-text="自动启动地面" inactive-text="关闭地面自动启动"></el-switch>
+                    </el-col>
+                </el-row>
+
+                <el-row style="margin: 5px">
+                    <el-col :span="8">
+                        <el-switch v-model="autoStartCaves" active-text="自动启动洞穴" inactive-text="关闭洞穴自动启动"></el-switch>
+                    </el-col>
+                </el-row>
+
+                <el-row style="margin: 5px">
+                    <el-col :span="8">
+                        <el-switch v-model="autoRegenerate" active-text="自动重置世界" inactive-text="关闭自动重置"></el-switch>
+                    </el-col>
+                </el-row>
+            </el-card>
+
 
             <el-card style="margin: 10px; position: sticky; bottom: 0;  z-index: 10;">
                 <el-button :size="size" type="primary" @click="saveSchedule()"><@spring.message code="home.pane1.card1.dst.active.save"/></el-button>
@@ -210,6 +235,9 @@
     new Vue({
         el: '#sys_index',
         data: {
+            autoStartMaster: false,
+            autoStartCaves: false,
+            autoRegenerate: false,
             roomId: null,
             serverId: null,
             activeName: 'first',
@@ -222,8 +250,6 @@
             scheduleVO: undefined,
             updateTimeList: [],
             backupTimeList: [],
-            notStartMaster:false,
-            notStartCaves:false,
             smartUpdate:false,
             versionMap: {},
             model: {
@@ -298,8 +324,9 @@
                             this.backupTimeList.push(obj);
                         })
                     }
-                    this.notStartMaster = data.notStartMaster ? data.notStartMaster : false;
-                    this.notStartCaves = data.notStartCaves ? data.notStartCaves : false;
+                    this.autoStartMaster = data.autoStartMaster ? data.autoStartMaster : false;
+                    this.autoStartCaves = data.autoStartCaves ? data.autoStartCaves : false;
+                    this.autoRegenerate = data.autoRegenerate ? data.autoRegenerate : false;
                     this.smartUpdate = data.smartUpdate ? data.smartUpdate : false;
                 })
             },
@@ -362,8 +389,9 @@
                         params.updateTimeList.push(obj);
                     })
                 }
-                params.notStartMaster = this.notStartMaster;
-                params.notStartCaves = this.notStartCaves;
+                params.autoStartMaster = this.autoStartMaster
+                params.autoStartCaves = this.autoStartCaves
+                params.autoRegenerate = this.autoRegenerate
                 params.smartUpdate = this.smartUpdate;
                 post("/system/saveSchedule?roomId=" + this.roomId+"&serverId="+this.serverId, params).then((data) => {
                     if (data) {

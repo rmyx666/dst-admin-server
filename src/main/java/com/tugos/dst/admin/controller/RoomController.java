@@ -1,8 +1,8 @@
 package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.service.RoomService;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 
 
@@ -60,7 +60,7 @@ public class RoomController {
     @PostMapping("/save")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> saveRoomInfos(@RequestBody DstConfigRoomData roomInfo) {
+    public ResultVO<String> saveRoomInfos(@RequestBody RoomInfo roomInfo) {
         return roomService.saveRoomInfos(roomInfo);
     }
 
@@ -76,7 +76,7 @@ public class RoomController {
     @PostMapping("/update")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> updateRoomInfos(@RequestBody DstConfigRoomData roomInfo) throws Exception {
+    public ResultVO<String> updateRoomInfos(@RequestBody RoomInfo roomInfo) throws Exception {
         return roomService.updateRoomInfos(roomInfo);
     }
 

@@ -12,11 +12,12 @@ CREATE TABLE IF NOT EXISTS room_info (
     room_name VARCHAR(255),
     schedule_update_map TEXT,  -- JSON 存储
     schedule_backup_map TEXT,  -- JSON 存储
-    not_start_master BOOLEAN,
-    not_start_caves BOOLEAN,
+    auto_start_master BOOLEAN, -- 修改字段名
+    auto_start_caves BOOLEAN,  -- 修改字段名
     master_port VARCHAR(10),
     ground_port VARCHAR(10),
-    caves_port VARCHAR(10)
+    caves_port VARCHAR(10),
+    auto_regenerate BOOLEAN    -- 新增字段
 );
 CREATE TABLE IF NOT EXISTS server_info (
     id INTEGER PRIMARY KEY,                 -- 主键，自增ID
@@ -31,3 +32,5 @@ CREATE TABLE IF NOT EXISTS user (
     nickname VARCHAR(255),               -- 昵称
     picture VARCHAR(255)                 -- 头像（图片URL）
 );
+
+

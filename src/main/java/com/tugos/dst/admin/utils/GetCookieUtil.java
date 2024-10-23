@@ -1,7 +1,7 @@
 package com.tugos.dst.admin.utils;
 
 import cn.hutool.crypto.digest.DigestUtil;
-import com.tugos.dst.admin.entity.DstServerInfoData;
+import com.tugos.dst.admin.entity.ServerInfo;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,7 +30,7 @@ public class GetCookieUtil {
      * @Description
      * @date 2024/9/25 14:55
      */
-    public static String getCookie(DstServerInfoData serverInfo, Boolean refresh) throws Exception {
+    public static String getCookie(ServerInfo serverInfo, Boolean refresh) throws Exception {
 
         if (refresh) {
             String ip = "http://" + serverInfo.getIp() + ":8080";

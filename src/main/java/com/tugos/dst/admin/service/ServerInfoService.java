@@ -2,13 +2,12 @@ package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
-import com.tugos.dst.admin.entity.DstServerInfoData;
+import com.tugos.dst.admin.entity.ServerInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ServerInfoService {
@@ -20,17 +19,17 @@ public class ServerInfoService {
     DstServerInfoDataMapper dstServerInfoDataMapper;
 
 
-    public DstServerInfoData getServerInfo(Long id) {
+    public ServerInfo getServerInfo(Long id) {
         return dstServerInfoDataMapper.selectById(id);
     }
 
-    public List<DstServerInfoData> getServerInfoList() {
+    public List<ServerInfo> getServerInfoList() {
 
         return new ArrayList<>(dstServerInfoDataMapper.selectList(null));
     }
 
-    public ResultVO<String> updateServerInfo(DstServerInfoData serverInfo) {
-        DstServerInfoData dstServerInfoData = dstServerInfoDataMapper.selectById(serverInfo.getId());
+    public ResultVO<String> updateServerInfo(ServerInfo serverInfo) {
+        ServerInfo dstServerInfoData = dstServerInfoDataMapper.selectById(serverInfo.getId());
 
         dstServerInfoData.setIp(serverInfo.getIp());
         dstServerInfoData.setName(serverInfo.getName());
@@ -40,13 +39,13 @@ public class ServerInfoService {
         return ResultVO.success();
     }
 
-    public ResultVO<String> saveServerInfo(DstServerInfoData serverInfo) {
-        List<DstServerInfoData> dstServerInfoData = dstServerInfoDataMapper.selectList(null);
+    public ResultVO<String> saveServerInfo(ServerInfo serverInfo) {
+        List<ServerInfo> serverInfoData = dstServerInfoDataMapper.selectList(null);
 
-        if (dstServerInfoData.stream().anyMatch(x -> x.getId().equals(serverInfo.getId()))) {
+        if (serverInfoData.stream().anyMatch(x -> x.getId().equals(serverInfo.getId()))) {
             return ResultVO.fail("Id重复");
         }
-        if (dstServerInfoData.stream().anyMatch(x -> x.getIp().equals(serverInfo.getIp()))) {
+        if (serverInfoData.stream().anyMatch(x -> x.getIp().equals(serverInfo.getIp()))) {
             return ResultVO.fail("IP重复");
         }
 

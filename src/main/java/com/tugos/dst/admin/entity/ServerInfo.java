@@ -22,7 +22,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DstServerInfoData implements Serializable {
+public class ServerInfo implements Serializable {
 
 
     @TableId

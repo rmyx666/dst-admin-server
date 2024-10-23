@@ -6,7 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.enums.DstLogTypeEnum;
 import com.tugos.dst.admin.utils.*;
 import com.tugos.dst.admin.vo.GamePortVO;
@@ -67,32 +67,33 @@ public class SystemService {
      * @return 数据
      */
     public ScheduleVO getScheduleList(String roomId) {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
         ScheduleVO data = new ScheduleVO();
-        Set<String> updateSet = dstConfigRoomData.scheduleUpdateMap.keySet();
+        Set<String> updateSet = roomInfo.scheduleUpdateMap.keySet();
         if (CollectionUtils.isNotEmpty(updateSet)) {
             List<ScheduleVO.InnerData> updateTimeList = new ArrayList<>();
             updateSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(dstConfigRoomData.scheduleUpdateMap.get(e));
+                innerData.setCount(roomInfo.scheduleUpdateMap.get(e));
                 updateTimeList.add(innerData);
             });
             data.setUpdateTimeList(updateTimeList);
         }
-        Set<String> backupSet = dstConfigRoomData.scheduleBackupMap.keySet();
+        Set<String> backupSet = roomInfo.scheduleBackupMap.keySet();
         if (CollectionUtils.isNotEmpty(backupSet)) {
             List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
             backupSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(dstConfigRoomData.scheduleBackupMap.get(e));
+                innerData.setCount(roomInfo.scheduleBackupMap.get(e));
                 backupTimeList.add(innerData);
             });
             data.setBackupTimeList(backupTimeList);
         }
-        data.setNotStartMaster(dstConfigRoomData.notStartMaster);
-        data.setNotStartCaves(dstConfigRoomData.notStartCaves);
+        data.setAutoStartMaster(roomInfo.getAutoStartMaster());
+        data.setAutoStartCaves(roomInfo.getAutoStartCaves());
+        data.setAutoRegenerate(roomInfo.getAutoRegenerate());
         data.setSmartUpdate(dataService.getSmartUpdate());
         return data;
     }
@@ -103,9 +104,9 @@ public class SystemService {
      * @param vo 提交的数据
      */
     public void saveSchedule(ScheduleVO vo, String roomId) {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
 
-        dstConfigRoomData.clearAllData();
+        roomInfo.clearAllData();
 
         if (CollectionUtils.isNotEmpty(vo.getBackupTimeList())) {
             //写入缓存
@@ -114,7 +115,7 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    dstConfigRoomData.scheduleBackupMap.put(format, e.getCount());
+                    roomInfo.scheduleBackupMap.put(format, e.getCount());
                 }
             }
 
@@ -127,28 +128,27 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    dstConfigRoomData.scheduleUpdateMap.put(format, e.getCount());
+                    roomInfo.scheduleUpdateMap.put(format, e.getCount());
                 }
 
             }
 
         }
-        if (vo.getNotStartCaves() != null) {
-            dstConfigRoomData.notStartMaster = vo.getNotStartMaster();
-        } else {
-            dstConfigRoomData.notStartMaster = false;
+        if (vo.getAutoStartMaster() != null) {
+            roomInfo.autoStartMaster = vo.getAutoStartMaster();
         }
-        if (vo.getNotStartCaves() != null) {
-            dstConfigRoomData.notStartCaves = vo.getNotStartCaves();
-        } else {
-            dstConfigRoomData.notStartCaves = false;
+        if (vo.getAutoStartCaves() != null) {
+            roomInfo.autoStartCaves = vo.getAutoStartCaves();
+        }
+        if (vo.getAutoRegenerate() != null) {
+            roomInfo.autoRegenerate = vo.getAutoRegenerate();
         }
 //        if (vo.getSmartUpdate() != null) {
-//            dstConfigRoomData.smartUpdate = vo.getSmartUpdate();
+//            roomInfo.smartUpdate = vo.getSmartUpdate();
 //        } else {
-//            dstConfigRoomData.smartUpdate = false;
+//            roomInfo.smartUpdate = false;
 //        }
-     dstConfigRoomDataMapper.updateById(dstConfigRoomData);
+     dstConfigRoomDataMapper.updateById(roomInfo);
     }
 
     /**
@@ -168,21 +168,21 @@ public class SystemService {
 
     public GamePortVO getGamePort(String roomId) {
         GamePortVO gamePortVO = new GamePortVO();
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
-        gamePortVO.setMasterPort(dstConfigRoomData.masterPort);
-        gamePortVO.setGroundPort(dstConfigRoomData.groundPort);
-        gamePortVO.setCavesPort(dstConfigRoomData.cavesPort);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        gamePortVO.setMasterPort(roomInfo.masterPort);
+        gamePortVO.setGroundPort(roomInfo.groundPort);
+        gamePortVO.setCavesPort(roomInfo.cavesPort);
         return gamePortVO;
     }
 
     public void saveGamePort(GamePortVO gamePortVO, String roomId) {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
 
-        dstConfigRoomData.masterPort = gamePortVO.getMasterPort();
-        dstConfigRoomData.groundPort = gamePortVO.getGroundPort();
-        dstConfigRoomData.cavesPort = gamePortVO.getCavesPort();
+        roomInfo.masterPort = gamePortVO.getMasterPort();
+        roomInfo.groundPort = gamePortVO.getGroundPort();
+        roomInfo.cavesPort = gamePortVO.getCavesPort();
 
-        dstConfigRoomDataMapper.updateById(dstConfigRoomData);
+        dstConfigRoomDataMapper.updateById(roomInfo);
 //        DBUtils.saveDataToFile();
     }
 

@@ -26,7 +26,7 @@ import java.util.TreeMap;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DstConfigRoomData implements Serializable {
+public class RoomInfo implements Serializable {
     @TableId
     //@ApiModelProperty(value = "房间ID", required = true, hidden = false)
     public String roomId;
@@ -45,11 +45,11 @@ public class DstConfigRoomData implements Serializable {
     public TreeMap<String, Integer> scheduleBackupMap;
 
 
-    //@ApiModelProperty(value = "不启动地面标志", required = false, hidden = true)
-    public Boolean notStartMaster;
+    //@ApiModelProperty(value = "自动启动地面标志", required = false, hidden = true)
+    public Boolean autoStartMaster;
 
-    //@ApiModelProperty(value = "不启动洞穴标志", required = false, hidden = true)
-    public Boolean notStartCaves;
+    //@ApiModelProperty(value = "自动启动洞穴标志", required = false, hidden = true)
+    public Boolean autoStartCaves;
 
     //@ApiModelProperty(value = "主端口号", required = true, hidden = false)
     public String masterPort;
@@ -59,6 +59,9 @@ public class DstConfigRoomData implements Serializable {
 
     //@ApiModelProperty(value = "洞穴端口号", required = true, hidden = false)
     public String cavesPort;
+
+    //自动重启游戏
+    public Boolean autoRegenerate;
 
     /**
      * 清理所有数据

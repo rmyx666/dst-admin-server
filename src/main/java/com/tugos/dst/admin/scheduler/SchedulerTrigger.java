@@ -4,12 +4,16 @@ package com.tugos.dst.admin.scheduler;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Range;
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.dao.PlayerLogMapper;
+import com.tugos.dst.admin.entity.PlayerLog;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.service.*;
 import com.tugos.dst.admin.utils.*;
+import com.tugos.dst.admin.vo.GameSnapshotVO;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,6 +73,8 @@ public class SchedulerTrigger {
 
     @Autowired
     DataService dataService;
+    @Autowired
+    PlayerLogMapper playerLogMapper;
 
     /**
      * 每十分钟发送一个公告广播
@@ -91,8 +97,8 @@ public class SchedulerTrigger {
     @Scheduled(cron = "1 0 0 * * ?")
     public void resetScheduleMap() {
 
-        List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
-        for (DstConfigRoomData roomInfo : dstConfigRoomData) {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        for (RoomInfo roomInfo : roomData) {
             Set<String> backupKeySet = roomInfo.scheduleBackupMap.keySet();
             for (String key : backupKeySet) {
                 roomInfo.scheduleBackupMap.put(key, 0);
@@ -129,8 +135,8 @@ public class SchedulerTrigger {
                 long lv = Long.parseLong(localVersion);
                 if (sv > lv) {
                     log.info("智能更新进行...");
-                    List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
-                    for (DstConfigRoomData roomInfo : dstConfigRoomData) {
+                    List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+                    for (RoomInfo roomInfo : roomData) {
                         onlyUpdateGame(roomInfo);
                     }
 
@@ -158,8 +164,8 @@ public class SchedulerTrigger {
     public void updateGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
-        for (DstConfigRoomData roomInfo : dstConfigRoomData) {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        for (RoomInfo roomInfo : roomData) {
             Set<String> updateListTime = roomInfo.scheduleUpdateMap.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
                 updateListTime.forEach(time -> {
@@ -197,7 +203,7 @@ public class SchedulerTrigger {
 
     }
 
-    private void onlyUpdateGame(DstConfigRoomData roomInfo) {
+    private void onlyUpdateGame(RoomInfo roomInfo) {
         shellService.sendBroadcast("服务器将马上进行更新，你将与服务器断开连接(The server will be updated immediately)", roomInfo.roomId);
         shellService.sendBroadcast("请稍后再进入房间(Please enter the room later)", roomInfo.roomId);
         try {
@@ -206,21 +212,21 @@ public class SchedulerTrigger {
             e.printStackTrace();
         }
         homeService.updateGame(roomInfo.roomId);
-        boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
-        boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
-        if (!notStartMaster && !notStartCaves) {
+        boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
+        boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
+        if (autoStartMaster && autoStartCaves) {
             //全启动
             homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
         }
-        if (notStartMaster && !notStartCaves) {
+        if (!autoStartMaster && autoStartCaves) {
             //不启动地面
             homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
         }
-        if (!notStartMaster && notStartCaves) {
+        if (autoStartMaster && !autoStartCaves) {
             //不启动洞穴
             homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
         }
-        if (notStartMaster && notStartCaves) {
+        if (!autoStartMaster && !autoStartCaves) {
             //都不启动
         }
     }
@@ -232,8 +238,8 @@ public class SchedulerTrigger {
     public void backupGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        List<DstConfigRoomData> dstConfigRoomData = dstConfigRoomDataMapper.selectList(null);
-        for (DstConfigRoomData roomInfo : dstConfigRoomData) {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        for (RoomInfo roomInfo : roomData) {
             Set<String> backupListTime = roomInfo.scheduleBackupMap.keySet();
             //执行备份任务
             if (CollectionUtils.isNotEmpty(backupListTime)) {
@@ -259,4 +265,78 @@ public class SchedulerTrigger {
     }
 
 
+    /**
+     * @return void
+     * @Title autoRegenerateEveryday
+     * @Description 如果游戏时长大于0小于40天，且三天内没有人进入，重置该世界，每天晚上六点判定一次
+     * @author wgr
+     * @date 2024/10/23 10:55
+     */
+    @Scheduled(cron = "0 0 18 * * ?")
+//    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
+    public void autoRegenerateEveryday() {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        for (RoomInfo roomInfo : roomData) {
+            if (roomInfo.autoRegenerate) {
+
+
+                // 获取当前时间和一个月前的时间
+                Date now = new Date();
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(3L * 24 * 60 * 60)); // 30天前
+
+                // 构建查询条件
+                QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("room_id", roomInfo.roomId)
+                        .between("create_time", oneMonthAgo, now);
+
+                // 获取玩家日志
+                Long playerLogCount = playerLogMapper.selectCount(queryWrapper);
+
+                Integer playDay = 0;
+
+                GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomInfo.roomId);
+                if (gameSnapshot != null) {
+                    playDay = Integer.valueOf(gameSnapshot.getPlayDay());
+                }
+
+                if (playerLogCount == 0 && playDay > 0 && playDay < 40) {
+                    shellService.regenerate(roomInfo.roomId);
+                }
+            }
+        }
+    }
+
+    /**
+     * @return void
+     * @Title autoRegenerateFriday
+     * @Description 如果游戏7天内没有人进入，重置该世界，每周五晚上六点判定一次
+     * @author wgr
+     * @date 2024/10/23 10:56
+     */
+    @Scheduled(cron = "0 0 18 ? * FRI")
+    public void autoRegenerateFriday() {
+        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        for (RoomInfo roomInfo : roomData) {
+            if (roomInfo.autoRegenerate) {
+
+
+                // 获取当前时间和一个月前的时间
+                Date now = new Date();
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(7L * 24 * 60 * 60)); // 30天前
+
+                // 构建查询条件
+                QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("room_id", roomInfo.roomId)
+                        .between("create_time", oneMonthAgo, now);
+
+                // 获取玩家日志
+                Long playerLogCount = playerLogMapper.selectCount(queryWrapper);
+
+
+                if (playerLogCount == 0) {
+                    shellService.regenerate(roomInfo.roomId);
+                }
+            }
+        }
+    }
 }

@@ -6,12 +6,11 @@ import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.enums.DstLogTypeEnum;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.ShellUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -191,10 +190,10 @@ public class PlayerService {
     @Async
     public void savePlayerLog() throws Exception {
         //获取本地数据
-        List<DstConfigRoomData> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
 
 
-        for (DstConfigRoomData roomData : roomInfoList) {
+        for (RoomInfo roomData : roomInfoList) {
             saveRoomPlayerLog(roomData.getRoomId());
         }
     }

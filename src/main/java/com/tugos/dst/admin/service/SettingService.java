@@ -6,7 +6,7 @@ import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
 import com.tugos.dst.admin.enums.SettingTypeEnum;
 import com.tugos.dst.admin.enums.StartTypeEnum;
-import com.tugos.dst.admin.entity.DstConfigRoomData;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.StrUtils;
@@ -85,43 +85,43 @@ public class SettingService {
             //启动新游戏
             homeService.delRecord(roomId);
 
-            DstConfigRoomData roomInfo = dstConfigRoomDataMapper.selectById(roomId);
-            boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
-            boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
-            if (!notStartMaster && !notStartCaves) {
+            RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+            boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
+            boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
+            if (autoStartMaster && autoStartCaves) {
                 //全启动
                 homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
             }
-            if (notStartMaster && !notStartCaves) {
+            if (!autoStartMaster && autoStartCaves) {
                 //不启动地面
                 homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
             }
-            if (!notStartMaster && notStartCaves) {
+            if (autoStartMaster && !autoStartCaves) {
                 //不启动洞穴
                 homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
             }
-            if (notStartMaster && notStartCaves) {
+            if (!autoStartMaster && !autoStartCaves) {
                 //都不启动
             }
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
-            DstConfigRoomData roomInfo =  dstConfigRoomDataMapper.selectById(roomId);
-            boolean notStartMaster = roomInfo.notStartMaster != null ? roomInfo.notStartMaster : false;
-            boolean notStartCaves = roomInfo.notStartCaves != null ? roomInfo.notStartCaves : false;
-            if (!notStartMaster && !notStartCaves) {
+            RoomInfo roomInfo =  dstConfigRoomDataMapper.selectById(roomId);
+            boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
+            boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
+            if (autoStartMaster && autoStartCaves) {
                 //全启动
                 homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
             }
-            if (notStartMaster && !notStartCaves) {
+            if (!autoStartMaster && autoStartCaves) {
                 //不启动地面
                 homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
             }
-            if (!notStartMaster && notStartCaves) {
+            if (autoStartMaster && !autoStartCaves) {
                 //不启动洞穴
                 homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
             }
-            if (notStartMaster && notStartCaves) {
+            if (!autoStartMaster && !autoStartCaves) {
                 //都不启动
             }
         }
@@ -258,7 +258,7 @@ public class SettingService {
      * 生成地面 server.ini
      */
     public void createMasterServerIniV2(String roomId) throws Exception {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER;
         //创建地面设置的文件夹
         FileUtils.mkdirs(basePath);
@@ -271,9 +271,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(dstConfigRoomData.getGroundPort(), this.groundPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(roomInfo.getGroundPort(), this.groundPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(dstConfigRoomData.getGroundPort(), this.groundPort));
+            network.put("server_port", StrUtils.ofNULL(roomInfo.getGroundPort(), this.groundPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -315,7 +315,7 @@ public class SettingService {
      * 生成洞穴 server.ini
      */
     public void createCavesServerIniV2(String roomId) throws Exception {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_CAVES;
         //创建洞穴设置的文件夹
         FileUtils.mkdirs(basePath);
@@ -329,9 +329,9 @@ public class SettingService {
 
         Map<String, String> network = ini.get("NETWORK");
         if (network == null) {
-            ini.add("NETWORK", "server_port", StrUtils.ofNULL(dstConfigRoomData.getCavesPort(), this.cavesPort));
+            ini.add("NETWORK", "server_port", StrUtils.ofNULL(roomInfo.getCavesPort(), this.cavesPort));
         } else {
-            network.put("server_port", StrUtils.ofNULL(dstConfigRoomData.getCavesPort(), this.cavesPort));
+            network.put("server_port", StrUtils.ofNULL(roomInfo.getCavesPort(), this.cavesPort));
         }
 
         Map<String, String> shard = ini.get("SHARD");
@@ -418,7 +418,7 @@ public class SettingService {
      * @throws Exception 异常
      */
     public void createClusterV2(GameConfigVO vo, String roomId) throws Exception {
-        DstConfigRoomData dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
         String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
         log.info("生成游戏配置文件 cluster.ini文件,{}", filePath);
 
@@ -472,13 +472,13 @@ public class SettingService {
             ini.add("SHARD", "shard_enabled", "true");
             ini.add("SHARD", "bind_ip", "127.0.0.1");
             ini.add("SHARD", "master_ip", "127.0.0.1");
-            ini.add("SHARD", "master_port", StrUtils.ofNULL(dstConfigRoomData.getMasterPort(), this.masterPort));
+            ini.add("SHARD", "master_port", StrUtils.ofNULL(roomInfo.getMasterPort(), this.masterPort));
             ini.add("SHARD", "cluster_key", "defaultPass");
         } else {
             //shard.put("shard_enabled",  "127.0.0.1");
             //shard.put("bind_ip",  "127.0.0.1");
             //shard.put("master_ip",  "127.0.0.1");
-            shard.put("master_port", StrUtils.ofNULL(dstConfigRoomData.getMasterPort(), this.masterPort));
+            shard.put("master_port", StrUtils.ofNULL(roomInfo.getMasterPort(), this.masterPort));
             //shard.put("cluster_key", "defaultPass");
         }
         ini.store();
