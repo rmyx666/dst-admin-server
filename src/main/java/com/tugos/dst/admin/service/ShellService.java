@@ -322,7 +322,7 @@ public class ShellService {
         ShellUtil.execShellBin(cavesCMD.replace("DST_CAVES", "Caves_" + roomId));
 
 //        重置世界时删除玩家日志
-        homeService.delRoomPlayerLog(roomId);
+//        homeService.delRoomPlayerLog(roomId);
     }
 
 
