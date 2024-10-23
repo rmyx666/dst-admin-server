@@ -1,0 +1,85 @@
+<configuration>
+    <!-- 定义日志文件路径 -->
+    <property name="LOG_PATH" value="log"/>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- running.log：所有日志都输出到这个文件 -->
+    <appender name="RUNNING_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/running.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/running.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- error.log：只记录 ERROR 级别的日志 -->
+    <appender name="ERROR_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 用户操作日志 -->
+    <appender name="USER_ACTION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/user_action.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/user_action.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 系统执行日志 -->
+    <appender name="SYSTEM_EXECUTION_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/system_execution.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/system_execution.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 根日志：所有日志输出到控制台和 running.log -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="RUNNING_LOG"/>
+    </root>
+
+    <!-- Spring 框架的错误日志记录到 error.log -->
+    <logger name="org.springframework" level="ERROR" additivity="true">
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
+
+    <!-- 错误日志记录到 error.log，additivity=true 保证也传递到根日志，写入 running.log -->
+    <logger name="com.example.error" level="ERROR" additivity="true">
+        <appender-ref ref="ERROR_LOG"/>
+    </logger>
+    
+    <!-- 用户操作日志 -->
+    <logger name="com.example.useraction" level="INFO" additivity="false">
+        <appender-ref ref="USER_ACTION_LOG"/>
+    </logger>
+
+    <!-- 系统自动执行日志 -->
+    <logger name="com.example.systemexecution" level="INFO" additivity="false">
+        <appender-ref ref="SYSTEM_EXECUTION_LOG"/>
+    </logger>
+</configuration>

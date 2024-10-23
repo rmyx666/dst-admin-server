@@ -3,6 +3,7 @@ package com.tugos.dst.admin.config.shiro;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.tugos.dst.admin.entity.User;
+import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.service.DataService;
 import lombok.extern.log4j.Log4j2;
 import org.apache.shiro.authc.*;
@@ -70,10 +71,10 @@ public class AuthRealm extends AuthorizingRealm {
 
                 if (DigestUtil.md5Hex("user" + dataService.getUser().getUsername() + timestamp).equals(username)
                         && DigestUtil.md5Hex("password" + dataService.getUser().getPassword() + timestamp).equals(password)) {
-                    log.info(host+"登录成功");
+                    LoggerUtil.userLog(host+"登录成功");
                     return true;
                 }
-                log.info(host+"登陆失败");
+                LoggerUtil.userLog(host+"登录失败");
                 return false;
             }
         });
