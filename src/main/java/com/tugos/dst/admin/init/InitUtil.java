@@ -56,9 +56,11 @@ public class InitUtil {
         copyAndChmod(DstConstant.INSTALL_DST);
         copyAndChmod(DstConstant.DST_START);
         copyAndChmod(DstConstant.UPDATE);
+        copyAndChmod(DstConstant.RESTART);
         ShellUtil.runShell("sed -i 's/\\r//' ~/dstStart.sh");
         ShellUtil.runShell("sed -i 's/\\r//' ~/install.sh");
         ShellUtil.runShell("sed -i 's/\\r//' ~/update.sh");
+        ShellUtil.runShell("sed -i 's/\\r//' ~/restart.sh");
 
 
 

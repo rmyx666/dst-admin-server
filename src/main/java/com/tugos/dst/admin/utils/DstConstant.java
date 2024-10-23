@@ -10,6 +10,7 @@ public final class DstConstant {
     public static final String INSTALL_DST = "install.sh";
     public static final String DST_START = "dstStart.sh";
     public static final String UPDATE = "update.sh";
+    public static final String RESTART = "restart.sh";
 
     /**
      * 启动脚本的存放路径 ~/dst/bin
