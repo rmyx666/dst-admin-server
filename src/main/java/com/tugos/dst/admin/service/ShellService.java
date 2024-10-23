@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ShellService {
 
+    @Autowired
+    private HomeService homeService;
+
     /**
      * 最大睡眠时间 10秒
      */
@@ -317,6 +320,9 @@ public class ShellService {
         String cavesCMD = "screen -S \"" + DstConstant.SCREEN_WORK_CAVES_NAME + "\" -p 0 -X stuff \"c_regenerateworld()\\n\"";
         ShellUtil.execShellBin(masterCMD.replace("DST_MASTER", "Master_" + roomId));
         ShellUtil.execShellBin(cavesCMD.replace("DST_CAVES", "Caves_" + roomId));
+
+//        重置世界时删除玩家日志
+        homeService.delRoomPlayerLog(roomId);
     }
 
 

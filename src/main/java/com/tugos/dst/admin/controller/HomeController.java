@@ -83,7 +83,7 @@ public class HomeController {
     public ResultVO<String> start(@RequestParam Integer type,
                                   @RequestParam(required = true) String roomId) throws Exception {
         log.info("启动服务器，type={}", type);
-        return homeService.start(type,roomId);
+        return homeService.start(type, roomId);
 
     }
 
@@ -91,9 +91,9 @@ public class HomeController {
     @GetMapping("/stop")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> stop(@RequestParam Integer type,@RequestParam(required = true) String roomId) throws Exception {
+    public ResultVO<String> stop(@RequestParam Integer type, @RequestParam(required = true) String roomId) throws Exception {
         log.info("停止服务器，type={}", type);
-        return homeService.stop(type,roomId);
+        return homeService.stop(type, roomId);
 
     }
 
@@ -107,24 +107,23 @@ public class HomeController {
     }
 
 
-
     @GetMapping("/backup")
     @RequiresAuthentication
     @ResponseBody
     public ResultVO<String> backup(@RequestParam(required = false) String name,
                                    @RequestParam(required = true) String roomId) throws Exception {
         log.info("备份游戏,{}", name);
-        return backupService.backup(name,roomId);
+        return backupService.backup(name, roomId);
 
     }
 
     @GetMapping("/restore")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> restore(@RequestParam String name,@RequestParam(required = true) String roomId) throws Exception {
+    public ResultVO<String> restore(@RequestParam String name, @RequestParam(required = true) String roomId) throws Exception {
         log.info("恢复存档,{}", name);
         homeService.stopServer(roomId);
-        return backupService.restore(name,roomId);
+        return backupService.restore(name, roomId);
     }
 
     @GetMapping("/delRecord")
@@ -141,9 +140,9 @@ public class HomeController {
     @GetMapping("/sendBroadcast")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> sendBroadcast(@RequestParam String message,@RequestParam(required = true) String roomId) throws Exception {
+    public ResultVO<String> sendBroadcast(@RequestParam String message, @RequestParam(required = true) String roomId) throws Exception {
         log.info("发送公告：" + message);
-        shellService.sendBroadcast(message,roomId);
+        shellService.sendBroadcast(message, roomId);
         Thread.sleep(1000);
         return ResultVO.success();
     }
@@ -160,18 +159,18 @@ public class HomeController {
     @GetMapping("/kickPlayer")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> kickPlayer(@RequestParam String userId,@RequestParam(required = true) String roomId) {
+    public ResultVO<String> kickPlayer(@RequestParam String userId, @RequestParam(required = true) String roomId) {
         log.info("踢出玩家：" + userId);
-        shellService.kickPlayer(userId,roomId);
+        shellService.kickPlayer(userId, roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/rollback")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> rollback(@RequestParam Integer dayNum,@RequestParam(required = true) String roomId) {
+    public ResultVO<String> rollback(@RequestParam Integer dayNum, @RequestParam(required = true) String roomId) {
         log.info("回滚指定的天数：" + dayNum);
-        shellService.rollback(dayNum,roomId);
+        shellService.rollback(dayNum, roomId);
         return ResultVO.success();
     }
 
@@ -181,31 +180,32 @@ public class HomeController {
     public ResultVO<String> regenerate(@RequestParam(required = true) String roomId) {
         log.info("重置世界...");
         shellService.regenerate(roomId);
+
         return ResultVO.success();
     }
 
     @PostMapping("/masterConsole")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> masterConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
-        shellService.masterConsole(param.get("command"),roomId);
+    public ResultVO<String> masterConsole(@RequestBody Map<String, String> param, @RequestParam(required = true) String roomId) {
+        shellService.masterConsole(param.get("command"), roomId);
         return ResultVO.success();
     }
 
     @PostMapping("/cavesConsole")
     @ResponseBody
     @RequiresAuthentication
-    public ResultVO<String> cavesConsole(@RequestBody Map<String, String> param,@RequestParam(required = true) String roomId) {
-        shellService.cavesConsole(param.get("command"),roomId);
+    public ResultVO<String> cavesConsole(@RequestBody Map<String, String> param, @RequestParam(required = true) String roomId) {
+        shellService.cavesConsole(param.get("command"), roomId);
         return ResultVO.success();
     }
 
     @GetMapping("/playerOperate")
     @RequiresAuthentication
     @ResponseBody
-    public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type,@RequestParam(required = true) String roomId) throws Exception {
+    public ResultVO<String> playerOperate(@RequestParam String userId, @RequestParam String type, @RequestParam(required = true) String roomId) throws Exception {
         log.info("执行高级针对玩家的操作：type={},userId={}", type, userId);
-        return shellService.playerOperate(type, userId,roomId);
+        return shellService.playerOperate(type, userId, roomId);
 
     }
 
@@ -234,7 +234,6 @@ public class HomeController {
         return ResultVO.data(homeService.getGameArchive(roomId));
 
     }
-
 
 
     @Autowired
