@@ -104,7 +104,7 @@ public final class DstConstant {
     /**
      * 获取地面的玩家 替换99999999关键字 添加生存时间
      */
-    public static final String MASTER_PLAYERAGE_CMD = "screen -S \""+SCREEN_WORK_MASTER_NAME+"\" -p 0 -X stuff \"for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\\\"playerlist %s [%d] %s %s %s %s\\\", 99999999, i-1, v.userid, v.name, v.prefab, v.playerage )) end$(printf \\\\r)\"\n";
+    public static final String MASTER_PLAYERAGE_CMD = "screen -S \""+SCREEN_WORK_MASTER_NAME+"\" -p 0 -X stuff \"for i, v in ipairs(TheNet:GetClientTable()) do  print(string.format(\\\"playerlist %s [%d] %s#split#%s#split#%s#split#%s\\\", 99999999, i-1, v.userid, v.name, v.prefab, v.playerage )) end$(printf \\\\r)\"\n";
 
     /**
      * 饥荒的启动程序

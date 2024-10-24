@@ -260,7 +260,6 @@ public class SchedulerTrigger {
                 });
             }
             dstConfigRoomDataMapper.updateById(roomInfo);
-            LoggerUtil.systemLog("重置房间："+roomInfo.roomId);
         }
 
 
@@ -337,6 +336,7 @@ public class SchedulerTrigger {
 
                 if (playerLogCount < 60) {
                     shellService.regenerate(roomInfo.roomId);
+                    LoggerUtil.systemLog("重置房间："+roomInfo.roomId);
                 }
             }
         }

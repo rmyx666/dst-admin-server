@@ -118,8 +118,8 @@ public class PlayerService {
 
     /**
      * 解析日志获取玩家信息
-     * [14:18:00]: playerlist 1621253438444 [0] KU_c1gvcIl4 [Host] 0
-     * [14:18:00]: playerlist 1621253438444 [1] KU_***** nickname wendy 13
+     * [14:18:00]: playerlist 1621253438444 [0] KU_c1gvcIl4#split#[Host]#split#0
+     * [14:18:00]: playerlist 1621253438444 [1] KU_*****#split#nickname#split#wendy#split#13
      *
      * @return ku_** 昵称 角色 生存时间
      */
@@ -163,15 +163,17 @@ public class PlayerService {
         List<String> playerList = getPlayerList(roomId);
 
         for (String s : playerList) {
-            String[] split = s.split(" ");
-            PlayerLog playerLog = PlayerLog.builder()
-                    .createTime(new Date())
-                    .roomId(roomId)
-                    .userId(split[0])
-                    .name(split[1]).prefab(split[2])
-                    .playerage(Integer.valueOf(split[3]))
-                    .build();
-            playerLogList.add(playerLog);
+            String[] split = s.split("#split#");
+            if (split.length==4){
+                PlayerLog playerLog = PlayerLog.builder()
+                        .createTime(new Date())
+                        .roomId(roomId)
+                        .userId(split[0])
+                        .name(split[1]).prefab(split[2])
+                        .playerage(Integer.valueOf(split[3]))
+                        .build();
+                playerLogList.add(playerLog);
+            }
         }
 
         return playerLogList;

@@ -296,7 +296,7 @@ public class BackupService {
         GameSnapshotVO gameSnapshotVO = null;
         try {
             String snapshot = getSnapshot(roomId);
-            log.info("快照信息：{}", snapshot);
+//            log.info("快照信息：{}", snapshot);
             if (StringUtils.isNotBlank(snapshot)) {
                 gameSnapshotVO = parseSnapshot(snapshot);
             }
