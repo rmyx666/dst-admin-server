@@ -283,7 +283,7 @@ public class SchedulerTrigger {
 
                 // 获取当前时间和一个月前的时间
                 Date now = new Date();
-                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(3L * 24 * 60 * 60)); // 30天前
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(3L * 24 * 60 * 60)); // 3天前
 
                 // 构建查询条件
                 QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
@@ -311,7 +311,7 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title autoRegenerateFriday
-     * @Description 如果游戏7天内没有人进入，重置该世界，每周五晚上六点判定一次
+     * @Description 如果游戏7天内游玩时间少于60分钟，重置该世界，每周五晚上六点判定一次
      * @author wgr
      * @date 2024/10/23 10:56
      */
@@ -335,7 +335,7 @@ public class SchedulerTrigger {
                 Long playerLogCount = playerLogMapper.selectCount(queryWrapper);
 
 
-                if (playerLogCount == 0) {
+                if (playerLogCount < 60) {
                     shellService.regenerate(roomInfo.roomId);
                 }
             }
