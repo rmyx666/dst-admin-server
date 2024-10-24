@@ -181,6 +181,10 @@ public class HomeController {
         log.info("重置世界...");
         shellService.regenerate(roomId);
 
+        //        重置世界时删除玩家日志
+        homeService.delRoomPlayerLog(roomId);
+
+
         return ResultVO.success();
     }
 

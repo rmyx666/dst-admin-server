@@ -270,12 +270,11 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title autoRegenerateEveryday
-     * @Description 如果游戏时长大于0小于40天，且三天内没有人进入，重置该世界，每天晚上六点判定一次
+     * @Description 如果游戏时长大于0小于40天，且三天内用户在线时长少于60分钟，重置该世界，每天晚上六点判定一次
      * @author wgr
      * @date 2024/10/23 10:55
      */
     @Scheduled(cron = "0 0 18 * * ?")
-//    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
     public void autoRegenerateEveryday() {
         List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
@@ -301,7 +300,7 @@ public class SchedulerTrigger {
                     playDay = Integer.valueOf(gameSnapshot.getPlayDay());
                 }
 
-                if (playerLogCount == 0 && playDay > 0 && playDay < 40) {
+                if (playerLogCount < 60 && playDay > 0 && playDay < 40) {
                     shellService.regenerate(roomInfo.roomId);
                     LoggerUtil.systemLog("重置房间："+roomInfo.roomId);
                 }
