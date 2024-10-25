@@ -256,16 +256,19 @@ public class BackupService {
         //如果相同日期有一样的存档就不保存
         if (CollectionUtils.isNotEmpty(backupList)) {
             // 使用正则表达式匹配
-            Pattern pattern = Pattern.compile("_(\\d+)days");
-            Matcher matcher = pattern.matcher(backupList.get(0).getFileName());
-            if (matcher.find()) {
+            Pattern oldDaysPattern = Pattern.compile("_(\\d+)(days|天)");
+            Pattern nowDaysPattern = Pattern.compile("(\\d+)(days|天)");
+            Matcher oldDaysMatcher = oldDaysPattern.matcher(backupList.get(0).getFileName());
+            Matcher nowDaysMatcher = nowDaysPattern.matcher(playDate);
+            if (oldDaysMatcher.find()&&nowDaysMatcher.find()) {
                 // 获取捕获的数字
-                String number = matcher.group(1);
-                if (!number.equals(playDate)) {
+                String oldDays = oldDaysMatcher.group(1);
+                String nowDays = nowDaysMatcher.group(1);
+                if (!oldDays.equals(nowDays)) {
                     createBackup(fileName, roomId);
-                    LoggerUtil.systemLog("成功备份存档，房间id" + roomId + "上一次天数：" + number + "本次天数：" + playDate);
+                    LoggerUtil.systemLog("成功备份存档，房间id" + roomId + "上一次天数：" + oldDays + "本次天数：" + nowDays);
                 } else {
-                    LoggerUtil.systemLog("备份存档不生效，存档天数相同，房间id" + roomId + "上一次天数：" + number + "本次天数：" + playDate);
+                    LoggerUtil.systemLog("备份存档不生效，存档天数相同，房间id" + roomId + "上一次天数：" + oldDays + "本次天数：" + nowDays);
                 }
             } else {
                 LoggerUtil.systemLog("备份存档失败,存档天数解析异常");
