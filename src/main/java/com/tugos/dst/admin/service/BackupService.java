@@ -11,6 +11,7 @@ import com.tugos.dst.admin.common.ResultCodeEnum;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.exception.ResultException;
+import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.vo.BackupFileVO;
@@ -33,6 +34,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author qinming
@@ -216,13 +219,16 @@ public class BackupService {
             }
         }
         String fileName;
+        String serverName = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.room");
+        String playDate = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.playDay");
+        String season = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.season");
+        String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
+
+
         if (StringUtils.isNotBlank(name)) {
             fileName = name + ".zip";
         } else {
-            String serverName = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.room");
-            String playDate = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.playDay");
-            String season = I18nResourcesConfig.getMessage("tip.game.Archive.unknown.season");
-            String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
+
             File file = new File(filePath);
             if (file.exists()) {
                 List<String> list = FileUtil.readLines(filePath, StandardCharsets.UTF_8);
@@ -249,13 +255,25 @@ public class BackupService {
 
         //如果相同日期有一样的存档就不保存
         if (CollectionUtils.isNotEmpty(backupList)) {
-            if (!backupList.get(0).getFileName().equals(fileName)){
-                createBackup(fileName, roomId);
+            // 使用正则表达式匹配
+            Pattern pattern = Pattern.compile("_(\\d+)days");
+            Matcher matcher = pattern.matcher(backupList.get(0).getFileName());
+            if (matcher.find()) {
+                // 获取捕获的数字
+                String number = matcher.group(1);
+                if (!number.equals(playDate)) {
+                    createBackup(fileName, roomId);
+                    LoggerUtil.systemLog("成功备份存档，房间id" + roomId + "上一次天数：" + number + "本次天数：" + playDate);
+                } else {
+                    LoggerUtil.systemLog("备份存档不生效，存档天数相同，房间id" + roomId + "上一次天数：" + number + "本次天数：" + playDate);
+                }
+            } else {
+                LoggerUtil.systemLog("备份存档失败,存档天数解析异常");
             }
-        }else {
+
+        } else {
             createBackup(fileName, roomId);
         }
-
         return ResultVO.success();
     }
 
