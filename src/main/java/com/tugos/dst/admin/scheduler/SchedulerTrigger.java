@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -41,6 +42,8 @@ public class SchedulerTrigger {
     @Autowired
     PlayerService playerService;
     @Autowired
+    PlayerLogService playerLogService;
+    @Autowired
     private HomeService homeService;
     @Autowired
     private ShellService shellService;
@@ -56,13 +59,16 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title runScreenScheduler
-     * @Description 定时获取当前在线的玩家信息并保存到数据库中 定时任务每60秒执行一次,第一次延长10秒
+     * @Description 定时任务每60秒执行一次, 第一次延长10秒
      * @author wgr
      * @date 2024/10/17 15:10
      */
     @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
     public void runScreenScheduler() throws Exception {
-        playerService.savePlayerLog();
+        Map<String, List<PlayerLog>> allPlayerLog = playerLogService.getAllPlayerLog();
+        //定时获取当前在线的玩家信息并保存到数据库中
+        playerLogService.savePlayerLog(allPlayerLog);
+
     }
 
 
@@ -213,23 +219,10 @@ public class SchedulerTrigger {
             e.printStackTrace();
         }
         homeService.updateGame(roomInfo.roomId);
-        boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
-        boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
-        if (autoStartMaster && autoStartCaves) {
-            //全启动
-            homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
-        }
-        if (!autoStartMaster && autoStartCaves) {
-            //不启动地面
-            homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
-        }
-        if (autoStartMaster && !autoStartCaves) {
-            //不启动洞穴
-            homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
-        }
-        if (!autoStartMaster && !autoStartCaves) {
-            //都不启动
-        }
+
+        homeService.start(roomInfo);
+
+
     }
 
 
@@ -301,7 +294,7 @@ public class SchedulerTrigger {
 
                 if (playerLogCount < 60 && playDay > 0 && playDay < 40) {
                     shellService.regenerate(roomInfo.roomId);
-                    LoggerUtil.systemLog("重置房间："+roomInfo.roomId);
+                    LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
                 }
             }
         }
@@ -336,7 +329,7 @@ public class SchedulerTrigger {
 
                 if (playerLogCount < 60) {
                     shellService.regenerate(roomInfo.roomId);
-                    LoggerUtil.systemLog("重置房间："+roomInfo.roomId);
+                    LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
                 }
             }
         }

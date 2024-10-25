@@ -4,6 +4,8 @@ import com.tugos.dst.admin.common.ResultVO;
 
 import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
 import com.tugos.dst.admin.entity.RoomInfo;
+import com.tugos.dst.admin.enums.StartTypeEnum;
+import com.tugos.dst.admin.enums.StopTypeEnum;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.vo.*;
@@ -47,7 +49,7 @@ public class RoomService {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
 
         List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
-        if (roomData.stream().anyMatch(x->x.getRoomId().equals(roomInfo.roomId))) {
+        if (roomData.stream().anyMatch(x -> x.getRoomId().equals(roomInfo.roomId))) {
             return ResultVO.fail("roomId重复");
         }
 
@@ -236,12 +238,12 @@ public class RoomService {
     }
 
     public ResultVO<String> delRoomInfos(String roomId) {
+        //删除房间信息
         dstConfigRoomDataMapper.deleteById(roomId);
 
-        //删除房间之前停止服务器
-        homeService.stopServer(roomId);
-        //删除房间的文件夹
-        backupService.delRoomDir(roomId);
+        //停止房间 删除房间文件夹 删除玩家日志
+        homeService.delRoomPath(roomId);
+
         return ResultVO.success();
     }
 
@@ -261,8 +263,45 @@ public class RoomService {
      *
      * @param roomId
      */
-    public void updateStartFlag(String roomId, Boolean startMsater, Boolean startCaves) {
+    public void updateStartFlag(Boolean startOrStop, Integer type, String roomId) {
         RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+
+        Boolean startMsater = null;
+        Boolean startCaves = null;
+        if (startOrStop) {
+            StartTypeEnum typeEnum = StartTypeEnum.get(type);
+            Objects.requireNonNull(typeEnum);
+            switch (typeEnum) {
+                case START_ALL:
+                    startMsater = true;
+                    startCaves = true;
+                    break;
+                case START_MASTER:
+                    startMsater = true;
+                    break;
+                case START_CAVES:
+                    startCaves = true;
+                    break;
+                default:
+            }
+        }else {
+            StopTypeEnum typeEnum = StopTypeEnum.get(type);
+            Objects.requireNonNull(typeEnum);
+            switch (typeEnum) {
+                case STOP_ALL:
+                    startMsater = false;
+                    startCaves = false;
+                    break;
+                case STOP_MASTER:
+                    startMsater = false;
+                    break;
+                case STOP_CAVES:
+                    startCaves = false;
+                    break;
+                default:
+            }
+        }
+
 
         if (startMsater != null) {
             roomInfo.autoStartMaster = startMsater;

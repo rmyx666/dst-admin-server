@@ -2,13 +2,12 @@ package com.tugos.dst.admin.controller;
 
 
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.service.BackupService;
-import com.tugos.dst.admin.service.HomeService;
-import com.tugos.dst.admin.service.ShellService;
+import com.tugos.dst.admin.service.*;
 import com.tugos.dst.admin.vo.DstServerInfoVO;
 import com.tugos.dst.admin.vo.GameArchiveVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
@@ -32,6 +31,11 @@ public class HomeController {
     private HomeService homeService;
     private ShellService shellService;
     private BackupService backupService;
+
+    @Autowired
+    PlayerLogService playerLogService;
+    @Autowired
+    RoomService roomService;
 
 
     /**
@@ -83,6 +87,7 @@ public class HomeController {
     public ResultVO<String> start(@RequestParam Integer type,
                                   @RequestParam(required = true) String roomId) throws Exception {
         log.info("启动服务器，type={}", type);
+        roomService.updateStartFlag(true,type,roomId);
         return homeService.start(type, roomId);
 
     }
@@ -93,6 +98,7 @@ public class HomeController {
     @ResponseBody
     public ResultVO<String> stop(@RequestParam Integer type, @RequestParam(required = true) String roomId) throws Exception {
         log.info("停止服务器，type={}", type);
+        roomService.updateStartFlag(false,type,roomId);
         return homeService.stop(type, roomId);
 
     }
@@ -182,7 +188,7 @@ public class HomeController {
         shellService.regenerate(roomId);
 
         //        重置世界时删除玩家日志
-        homeService.delRoomPlayerLog(roomId);
+        playerLogService.delRoomPlayerLog(roomId);
 
 
         return ResultVO.success();

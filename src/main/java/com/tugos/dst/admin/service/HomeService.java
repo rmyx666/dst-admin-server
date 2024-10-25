@@ -7,6 +7,7 @@ import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
+import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.systementity.Server;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.enums.StopTypeEnum;
@@ -38,8 +39,9 @@ public class HomeService {
     private SettingService settingService;
     @Autowired
     private RoomService roomService;
+
     @Autowired
-    PlayerLogMapper playerLogMapper;
+    PlayerLogService playerLogService;
 
     /**
      * 启动服务器进程
@@ -60,19 +62,16 @@ public class HomeService {
                 shellService.stopCaves(roomId);
                 shellService.startMaster(roomId);
                 shellService.startCaves(roomId);
-                roomService.updateStartFlag(roomId, true, true);
                 break;
             case START_MASTER:
                 //启动地面
                 shellService.stopMaster(roomId);
                 shellService.startMaster(roomId);
-                roomService.updateStartFlag(roomId, true, null);
                 break;
             case START_CAVES:
                 //启动洞穴
                 shellService.stopCaves(roomId);
                 shellService.startCaves(roomId);
-                roomService.updateStartFlag(roomId, null, true);
                 break;
             default:
         }
@@ -102,20 +101,56 @@ public class HomeService {
                 //停止所有,优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
                 shellService.elegantShutdownCaves(roomId);
-                roomService.updateStartFlag(roomId, false, false);
                 break;
             case STOP_MASTER:
                 //停止地面 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownMaster(roomId);
-                roomService.updateStartFlag(roomId, false, null);
                 break;
             case STOP_CAVES:
                 //停止洞穴 优雅关闭，10秒还未关闭强制关闭
                 shellService.elegantShutdownCaves(roomId);
-                roomService.updateStartFlag(roomId, null, false);
                 break;
             default:
         }
+        return ResultVO.success();
+    }
+
+    /**
+     * @param roomInfo
+     * @return com.tugos.dst.admin.common.ResultVO<java.lang.String>
+     * @Title start
+     * @Description 根据roominfo里的自动启动配置，启动房间
+     * @author wgr
+     * @date 2024/10/25 17:58
+     */
+    public ResultVO<String> start(RoomInfo roomInfo) {
+        boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
+        boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
+        if (autoStartMaster && autoStartCaves) {
+            //全启动
+            start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
+        }
+        if (!autoStartMaster && autoStartCaves) {
+            //不启动地面
+            start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
+        }
+        if (autoStartMaster && !autoStartCaves) {
+            //不启动洞穴
+            start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
+        }
+        return ResultVO.success();
+    }
+
+    /**
+     * @param roomInfo
+     * @return com.tugos.dst.admin.common.ResultVO<java.lang.String>
+     * @Title stop
+     * @Description 根据roominfo关闭所有
+     * @author wgr
+     * @date 2024/10/25 18:00
+     */
+    public ResultVO<String> stop(RoomInfo roomInfo) {
+        stop(0, roomInfo.roomId);
         return ResultVO.success();
     }
 
@@ -135,17 +170,6 @@ public class HomeService {
         }
     }
 
-    /**
-     * 判断token时候存在
-     *
-     * @return true存在
-     */
-    private boolean checkTokenIsExists() {
-        String tokenPath = DstConstant.ROOT_PATH + DstConstant.DST_USER_GAME_CONFG_PATH
-                + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_TOKEN;
-        File file = new File(tokenPath);
-        return file.exists();
-    }
 
     /**
      * 获取服务器的信息
@@ -215,7 +239,7 @@ public class HomeService {
         shellService.delCavesRecord(roomId);
         shellService.delMasterRecord(roomId);
 
-        delRoomPlayerLog(roomId);
+        playerLogService.delRoomPlayerLog(roomId);
     }
 
     /**
@@ -223,29 +247,13 @@ public class HomeService {
      */
     public void delRoomPath(String roomId) {
         this.stopServer(roomId);
-        String path = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId;
-        log.warn("删除room文件夹:{}", path);
-        FileUtil.del(path);
+        //删除房间的文件夹
+        backupService.delRoomDir(roomId);
 
-        delRoomPlayerLog(roomId);
+        //删除房间用户日志
+        playerLogService.delRoomPlayerLog(roomId);
     }
 
-    /**
-     * @param roomId
-     * @return void
-     * @Title delRoomPlayerLog
-     * @Description 删除roomId对应的日志文件
-     * @author wgr
-     * @date 2024/10/18 13:52
-     */
-
-
-    public void delRoomPlayerLog(String roomId) {
-        // 查询数据库获取玩家日志
-        QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("room_id", roomId);
-        int delete = playerLogMapper.delete(queryWrapper);
-    }
 
     /**
      * 删除指定世界的存档

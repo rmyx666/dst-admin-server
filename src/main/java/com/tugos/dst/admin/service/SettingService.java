@@ -86,44 +86,12 @@ public class SettingService {
             homeService.delRecord(roomId);
 
             RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
-            boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
-            boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
-            if (autoStartMaster && autoStartCaves) {
-                //全启动
-                homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
-            }
-            if (!autoStartMaster && autoStartCaves) {
-                //不启动地面
-                homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
-            }
-            if (autoStartMaster && !autoStartCaves) {
-                //不启动洞穴
-                homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
-            }
-            if (!autoStartMaster && !autoStartCaves) {
-                //都不启动
-            }
+            homeService.start(roomInfo);
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
             RoomInfo roomInfo =  dstConfigRoomDataMapper.selectById(roomId);
-            boolean autoStartMaster = roomInfo.autoStartMaster != null ? roomInfo.autoStartMaster : true;
-            boolean autoStartCaves = roomInfo.autoStartCaves != null ? roomInfo.autoStartCaves : true;
-            if (autoStartMaster && autoStartCaves) {
-                //全启动
-                homeService.start(StartTypeEnum.START_ALL.type, roomInfo.roomId);
-            }
-            if (!autoStartMaster && autoStartCaves) {
-                //不启动地面
-                homeService.start(StartTypeEnum.START_CAVES.type, roomInfo.roomId);
-            }
-            if (autoStartMaster && !autoStartCaves) {
-                //不启动洞穴
-                homeService.start(StartTypeEnum.START_MASTER.type, roomInfo.roomId);
-            }
-            if (!autoStartMaster && !autoStartCaves) {
-                //都不启动
-            }
+            homeService.start(roomInfo);
         }
         return ResultVO.success();
     }

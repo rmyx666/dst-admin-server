@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -116,89 +114,7 @@ public class PlayerService {
     }
 
 
-    /**
-     * 解析日志获取玩家信息
-     * [14:18:00]: playerlist 1621253438444 [0] KU_c1gvcIl4#split#[Host]#split#0
-     * [14:18:00]: playerlist 1621253438444 [1] KU_*****#split#nickname#split#wendy#split#13
-     *
-     * @return ku_** 昵称 角色 生存时间
-     */
-    public List<String> getPlayerList(String roomId) throws Exception {
-        String playerPrefix = "KU_";
-        String host = "[Host]";
-        String timeMillis = System.currentTimeMillis() + "";
-        String cmd = DstConstant.MASTER_PLAYERAGE_CMD.replace("99999999", timeMillis);
-        ShellUtil.runShell(cmd.replace("DST_MASTER", "Master_" + roomId));
-        //睡眠一秒
-        TimeUnit.SECONDS.sleep(1);
-        List<String> dstLog = systemService.getDstLog(DstLogTypeEnum.MASTER_LOG.type, 100, roomId);
-        List<String> playList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(dstLog)) {
-            dstLog.forEach(e -> {
-                if (e.contains(timeMillis)) {
-                    if (e.contains(playerPrefix)) {
-                        String tmp = e.substring(e.indexOf(playerPrefix)).replace("\t", "");
-                        if (!tmp.contains(host)) {
-                            playList.add(tmp);
-                        }
-                    }
-                }
-            });
-        }
-        return playList;
-    }
 
-    /**
-     * @param roomId
-     * @return java.util.List<com.tugos.dst.admin.entity.PlayerLog>
-     * @Title getPlayerLog
-     * @Description 获取玩家在线日志
-     * @author wgr
-     * @date 2024/10/12 17:19
-     */
-    private List<PlayerLog> getPlayerLog(String roomId) throws Exception {
-
-        List<PlayerLog> playerLogList = new ArrayList<>();
-
-        List<String> playerList = getPlayerList(roomId);
-
-        for (String s : playerList) {
-            String[] split = s.split("#split#");
-            if (split.length==4){
-                PlayerLog playerLog = PlayerLog.builder()
-                        .createTime(new Date())
-                        .roomId(roomId)
-                        .userId(split[0])
-                        .name(split[1]).prefab(split[2])
-                        .playerage(Integer.valueOf(split[3]))
-                        .build();
-                playerLogList.add(playerLog);
-            }
-        }
-
-        return playerLogList;
-    }
-
-
-    @Transactional
-    void saveRoomPlayerLog(String roomId) throws Exception {
-        List<PlayerLog> playerLog = getPlayerLog(roomId);
-        for (PlayerLog log : playerLog) {
-            playerLogMapper.insert(log);
-        }
-
-    }
-
-    @Async
-    public void savePlayerLog() throws Exception {
-        //获取本地数据
-        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
-
-
-        for (RoomInfo roomData : roomInfoList) {
-            saveRoomPlayerLog(roomData.getRoomId());
-        }
-    }
 
 
 }
