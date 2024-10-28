@@ -5,6 +5,8 @@ import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
 import com.tugos.dst.admin.dao.UserMapper;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.DataService;
+import com.tugos.dst.admin.systementity.Server;
+import com.tugos.dst.admin.systementity.serverInfo.Cpu;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.ShellUtil;
@@ -44,6 +46,8 @@ public class InitUtil {
     @Value("${dst.nickname:管理员}")
     private String nickname;
 
+    public static Integer CPU_NUM = 0;
+
 
     /**
      * 启动时释放安装dst游戏脚本
@@ -63,8 +67,11 @@ public class InitUtil {
         ShellUtil.runShell("sed -i 's/\\r//' ~/restart.sh");
 
 
+    }
 
-        if (userMapper.selectById(dstUser)==null){
+    @PostConstruct
+    public void initUser() throws Exception {
+        if (userMapper.selectById(dstUser) == null) {
             User user = User.builder()
                     .username(dstUser)
                     .password(dstPassword)
@@ -74,6 +81,16 @@ public class InitUtil {
         }
 
 
+    }
+
+
+    @PostConstruct
+    public void initCpuNum() throws Exception {
+        //获取硬件信息
+        Server server = new Server();
+        server.copyTo();
+        Cpu cpu = server.getCpu();
+        CPU_NUM = cpu.getCpuNum();
     }
 
     /**

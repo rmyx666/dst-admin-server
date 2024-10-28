@@ -22,12 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static com.tugos.dst.admin.init.InitUtil.CPU_NUM;
 
 /**
  * @author wgr
@@ -65,9 +64,11 @@ public class SchedulerTrigger {
      */
     @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
     public void runScreenScheduler() throws Exception {
-        Map<String, List<PlayerLog>> allPlayerLog = playerLogService.getAllPlayerLog();
+        Map<RoomInfo, List<PlayerLog>> allPlayerLog = playerLogService.getAllPlayerLog();
         //定时获取当前在线的玩家信息并保存到数据库中
         playerLogService.savePlayerLog(allPlayerLog);
+
+        autoStartOrStopGame(allPlayerLog);
 
     }
 
@@ -331,6 +332,67 @@ public class SchedulerTrigger {
                     shellService.regenerate(roomInfo.roomId);
                     LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
                 }
+            }
+        }
+    }
+
+    /**
+     * @param allPlayerLog
+     * @return void
+     * @Title autoStartOrStopGame
+     * @Description 一个服务器同时启动多个房间时，根据核心数的情况启动和关闭房间
+     * @author wgr
+     * @date 2024/10/28 14:17
+     */
+    private void autoStartOrStopGame(Map<RoomInfo, List<PlayerLog>> allPlayerLog) {
+
+        int usedCpuNum = 0;
+        List<RoomInfo> freeUseTwoCpuRoomList = new ArrayList<>();
+        List<RoomInfo> freeUseOneCpuRoomList = new ArrayList<>();
+        for (Map.Entry<RoomInfo, List<PlayerLog>> roomInfoListEntry : allPlayerLog.entrySet()) {
+            if (CollectionUtils.isNotEmpty(roomInfoListEntry.getValue())) {
+
+                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) usedCpuNum++;
+                if (roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) usedCpuNum++;
+            } else {
+                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true) && roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) {
+                    freeUseTwoCpuRoomList.add(roomInfoListEntry.getKey());
+                } else if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) {
+                    freeUseOneCpuRoomList.add(roomInfoListEntry.getKey());
+                }
+            }
+        }
+
+        int freeCpuNum = CPU_NUM - usedCpuNum;
+        if (freeCpuNum >= 2) {
+            start(freeUseTwoCpuRoomList);
+            start(freeUseOneCpuRoomList);
+        } else if (freeCpuNum == 1) {
+            stop(freeUseTwoCpuRoomList);
+            start(freeUseOneCpuRoomList);
+        } else {
+            stop(freeUseTwoCpuRoomList);
+            stop(freeUseOneCpuRoomList);
+        }
+
+    }
+
+    void stop(List<RoomInfo> roomInfos) {
+        for (RoomInfo roomInfo : roomInfos) {
+            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
+            if (masterStatus) {
+                homeService.stop(roomInfo);
+                LoggerUtil.systemLog("因为核心数不够关闭房间：" + roomInfo.getRoomId());
+            }
+        }
+    }
+
+    void start(List<RoomInfo> roomInfos) {
+        for (RoomInfo roomInfo : roomInfos) {
+            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
+            if (!masterStatus) {
+                homeService.start(roomInfo);
+                LoggerUtil.systemLog("核心数充足启动房间：" + roomInfo.getRoomId());
             }
         }
     }

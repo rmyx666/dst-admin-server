@@ -37,8 +37,7 @@ public class HomeService {
     private ShellService shellService;
     private BackupService backupService;
     private SettingService settingService;
-    @Autowired
-    private RoomService roomService;
+
 
     @Autowired
     PlayerLogService playerLogService;

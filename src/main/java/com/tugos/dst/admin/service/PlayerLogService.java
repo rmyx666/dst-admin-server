@@ -112,12 +112,12 @@ public class PlayerLogService {
      * @author wgr
      * @date 2024/10/25 15:55
      */
-    public Map<String, List<PlayerLog>> getAllPlayerLog() throws Exception {
-        Map<String, List<PlayerLog>> result = new HashMap<>();
+    public Map<RoomInfo, List<PlayerLog>> getAllPlayerLog() throws Exception {
+        Map<RoomInfo, List<PlayerLog>> result = new HashMap<>();
         List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
         for (RoomInfo roomData : roomInfoList) {
             List<PlayerLog> playerLog = getPlayerLog(roomData.getRoomId());
-            result.put(roomData.getRoomId(), playerLog);
+            result.put(roomData, playerLog);
         }
         return result;
     }
@@ -125,7 +125,7 @@ public class PlayerLogService {
 
     @Async
     @Transactional
-    public void savePlayerLog(Map<String, List<PlayerLog>> playerLogMap) throws Exception {
+    public void savePlayerLog(Map<RoomInfo, List<PlayerLog>> playerLogMap) throws Exception {
 
         for (List<PlayerLog> value : playerLogMap.values()) {
             for (PlayerLog playerLog : value) {
