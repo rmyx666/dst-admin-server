@@ -260,7 +260,7 @@ public class BackupService {
             Pattern nowDaysPattern = Pattern.compile("(\\d+)(days|天)");
             Matcher oldDaysMatcher = oldDaysPattern.matcher(backupList.get(0).getFileName());
             Matcher nowDaysMatcher = nowDaysPattern.matcher(playDate);
-            if (oldDaysMatcher.find()&&nowDaysMatcher.find()) {
+            if (oldDaysMatcher.find() && nowDaysMatcher.find()) {
                 // 获取捕获的数字
                 String oldDays = oldDaysMatcher.group(1);
                 String nowDays = nowDaysMatcher.group(1);
@@ -271,7 +271,7 @@ public class BackupService {
                     LoggerUtil.systemLog("备份存档不生效，存档天数相同，房间id" + roomId + "上一次天数：" + oldDays + "本次天数：" + nowDays);
                 }
             } else {
-                LoggerUtil.systemLog("备份存档失败,存档天数解析异常");
+                LoggerUtil.systemLog("房间id" + roomId + "备份存档失败,存档天数解析异常");
             }
 
         } else {
