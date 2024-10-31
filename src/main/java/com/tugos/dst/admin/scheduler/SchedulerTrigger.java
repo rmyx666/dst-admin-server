@@ -289,15 +289,15 @@ public class SchedulerTrigger {
                 Integer playDay = 0;
 
                 GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomInfo.roomId);
-                if (gameSnapshot != null) {
+                if (gameSnapshot != null && StringUtils.isNumeric(gameSnapshot.getPlayDay())) {
                     playDay = Integer.valueOf(gameSnapshot.getPlayDay());
                 }
 
                 if (playerLogCount < 60 && playDay > 0 && playDay < 40) {
                     shellService.regenerate(roomInfo.roomId);
                     LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
-                }else {
-                    LoggerUtil.systemLog("三天内在线时长"+playerLogCount+"不重置房间：" + roomInfo.roomId);
+                } else {
+                    LoggerUtil.systemLog("三天内在线时长" + playerLogCount + "不重置房间：" + roomInfo.roomId);
                 }
             }
         }
@@ -333,8 +333,8 @@ public class SchedulerTrigger {
                 if (playerLogCount < 60) {
                     shellService.regenerate(roomInfo.roomId);
                     LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
-                }else {
-                    LoggerUtil.systemLog("七天内在线时长"+playerLogCount+"不重置房间：" + roomInfo.roomId);
+                } else {
+                    LoggerUtil.systemLog("七天内在线时长" + playerLogCount + "不重置房间：" + roomInfo.roomId);
                 }
             }
         }
