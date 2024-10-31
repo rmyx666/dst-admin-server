@@ -56,7 +56,29 @@ public class RoomService {
 
         //配置每天6点更新游戏
         roomInfo.scheduleUpdateMap = new TreeMap<>();
+        roomInfo.scheduleUpdateMap.put("01:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("02:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("03:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("04:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("05:00:00", 0);
         roomInfo.scheduleUpdateMap.put("06:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("07:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("08:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("09:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("10:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("11:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("12:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("13:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("14:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("15:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("16:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("17:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("18:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("19:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("20:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("21:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("22:00:00", 0);
+        roomInfo.scheduleUpdateMap.put("23:00:00", 0);
         //每天6点，18点备份
         roomInfo.scheduleBackupMap = new TreeMap<>();
         roomInfo.scheduleBackupMap.put("06:00:00", 0);
