@@ -295,9 +295,9 @@ public class SchedulerTrigger {
 
                 if (playerLogCount < 60 && playDay > 0 && playDay < 40) {
                     shellService.regenerate(roomInfo.roomId);
-                    LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
+                    LoggerUtil.systemLog("自动重置房间 房间id:" + roomInfo.roomId + " 游戏天数:" + playDay + " 三天内在线时长:" + playerLogCount + " 判定自动重置");
                 } else {
-                    LoggerUtil.systemLog("三天内在线时长" + playerLogCount + "不重置房间：" + roomInfo.roomId);
+                    LoggerUtil.systemLog("自动重置房间 房间id:" + roomInfo.roomId + " 游戏天数:" + playDay + " 三天内在线时长:" + playerLogCount + " 判定不自动重置");
                 }
             }
         }
@@ -329,12 +329,18 @@ public class SchedulerTrigger {
                 // 获取玩家日志
                 Long playerLogCount = playerLogMapper.selectCount(queryWrapper);
 
+                Integer playDay = 0;
+
+                GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomInfo.roomId);
+                if (gameSnapshot != null && StringUtils.isNumeric(gameSnapshot.getPlayDay())) {
+                    playDay = Integer.valueOf(gameSnapshot.getPlayDay());
+                }
 
                 if (playerLogCount < 60) {
                     shellService.regenerate(roomInfo.roomId);
-                    LoggerUtil.systemLog("重置房间：" + roomInfo.roomId);
+                    LoggerUtil.systemLog("自动重置房间 房间id:" + roomInfo.roomId + " 游戏天数:" + playDay + " 七天内在线时长:" + playerLogCount + " 判定自动重置");
                 } else {
-                    LoggerUtil.systemLog("七天内在线时长" + playerLogCount + "不重置房间：" + roomInfo.roomId);
+                    LoggerUtil.systemLog("自动重置房间 房间id:" + roomInfo.roomId + " 游戏天数:" + playDay + " 七天内在线时长:" + playerLogCount + " 判定不自动重置");
                 }
             }
         }
@@ -386,7 +392,7 @@ public class SchedulerTrigger {
             boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
             if (masterStatus) {
                 homeService.stop(roomInfo);
-                LoggerUtil.systemLog("因为核心数不够关闭房间：" + roomInfo.getRoomId());
+                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 因为核心数不够关闭房间");
             }
         }
     }
@@ -396,7 +402,7 @@ public class SchedulerTrigger {
             boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
             if (!masterStatus) {
                 homeService.start(roomInfo);
-                LoggerUtil.systemLog("核心数充足启动房间：" + roomInfo.getRoomId());
+                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 核心数充足启动房间");
             }
         }
     }

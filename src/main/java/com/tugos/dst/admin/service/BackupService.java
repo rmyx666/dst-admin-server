@@ -266,12 +266,12 @@ public class BackupService {
                 String nowDays = nowDaysMatcher.group(1);
                 if (!oldDays.equals(nowDays)) {
                     createBackup(fileName, roomId);
-                    LoggerUtil.systemLog("成功备份存档，房间id" + roomId + "上一次天数：" + oldDays + "本次天数：" + nowDays);
+                    LoggerUtil.systemLog("自动备份存档 房间id：" + roomId + " 上一次天数：" + oldDays + " 本次天数：" + nowDays + " 备份成功");
                 } else {
-                    LoggerUtil.systemLog("备份存档不生效，存档天数相同，房间id" + roomId + "上一次天数：" + oldDays + "本次天数：" + nowDays);
+                    LoggerUtil.systemLog("自动备份存档 房间id：" + roomId + " 上一次天数：" + oldDays + " 本次天数：" + nowDays + " 不进行备份");
                 }
             } else {
-                LoggerUtil.systemLog("房间id" + roomId + "备份存档失败,存档天数解析异常");
+                LoggerUtil.systemLog("自动备份存档 房间id：" + roomId + " 存档天数解析异常");
             }
 
         } else {
