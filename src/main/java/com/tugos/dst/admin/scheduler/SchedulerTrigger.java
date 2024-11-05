@@ -267,7 +267,7 @@ public class SchedulerTrigger {
      * @author wgr
      * @date 2024/10/23 10:55
      */
-    @Scheduled(cron = "0 0 18 * * ?")
+    @Scheduled(cron = "0 0 17 * * ?")
     public void autoRegenerateEveryday() {
         List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {

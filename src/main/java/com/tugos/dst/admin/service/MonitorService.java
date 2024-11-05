@@ -141,7 +141,7 @@ public class MonitorService {
                 .collect(Collectors.toMap(
                         PlayerLog::getUserId, // key: userId
                         playerLog -> playerLog, // value: PlayerLog
-                        (existing, newEntry) -> existing.getPlayerage() >= newEntry.getPlayerage() ? existing : newEntry // 保留 playerage 最大的
+                        (existing, newEntry) -> existing.getCreateTime().after(newEntry.getCreateTime()) ? existing : newEntry // 保留 playerage 最大的
                 ));
 
 // 转换为 List 并按 playerage 倒序排序
