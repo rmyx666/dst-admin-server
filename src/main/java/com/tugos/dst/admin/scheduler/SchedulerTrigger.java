@@ -124,10 +124,10 @@ public class SchedulerTrigger {
     /**
      * 每天1点更新java程序
      */
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void updateJavaProgram() {
-        javaProgramUpdateUtil.updateJavaProgram();
-    }
+//    @Scheduled(cron = "0 0 1 * * ?")
+//    public void updateJavaProgram() {
+//        javaProgramUpdateUtil.updateJavaProgram();
+//    }
 
     /**
      * 智能更新，每30分钟检查一下最新版本
