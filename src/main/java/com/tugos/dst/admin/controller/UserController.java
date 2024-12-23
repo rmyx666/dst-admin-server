@@ -57,7 +57,9 @@ public class UserController {
     @RequiresAuthentication
     @ResponseBody
     public ResultVO setNewPwd(@RequestBody UpdatePwdVO vo) {
-        User userInfo = (User) SecurityUtils.getSubject().getPrincipal();
+        //暂时先修改成这样，从用户信息中获取的值是加密的，现在不太好搞处理
+//        User userInfo = (User) SecurityUtils.getSubject().getPrincipal();
+        User userInfo = dataService.getUser();
         if (StringUtils.isAnyBlank(vo.getOldPwd(), vo.getNewPwd(), vo.getConfirmPwd())) {
             return ResultVO.fail(ResultCodeEnum.UPDATE_PWD_ERROR1);
         }
@@ -108,7 +110,6 @@ public class UserController {
         Resource resource = new ClassPathResource("static" + defaultPath);
         FileCopyUtils.copy(resource.getInputStream(), response.getOutputStream());
     }
-
 
 
 }
