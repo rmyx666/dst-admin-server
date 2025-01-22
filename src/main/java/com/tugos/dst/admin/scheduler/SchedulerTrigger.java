@@ -68,7 +68,7 @@ public class SchedulerTrigger {
         //定时获取当前在线的玩家信息并保存到数据库中
         playerLogService.savePlayerLog(allPlayerLog);
 
-        autoStartOrStopGame(allPlayerLog);
+//        autoStartOrStopGame(allPlayerLog);
 
     }
 

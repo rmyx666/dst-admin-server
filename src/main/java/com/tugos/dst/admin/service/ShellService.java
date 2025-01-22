@@ -200,7 +200,11 @@ public class ShellService {
         //优雅关闭
         this.elegantShutdownMaster(roomId);
         this.elegantShutdownCaves(roomId);
-        return ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
+
+        //复制文件解决mod不能正确下载的问题
+
+        ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
+        return ShellUtil.runShell(DstConstant.CP_FILE);
     }
 
     /**
