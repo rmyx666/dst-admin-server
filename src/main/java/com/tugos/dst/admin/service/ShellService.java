@@ -202,7 +202,7 @@ public class ShellService {
         this.elegantShutdownCaves(roomId);
 
         //复制文件解决mod不能正确下载的问题
-
+        ShellUtil.runShell(DstConstant.CP_FILE);
         ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
         return ShellUtil.runShell(DstConstant.CP_FILE);
     }
