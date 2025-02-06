@@ -7,6 +7,7 @@ import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.entity.RoomOperationLog;
 import com.tugos.dst.admin.vo.GameSnapshotVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,14 @@ public class RoomOperationLogService {
         List<RoomInfo> roomInfoList = roomInfoMapper.selectList(null);
         for (RoomInfo roomData : roomInfoList) {
             String roomId = roomData.getRoomId();
-
+            String playDay = "0";
             GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomId);
-            String playDay = gameSnapshot.getPlayDay();
+            if (gameSnapshot == null) {
+                if (StringUtils.isNotBlank(gameSnapshot.getPlayDay())) {
+                    playDay = gameSnapshot.getPlayDay();
+                }
+            }
+
 
             boolean masterStatus = shellService.getMasterStatus(roomId);
             boolean cavesStatus = shellService.getCavesStatus(roomId);
