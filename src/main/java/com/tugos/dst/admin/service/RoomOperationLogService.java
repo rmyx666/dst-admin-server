@@ -39,7 +39,7 @@ public class RoomOperationLogService {
             String roomId = roomData.getRoomId();
             String playDay = "0";
             GameSnapshotVO gameSnapshot = backupService.getGameSnapshot(roomId);
-            if (gameSnapshot == null) {
+            if (gameSnapshot != null) {
                 if (StringUtils.isNotBlank(gameSnapshot.getPlayDay())) {
                     playDay = gameSnapshot.getPlayDay();
                 }
