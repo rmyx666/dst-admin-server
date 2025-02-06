@@ -61,10 +61,10 @@
             };
         },
         created() {
-            // 设置默认的时间范围为最近三天
+            // 设置默认的时间范围为最近7天
             const now = new Date();
             this.endTime = now;
-            this.startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);  // 三天前
+            this.startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);  // 7天前
         },
         mounted() {
             // 初始化ECharts
@@ -147,43 +147,58 @@
                 // 生成 ECharts 图表配置
                 const option = {
                     title: {
-                        text: '玩家在线情况趋势图',
+                        text: '房间监控',
                     },
                     tooltip: {
                         trigger: 'axis',
+                        position: function (point, params, dom, rect, size) {
+                            // 获取tooltip的宽度和高度
+                            const tooltipWidth = 300; // 假定tooltip宽度为300px
+                            const tooltipHeight = 200; // 假定tooltip高度为200px
+
+                            // 获取当前鼠标位置
+                            let tooltipX = point[0];
+                            let tooltipY = point[1];
+
+                            // 确保tooltip不会超出页面右侧边界
+                            if (tooltipX + tooltipWidth > size.viewSize[0]) {
+                                tooltipX = size.viewSize[0] - tooltipWidth;
+                            }
+
+                            // 确保tooltip不会超出页面底部边界
+                            if (tooltipY + tooltipHeight > size.viewSize[1]) {
+                                tooltipY = size.viewSize[1] - tooltipHeight;
+                            }
+
+                            return [tooltipX, tooltipY];
+                        },
                         formatter: (params) => {
-                            let content = params[0].name + '<br/>';
-
-                            // 获取玩家在线趋势数据
                             const playerTrendInfo = counts[params[0].dataIndex];
-                            content += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:';
+                            const roomTrendInfo = roomCounts[params[1].dataIndex];
 
+                            let playerContent = '<div style="padding: 10px; max-width: 280px; word-wrap: break-word;">';
+                            playerContent += '<strong>玩家在线数据</strong><br/>';
+                            playerContent += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:<br/>';
                             if (Array.isArray(playerTrendInfo.playerLogs)) {
                                 playerTrendInfo.playerLogs.forEach(log => {
-                                    content += '<br/>用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage;
+                                    playerContent += '用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage + '<br/>';
                                 });
                             } else {
-                                content += '<br/>没有玩家详情';
+                                playerContent += '没有玩家详情';
                             }
+                            playerContent += '</div>';
 
-                            // 获取房间操作趋势数据
-                            if (params.length > 1) {  // 确保 params[1] 存在
-                                const roomTrendInfo = roomCounts[params[1].dataIndex]; // params[1] 对应的是房间操作数据
-                                content += '<br/>房间操作数量: ' + roomTrendInfo.count + '<br/>';
+                            let roomContent = '<div style="padding: 10px; max-width: 280px; word-wrap: break-word;">';
+                            roomContent += '<strong>房间操作数据</strong><br/>';
+                            roomContent += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
+                            roomContent += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
+                            roomContent += '生存天数: ' + roomTrendInfo.playDay + '<br/>';
+                            roomContent += '</div>';
 
-                                content += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
-                                content += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
-
-                                if (roomTrendInfo.playDay) {
-                                    content += '生存天数: ' + roomTrendInfo.playDay;
-                                } else {
-                                    content += '没有生存天数信息';
-                                }
-                            }
-
-                            return content;
+                            return playerContent + roomContent;
                         }
                     },
+
                     xAxis: {
                         type: 'category',
                         data: timePeriods,
@@ -202,7 +217,7 @@
                             },
                             axisLabel: {
                                 formatter: function(value) {
-                                    return value; // 让房间操作的右边轴始终是 0, 1, 2
+                                    return value;
                                 }
                             },
                         }
@@ -234,9 +249,6 @@
                 // 使用刚指定的配置项和数据显示图表
                 this.chart.setOption(option);
             }
-
-
-
         }
     });
 </script>
