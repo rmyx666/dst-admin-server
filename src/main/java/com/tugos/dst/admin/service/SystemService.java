@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.google.common.collect.Lists;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.enums.DstLogTypeEnum;
 import com.tugos.dst.admin.utils.*;
@@ -30,7 +30,7 @@ public class SystemService {
     @Autowired
     DataService dataService;
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
     /**
      * 拉取dst游戏日志
      *
@@ -67,7 +67,7 @@ public class SystemService {
      * @return 数据
      */
     public ScheduleVO getScheduleList(String roomId) {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         ScheduleVO data = new ScheduleVO();
         Set<String> updateSet = roomInfo.scheduleUpdateMap.keySet();
         if (CollectionUtils.isNotEmpty(updateSet)) {
@@ -104,7 +104,7 @@ public class SystemService {
      * @param vo 提交的数据
      */
     public void saveSchedule(ScheduleVO vo, String roomId) {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
 
         roomInfo.clearAllData();
 
@@ -148,7 +148,7 @@ public class SystemService {
 //        } else {
 //            roomInfo.smartUpdate = false;
 //        }
-     dstConfigRoomDataMapper.updateById(roomInfo);
+     roomInfoMapper.updateById(roomInfo);
     }
 
     /**
@@ -168,7 +168,7 @@ public class SystemService {
 
     public GamePortVO getGamePort(String roomId) {
         GamePortVO gamePortVO = new GamePortVO();
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         gamePortVO.setMasterPort(roomInfo.masterPort);
         gamePortVO.setGroundPort(roomInfo.groundPort);
         gamePortVO.setCavesPort(roomInfo.cavesPort);
@@ -176,13 +176,13 @@ public class SystemService {
     }
 
     public void saveGamePort(GamePortVO gamePortVO, String roomId) {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
 
         roomInfo.masterPort = gamePortVO.getMasterPort();
         roomInfo.groundPort = gamePortVO.getGroundPort();
         roomInfo.cavesPort = gamePortVO.getCavesPort();
 
-        dstConfigRoomDataMapper.updateById(roomInfo);
+        roomInfoMapper.updateById(roomInfo);
 //        DBUtils.saveDataToFile();
     }
 

@@ -3,9 +3,8 @@ package com.tugos.dst.admin.service;
 
 import cn.hutool.core.io.FileUtil;
 import com.tugos.dst.admin.common.ResultVO;
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.enums.SettingTypeEnum;
-import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
@@ -57,7 +56,7 @@ public class SettingService {
     @Autowired
     DataService dataService;
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
 
     /**
      * 保存戏设置 如果type为2 会启动新游戏
@@ -85,12 +84,12 @@ public class SettingService {
             //启动新游戏
             homeService.delRecord(roomId);
 
-            RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+            RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
             homeService.start(roomInfo);
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
-            RoomInfo roomInfo =  dstConfigRoomDataMapper.selectById(roomId);
+            RoomInfo roomInfo =  roomInfoMapper.selectById(roomId);
             homeService.start(roomInfo);
         }
         return ResultVO.success();
@@ -226,7 +225,7 @@ public class SettingService {
      * 生成地面 server.ini
      */
     public void createMasterServerIniV2(String roomId) throws Exception {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_MASTER;
         //创建地面设置的文件夹
         FileUtils.mkdirs(basePath);
@@ -283,7 +282,7 @@ public class SettingService {
      * 生成洞穴 server.ini
      */
     public void createCavesServerIniV2(String roomId) throws Exception {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_CAVES;
         //创建洞穴设置的文件夹
         FileUtils.mkdirs(basePath);
@@ -386,7 +385,7 @@ public class SettingService {
      * @throws Exception 异常
      */
     public void createClusterV2(GameConfigVO vo, String roomId) throws Exception {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         String filePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomId + DstConstant.SINGLE_SLASH + DstConstant.DST_USER_CLUSTER_INI_NAME;
         log.info("生成游戏配置文件 cluster.ini文件,{}", filePath);
 

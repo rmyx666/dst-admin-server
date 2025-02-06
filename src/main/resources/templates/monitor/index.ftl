@@ -55,6 +55,7 @@
                 endTime: '',    // 结束时间
                 type: 'hour',   // 默认粒度为小时
                 trendData: [],  // 存储返回的趋势数据
+                roomTrendData: [],  // 存储房间操作趋势数据
                 playerData: [], // 存储返回的玩家数据
                 chart: null     // 存储ECharts实例
             };
@@ -71,6 +72,7 @@
             this.fetchPlayerOnlineTrend();
         },
         methods: {
+            // 获取玩家在线趋势
             fetchPlayerOnlineTrend() {
                 const param = {
                     roomId: this.roomId,
@@ -79,23 +81,44 @@
                     type: this.type
                 };
 
-                axios.post("/monitor/getPlayerOnlineTrend?roomId=" + this.roomId+"&serverId="+this.serverId, param)
+                axios.post("/monitor/getPlayerOnlineTrend?roomId=" + this.roomId + "&serverId=" + this.serverId, param)
                     .then(response => {
                         this.trendData = response.data.data;  // 将接口返回的趋势数据赋值给 trendData
-                        this.renderChart();
-                        // 调用获取玩家在线生存天数接口
-                        this.fetchPlayerOnlineAge();
+                        this.fetchRoomOperationTrend(); // 获取房间操作趋势数据
                     })
                     .catch(error => {
                         console.error('Error fetching player online trend:', error);
                     });
             },
+
+            // 获取房间操作趋势
+            fetchRoomOperationTrend() {
+                const param = {
+                    roomId: this.roomId,
+                    startTime: this.startTime,
+                    endTime: this.endTime,
+                    type: this.type
+                };
+
+                axios.post("/monitor/getRoomOperationTrend?roomId=" + this.roomId + "&serverId=" + this.serverId, param)
+                    .then(response => {
+                        this.roomTrendData = response.data.data; // 将接口返回的房间操作趋势数据赋值给 roomTrendData
+                        this.renderChart(); // 合并数据并渲染图表
+                        // 调用获取玩家在线生存天数接口
+                        this.fetchPlayerOnlineAge();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching room operation trend:', error);
+                    });
+            },
+
+            // 获取玩家在线生存天数
             fetchPlayerOnlineAge() {
                 const param = {
                     roomId: this.roomId
                 };
 
-                axios.post("/monitor/getPlayerOnlineAge?roomId=" + this.roomId+"&serverId="+this.serverId, param)
+                axios.post("/monitor/getPlayerOnlineAge?roomId=" + this.roomId + "&serverId=" + this.serverId, param)
                     .then(response => {
                         this.playerData = response.data.data; // 将接口返回的玩家数据赋值给 playerData
                     })
@@ -103,11 +126,22 @@
                         console.error('Error fetching player online age:', error);
                     });
             },
+
+            // 渲染趋势图
             renderChart() {
                 const timePeriods = this.trendData.map(item => item.timePeriod);
                 const counts = this.trendData.map(item => ({
                     count: item.count,
-                    playerLogs: item.playerLogs // 将 playerLogs 包含在这里
+                    playerLogs: item.playerLogs // 玩家在线趋势数据
+                }));
+
+                // 合并房间操作趋势数据
+                const roomCounts = this.roomTrendData.map(item => ({
+                    count: item.count,
+                    masterStatus: item.masterStatus,
+                    cavesStatus: item.cavesStatus,
+                    playDay: item.playDay,
+                    timePeriod: item.timePeriod // 时间段
                 }));
 
                 // 生成 ECharts 图表配置
@@ -118,15 +152,33 @@
                     tooltip: {
                         trigger: 'axis',
                         formatter: (params) => {
-                            const trendInfo = counts[params[0].dataIndex]; // 使用 dataIndex 获取对应的数据
-                            let content = params[0].name + '<br/>玩家数量: ' + trendInfo.count + '<br/>玩家详情:';
+                            let content = params[0].name + '<br/>';
 
-                            if (Array.isArray(trendInfo.playerLogs)) {
-                                trendInfo.playerLogs.forEach(log => {
+                            // 获取玩家在线趋势数据
+                            const playerTrendInfo = counts[params[0].dataIndex];
+                            content += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:';
+
+                            if (Array.isArray(playerTrendInfo.playerLogs)) {
+                                playerTrendInfo.playerLogs.forEach(log => {
                                     content += '<br/>用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage;
                                 });
                             } else {
                                 content += '<br/>没有玩家详情';
+                            }
+
+                            // 获取房间操作趋势数据
+                            if (params.length > 1) {  // 确保 params[1] 存在
+                                const roomTrendInfo = roomCounts[params[1].dataIndex]; // params[1] 对应的是房间操作数据
+                                content += '<br/>房间操作数量: ' + roomTrendInfo.count + '<br/>';
+
+                                content += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
+                                content += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
+
+                                if (roomTrendInfo.playDay) {
+                                    content += '生存天数: ' + roomTrendInfo.playDay;
+                                } else {
+                                    content += '没有生存天数信息';
+                                }
                             }
 
                             return content;
@@ -136,23 +188,55 @@
                         type: 'category',
                         data: timePeriods,
                     },
-                    yAxis: {
-                        type: 'value',
-                    },
-                    series: [{
-                        name: '玩家数量',
-                        type: 'line',
-                        data: counts.map(item => item.count), // 只获取 count
-                        smooth: true, // 平滑曲线
-                        itemStyle: {
-                            color: '#5470c6',
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: '玩家数量',
                         },
-                    }],
+                        {
+                            type: 'value',
+                            name: '房间操作数量',
+                            position: 'right',
+                            axisLine: {
+                                show: true,
+                            },
+                            axisLabel: {
+                                formatter: function(value) {
+                                    return value; // 让房间操作的右边轴始终是 0, 1, 2
+                                }
+                            },
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '玩家数量',
+                            type: 'line',
+                            data: counts.map(function(item) { return item.count; }), // 玩家在线趋势的 count
+                            smooth: true,
+                            itemStyle: {
+                                color: '#5470c6',
+                            },
+                            yAxisIndex: 0,  // 指定使用左边的 Y 轴
+                        },
+                        {
+                            name: '房间操作数量',
+                            type: 'line',
+                            data: roomCounts.map(function(item) { return item.count; }), // 房间操作趋势的 count
+                            smooth: true,
+                            itemStyle: {
+                                color: '#ff7f50',
+                            },
+                            yAxisIndex: 1,  // 指定使用右边的 Y 轴
+                        }
+                    ],
                 };
 
                 // 使用刚指定的配置项和数据显示图表
                 this.chart.setOption(option);
             }
+
+
+
         }
     });
 </script>

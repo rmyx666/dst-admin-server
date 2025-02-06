@@ -6,11 +6,10 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Range;
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.entity.RoomInfo;
-import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.service.*;
 import com.tugos.dst.admin.utils.*;
@@ -53,7 +52,9 @@ public class SchedulerTrigger {
     JavaProgramUpdateUtil javaProgramUpdateUtil;
 
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
+    @Autowired
+    RoomOperationLogService roomOperationLogService;
 
     /**
      * @return void
@@ -68,8 +69,20 @@ public class SchedulerTrigger {
         //定时获取当前在线的玩家信息并保存到数据库中
         playerLogService.savePlayerLog(allPlayerLog);
 
+
+        //每分钟保存所有房间的房间运行日志
+        roomOperationLogService.saveRoomOperationLog();
+
 //        autoStartOrStopGame(allPlayerLog);
 
+    }
+
+    /**
+     * 每天1点更新删除一个月前的房间运行日志
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void delRoomOperationLog() {
+        roomOperationLogService.delRoomOperationLog();
     }
 
 
@@ -90,7 +103,7 @@ public class SchedulerTrigger {
     @Scheduled(fixedRate = 600000)
     public void sendMsg() throws InterruptedException {
 
-        List<String> collect = dstConfigRoomDataMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
+        List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
         String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
         for (String roomId : collect) {
             shellService.sendBroadcast(message, roomId);
@@ -105,7 +118,7 @@ public class SchedulerTrigger {
     @Scheduled(cron = "1 0 0 * * ?")
     public void resetScheduleMap() {
 
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
             Set<String> backupKeySet = roomInfo.scheduleBackupMap.keySet();
             for (String key : backupKeySet) {
@@ -115,7 +128,7 @@ public class SchedulerTrigger {
             for (String key : updateKeySet) {
                 roomInfo.scheduleUpdateMap.put(key, 0);
             }
-            dstConfigRoomDataMapper.updateById(roomInfo);
+            roomInfoMapper.updateById(roomInfo);
         }
 
 
@@ -143,7 +156,7 @@ public class SchedulerTrigger {
                 long lv = Long.parseLong(localVersion);
                 if (sv > lv) {
                     log.info("智能更新进行...");
-                    List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+                    List<RoomInfo> roomData = roomInfoMapper.selectList(null);
                     for (RoomInfo roomInfo : roomData) {
                         onlyUpdateGame(roomInfo);
                     }
@@ -172,7 +185,7 @@ public class SchedulerTrigger {
     public void updateGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
             Set<String> updateListTime = roomInfo.scheduleUpdateMap.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
@@ -205,7 +218,7 @@ public class SchedulerTrigger {
                     }
                 });
             }
-            dstConfigRoomDataMapper.updateById(roomInfo);
+            roomInfoMapper.updateById(roomInfo);
         }
 
 
@@ -233,7 +246,7 @@ public class SchedulerTrigger {
     public void backupGame() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
             Set<String> backupListTime = roomInfo.scheduleBackupMap.keySet();
             //执行备份任务
@@ -253,7 +266,7 @@ public class SchedulerTrigger {
                     }
                 });
             }
-            dstConfigRoomDataMapper.updateById(roomInfo);
+            roomInfoMapper.updateById(roomInfo);
         }
 
 
@@ -269,7 +282,7 @@ public class SchedulerTrigger {
      */
     @Scheduled(cron = "0 0 17 * * ?")
     public void autoRegenerateEveryday() {
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
             if (roomInfo.autoRegenerate) {
 
@@ -312,7 +325,7 @@ public class SchedulerTrigger {
      */
     @Scheduled(cron = "0 0 18 ? * FRI")
     public void autoRegenerateFriday() {
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
             if (roomInfo.autoRegenerate) {
 

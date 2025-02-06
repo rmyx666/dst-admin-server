@@ -6,6 +6,7 @@ import com.tugos.dst.admin.param.PlayerOnlineParam;
 import com.tugos.dst.admin.service.MonitorService;
 import com.tugos.dst.admin.service.PlayerService;
 import com.tugos.dst.admin.vo.OnlineTrendVo;
+import com.tugos.dst.admin.vo.RoomOperationTrendVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +37,21 @@ public class MoniterController {
     public ResultVO<List<OnlineTrendVo>> getPlayerOnlineTrend(@RequestBody PlayerOnlineParam param) {
         log.info("获取玩家在线情况趋势图");
         return ResultVO.data(monitorService.getPlayerOnlineTrend(param));
-
     }
 
     @PostMapping("/getPlayerOnlineAge")
     @RequiresAuthentication
     @ResponseBody
     public ResultVO<List<PlayerLog>> getPlayerOnlineAge(@RequestBody PlayerOnlineParam param) {
-        log.info("获取玩家在线情况趋势图");
+        log.info("获取玩家在线时间");
         return ResultVO.data(monitorService.getPlayerOnlineAge(param));
+    }
 
+    @PostMapping("/getRoomOperationTrend")
+    @RequiresAuthentication
+    @ResponseBody
+    public ResultVO<List<RoomOperationTrendVo>> getRoomOperationTrend(@RequestBody PlayerOnlineParam param) {
+        log.info("获取玩家在线情况趋势图");
+        return ResultVO.data(monitorService.getRoomOperationTrend(param));
     }
 }

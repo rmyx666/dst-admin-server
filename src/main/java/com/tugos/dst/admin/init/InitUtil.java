@@ -1,6 +1,6 @@
 package com.tugos.dst.admin.init;
 
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
 import com.tugos.dst.admin.dao.UserMapper;
 import com.tugos.dst.admin.entity.User;
@@ -31,7 +31,7 @@ public class InitUtil {
     @Autowired
     DataService dataService;
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
     @Autowired
     DstServerInfoDataMapper dstServerInfoDataMapper;
     @Autowired
@@ -83,15 +83,21 @@ public class InitUtil {
 
     }
 
-
-    @PostConstruct
-    public void initCpuNum() throws Exception {
-        //获取硬件信息
-        Server server = new Server();
-        server.copyTo();
-        Cpu cpu = server.getCpu();
-        CPU_NUM = cpu.getCpuNum();
-    }
+/**
+ * @Title initCpuNum
+ * @Description 获取当前cpu核数 目前不需要
+ * @author wgr
+ * @return void
+ * @date 2025/2/6 14:39
+ */
+//    @PostConstruct
+//    public void initCpuNum() throws Exception {
+//        //获取硬件信息
+//        Server server = new Server();
+//        server.copyTo();
+//        Cpu cpu = server.getCpu();
+//        CPU_NUM = cpu.getCpuNum();
+//    }
 
     /**
      * 释放脚本并授权

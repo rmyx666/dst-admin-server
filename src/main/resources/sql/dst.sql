@@ -32,5 +32,13 @@ CREATE TABLE IF NOT EXISTS user (
     nickname VARCHAR(255),               -- 昵称
     picture VARCHAR(255)                 -- 头像（图片URL）
 );
+CREATE TABLE IF NOT EXISTS room_operation_log (
+    id INTEGER PRIMARY KEY,              -- 主键ID
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,  -- 创建时间，默认值为当前时间
+    room_id TEXT,                        -- 房间ID
+    master_status BOOLEAN,                -- 地面状态 true 启动
+    caves_status BOOLEAN,                 -- 洞穴状态 true 启动
+    play_day TEXT                         -- 存档内游戏天数
+);
 
 

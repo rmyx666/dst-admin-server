@@ -2,7 +2,7 @@ package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
 
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.enums.StopTypeEnum;
@@ -43,12 +43,12 @@ public class RoomService {
     @Autowired
     ServerService serverService;
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
 
     public ResultVO<String> saveRoomInfos(RoomInfo roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
 
-        List<RoomInfo> roomData = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         if (roomData.stream().anyMatch(x -> x.getRoomId().equals(roomInfo.roomId))) {
             return ResultVO.fail("roomId重复");
         }
@@ -88,7 +88,7 @@ public class RoomService {
         roomInfo.setAutoStartCaves(true);
         roomInfo.setAutoRegenerate(false);
 
-        dstConfigRoomDataMapper.insert(roomInfo);
+        roomInfoMapper.insert(roomInfo);
         //创建新房间的文件夹
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomInfo.getRoomId();
         FileUtils.mkdirs(basePath);
@@ -112,7 +112,7 @@ public class RoomService {
 
     public List<RoomInfoVO> getLocalRoomInfos() {
         //获取本地数据
-        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomInfoList = roomInfoMapper.selectList(null);
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
@@ -184,7 +184,7 @@ public class RoomService {
 
     public List<RoomInfoVO> getLocalRoomInfosWithHardware() throws Exception {
         //获取本地数据
-        List<RoomInfo> roomInfoList = dstConfigRoomDataMapper.selectList(null);
+        List<RoomInfo> roomInfoList = roomInfoMapper.selectList(null);
 
         List<RoomInfoVO> roomInfoVOS = new ArrayList<>();
 
@@ -261,7 +261,7 @@ public class RoomService {
 
     public ResultVO<String> delRoomInfos(String roomId) {
         //删除房间信息
-        dstConfigRoomDataMapper.deleteById(roomId);
+        roomInfoMapper.deleteById(roomId);
 
         //停止房间 删除房间文件夹 删除玩家日志
         homeService.delRoomPath(roomId);
@@ -270,13 +270,13 @@ public class RoomService {
     }
 
     public ResultVO<String> updateRoomInfos(RoomInfo roomInfo) {
-        RoomInfo dstConfigRoomData = dstConfigRoomDataMapper.selectById(roomInfo.roomId);
+        RoomInfo dstConfigRoomData = roomInfoMapper.selectById(roomInfo.roomId);
         dstConfigRoomData.setRoomName(roomInfo.getRoomName());
         dstConfigRoomData.setMasterPort(roomInfo.getMasterPort());
         dstConfigRoomData.setCavesPort(roomInfo.getCavesPort());
         dstConfigRoomData.setGroundPort(roomInfo.getGroundPort());
 
-        dstConfigRoomDataMapper.updateById(roomInfo);
+        roomInfoMapper.updateById(roomInfo);
         return ResultVO.success();
     }
 
@@ -286,7 +286,7 @@ public class RoomService {
      * @param roomId
      */
     public void updateStartFlag(Boolean startOrStop, Integer type, String roomId) {
-        RoomInfo roomInfo = dstConfigRoomDataMapper.selectById(roomId);
+        RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
 
         Boolean startMsater = null;
         Boolean startCaves = null;
@@ -332,6 +332,6 @@ public class RoomService {
             roomInfo.autoStartCaves = startCaves;
         }
 
-        dstConfigRoomDataMapper.updateById(roomInfo);
+        roomInfoMapper.updateById(roomInfo);
     }
 }

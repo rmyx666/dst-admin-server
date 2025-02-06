@@ -2,23 +2,15 @@ package com.tugos.dst.admin.service;
 
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.config.I18nResourcesConfig;
-import com.tugos.dst.admin.dao.DstConfigRoomDataMapper;
+import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
-import com.tugos.dst.admin.entity.PlayerLog;
-import com.tugos.dst.admin.enums.DstLogTypeEnum;
-import com.tugos.dst.admin.entity.RoomInfo;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
-import com.tugos.dst.admin.utils.ShellUtil;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author qinming
@@ -37,7 +29,7 @@ public class PlayerService {
     DataService dataService;
 
     @Autowired
-    DstConfigRoomDataMapper dstConfigRoomDataMapper;
+    RoomInfoMapper roomInfoMapper;
 
     /**
      * 读取游戏管理员列表
