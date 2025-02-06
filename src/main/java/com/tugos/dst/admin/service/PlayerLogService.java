@@ -120,14 +120,20 @@ public class PlayerLogService {
 
 
     @Async
-    @Transactional
     public void savePlayerLog(Map<RoomInfo, List<PlayerLog>> playerLogMap) throws Exception {
 
         for (List<PlayerLog> value : playerLogMap.values()) {
             for (PlayerLog playerLog : value) {
-                playerLogMapper.insert(playerLog);
+                // 每次插入操作都放到单独事务中，并加上1秒的睡眠
+                savePlayerLogInTransaction(playerLog);
+                Thread.sleep(1000); // 睡眠1秒
             }
         }
+    }
+
+    @Transactional
+    public void savePlayerLogInTransaction(PlayerLog playerLog) throws InterruptedException {
+        playerLogMapper.insert(playerLog);
     }
 
 

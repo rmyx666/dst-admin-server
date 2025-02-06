@@ -241,9 +241,7 @@ public class MonitorService {
                 trend.setCavesStatus(true); // 如果有 cavesStatus 为 true，设置为 true
             }
 
-            // 统计 masterStatus 和 cavesStatus 为 true 的个数
-            if (log.getMasterStatus()) trend.setCount(trend.getCount() + 1);
-            if (log.getCavesStatus()) trend.setCount(trend.getCount() + 1);
+
 
             // 处理 playDay，保留同一时间段内 createTime 最晚的记录
             if (trend.getPlayDay() == null || log.getCreateTime().after(trend.getCreateTime())) {
@@ -254,6 +252,12 @@ public class MonitorService {
 
         // 将所有结果转为 List 返回
         trends.addAll(trendMap.values());
+
+        for (RoomOperationTrendVo trend : trends) {
+            // 统计 masterStatus 和 cavesStatus 为 true 的个数
+            if (trend.getMasterStatus()) trend.setCount(trend.getCount() + 1);
+            if (trend.getCavesStatus()) trend.setCount(trend.getCount() + 1);
+        }
         return trends;
     }
 

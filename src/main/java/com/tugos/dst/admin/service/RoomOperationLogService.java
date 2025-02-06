@@ -32,8 +32,7 @@ public class RoomOperationLogService {
     ShellService shellService;
 
     @Async
-    @Transactional
-    public void saveRoomOperationLog() {
+    public void saveRoomOperationLog() throws InterruptedException {
         List<RoomInfo> roomInfoList = roomInfoMapper.selectList(null);
         for (RoomInfo roomData : roomInfoList) {
             String roomId = roomData.getRoomId();
@@ -51,8 +50,16 @@ public class RoomOperationLogService {
                     .masterStatus(masterStatus)
                     .cavesStatus(cavesStatus)
                     .build();
-            roomOperationLogMapper.insert(build);
+
+            // 将每次插入操作放到独立事务中
+            saveRoomOperationLogInTransaction(build);
+            Thread.sleep(1000); // 睡眠1秒
         }
+    }
+
+    @Transactional
+    public void saveRoomOperationLogInTransaction(RoomOperationLog build) throws InterruptedException {
+        roomOperationLogMapper.insert(build);
     }
 
     /**
