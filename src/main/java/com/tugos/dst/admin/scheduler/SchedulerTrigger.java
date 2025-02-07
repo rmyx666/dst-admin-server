@@ -63,7 +63,7 @@ public class SchedulerTrigger {
      * @author wgr
      * @date 2024/10/17 15:10
      */
-    @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
+    @Scheduled(cron = "0 * * * * ?")
     public void runScreenScheduler() throws Exception {
         Map<RoomInfo, List<PlayerLog>> allPlayerLog = playerLogService.getAllPlayerLog();
         //定时获取当前在线的玩家信息并保存到数据库中
