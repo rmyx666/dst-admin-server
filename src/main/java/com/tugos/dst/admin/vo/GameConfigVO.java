@@ -40,5 +40,6 @@ public class GameConfigVO {
      */
     private Integer type;
 
+    private String steamGroupId;
 
 }

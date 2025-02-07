@@ -105,6 +105,14 @@
                             </el-col>
                         </el-row>
 
+                        <el-row>
+                            <el-col :span="15">
+                                <el-form-item prop="steamGroupId" label="群组">
+                                    <el-input v-model="model.steamGroupId" clearable maxlength="20" show-word-limit></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+
                     </el-form>
 
                     <el-button :size="size" @click="drawer = true" type="primary" style="margin-left: 16px;">
@@ -633,6 +641,7 @@
                 whiteListSize: 0,
                 clusterPassword: undefined,
                 token: undefined,
+                steamGroupId: undefined, // 新字段 群组id
                 masterMapData: undefined,
                 cavesMapData: undefined,
                 modData: undefined,

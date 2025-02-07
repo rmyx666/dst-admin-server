@@ -89,7 +89,7 @@ public class SettingService {
         }
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
-            RoomInfo roomInfo =  roomInfoMapper.selectById(roomId);
+            RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
             homeService.start(roomInfo);
         }
         return ResultVO.success();
@@ -157,6 +157,12 @@ public class SettingService {
                     String[] split = e.split("=");
                     if (StringUtils.isNotBlank(split[1])) {
                         gameConfigVO.setClusterName(split[1].trim());
+                    }
+                }
+                if (e.contains("steam_group_id")) {
+                    String[] split = e.split("=");
+                    if (StringUtils.isNotBlank(split[1])) {
+                        gameConfigVO.setSteamGroupId(split[1].trim());
                     }
                 }
             }
@@ -448,6 +454,17 @@ public class SettingService {
             shard.put("master_port", StrUtils.ofNULL(roomInfo.getMasterPort(), this.masterPort));
             //shard.put("cluster_key", "defaultPass");
         }
+
+        //添加群组配置
+        Map<String, String> steam = ini.get("STEAM");
+        if (steam == null) {
+            ini.add("STEAM", "steam_group_admins", "false");
+            ini.add("STEAM", "steam_group_id", StrUtils.ofNULL(vo.getSteamGroupId()));
+            ini.add("STEAM", "steam_group_only", "false");
+        } else {
+            steam.put("steam_group_id", StrUtils.ofNULL(vo.getSteamGroupId()));
+        }
+
         ini.store();
     }
 
