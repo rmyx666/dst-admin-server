@@ -234,7 +234,11 @@ public class SchedulerTrigger {
         }
         homeService.updateGame(roomInfo.roomId);
 
-        homeService.start(roomInfo);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
+        for (RoomInfo roomDatum : roomData) {
+            homeService.start(roomDatum);
+        }
+
 
 
     }
@@ -367,56 +371,56 @@ public class SchedulerTrigger {
      * @author wgr
      * @date 2024/10/28 14:17
      */
-    private void autoStartOrStopGame(Map<RoomInfo, List<PlayerLog>> allPlayerLog) {
-
-        int usedCpuNum = 0;
-        List<RoomInfo> freeUseTwoCpuRoomList = new ArrayList<>();
-        List<RoomInfo> freeUseOneCpuRoomList = new ArrayList<>();
-        for (Map.Entry<RoomInfo, List<PlayerLog>> roomInfoListEntry : allPlayerLog.entrySet()) {
-            if (CollectionUtils.isNotEmpty(roomInfoListEntry.getValue())) {
-
-                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) usedCpuNum++;
-                if (roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) usedCpuNum++;
-            } else {
-                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true) && roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) {
-                    freeUseTwoCpuRoomList.add(roomInfoListEntry.getKey());
-                } else if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) {
-                    freeUseOneCpuRoomList.add(roomInfoListEntry.getKey());
-                }
-            }
-        }
-
-        int freeCpuNum = CPU_NUM - usedCpuNum;
-        if (freeCpuNum >= 2) {
-            start(freeUseTwoCpuRoomList);
-            start(freeUseOneCpuRoomList);
-        } else if (freeCpuNum == 1) {
-            stop(freeUseTwoCpuRoomList);
-            start(freeUseOneCpuRoomList);
-        } else {
-            stop(freeUseTwoCpuRoomList);
-            stop(freeUseOneCpuRoomList);
-        }
-
-    }
-
-    void stop(List<RoomInfo> roomInfos) {
-        for (RoomInfo roomInfo : roomInfos) {
-            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
-            if (masterStatus) {
-                homeService.stop(roomInfo);
-                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 因为核心数不够关闭房间");
-            }
-        }
-    }
-
-    void start(List<RoomInfo> roomInfos) {
-        for (RoomInfo roomInfo : roomInfos) {
-            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
-            if (!masterStatus) {
-                homeService.start(roomInfo);
-                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 核心数充足启动房间");
-            }
-        }
-    }
+//    private void autoStartOrStopGame(Map<RoomInfo, List<PlayerLog>> allPlayerLog) {
+//
+//        int usedCpuNum = 0;
+//        List<RoomInfo> freeUseTwoCpuRoomList = new ArrayList<>();
+//        List<RoomInfo> freeUseOneCpuRoomList = new ArrayList<>();
+//        for (Map.Entry<RoomInfo, List<PlayerLog>> roomInfoListEntry : allPlayerLog.entrySet()) {
+//            if (CollectionUtils.isNotEmpty(roomInfoListEntry.getValue())) {
+//
+//                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) usedCpuNum++;
+//                if (roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) usedCpuNum++;
+//            } else {
+//                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true) && roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) {
+//                    freeUseTwoCpuRoomList.add(roomInfoListEntry.getKey());
+//                } else if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) {
+//                    freeUseOneCpuRoomList.add(roomInfoListEntry.getKey());
+//                }
+//            }
+//        }
+//
+//        int freeCpuNum = CPU_NUM - usedCpuNum;
+//        if (freeCpuNum >= 2) {
+//            start(freeUseTwoCpuRoomList);
+//            start(freeUseOneCpuRoomList);
+//        } else if (freeCpuNum == 1) {
+//            stop(freeUseTwoCpuRoomList);
+//            start(freeUseOneCpuRoomList);
+//        } else {
+//            stop(freeUseTwoCpuRoomList);
+//            stop(freeUseOneCpuRoomList);
+//        }
+//
+//    }
+//
+//    void stop(List<RoomInfo> roomInfos) {
+//        for (RoomInfo roomInfo : roomInfos) {
+//            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
+//            if (masterStatus) {
+//                homeService.stop(roomInfo);
+//                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 因为核心数不够关闭房间");
+//            }
+//        }
+//    }
+//
+//    void start(List<RoomInfo> roomInfos) {
+//        for (RoomInfo roomInfo : roomInfos) {
+//            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
+//            if (!masterStatus) {
+//                homeService.start(roomInfo);
+//                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 核心数充足启动房间");
+//            }
+//        }
+//    }
 }
