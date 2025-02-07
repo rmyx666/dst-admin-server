@@ -59,7 +59,7 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title runScreenScheduler
-     * @Description 定时任务每60秒执行一次, 第一次延长10秒
+     * @Description 定时任务每分钟
      * @author wgr
      * @date 2024/10/17 15:10
      */
