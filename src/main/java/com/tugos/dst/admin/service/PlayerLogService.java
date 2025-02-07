@@ -5,6 +5,7 @@ import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.entity.RoomInfo;
+import com.tugos.dst.admin.entity.RoomOperationLog;
 import com.tugos.dst.admin.enums.DstLogTypeEnum;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.ShellUtil;
@@ -138,19 +139,28 @@ public class PlayerLogService {
 
 
     /**
-     * @param roomId
      * @return void
      * @Title delRoomPlayerLog
-     * @Description 删除roomId对应的日志文件
+     * @Description 删除一个月前的日志文件
      * @author wgr
      * @date 2024/10/18 13:52
      */
+    public void delRoomPlayerLog() {
+        // 获取当前时间
+        Date currentTime = new Date();
 
+        // 获取一个月前的时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentTime);
+        calendar.add(Calendar.MONTH, -1); // 当前时间减去一个月
 
-    public void delRoomPlayerLog(String roomId) {
-        // 查询数据库获取玩家日志
+        Date oneMonthAgo = calendar.getTime();
+
+        // 构造查询条件，删除超过一个月的数据
         QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("room_id", roomId);
+        queryWrapper.lt("create_time", oneMonthAgo); // 小于一个月前的时间
+
+        // 执行删除操作
         playerLogMapper.delete(queryWrapper);
     }
 

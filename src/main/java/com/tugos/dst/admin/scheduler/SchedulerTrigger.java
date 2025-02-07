@@ -83,6 +83,7 @@ public class SchedulerTrigger {
     @Scheduled(cron = "0 0 1 * * ?")
     public void delRoomOperationLog() {
         roomOperationLogService.delRoomOperationLog();
+        playerLogService.delRoomPlayerLog();
     }
 
 
@@ -238,7 +239,6 @@ public class SchedulerTrigger {
         for (RoomInfo roomDatum : roomData) {
             homeService.start(roomDatum);
         }
-
 
 
     }

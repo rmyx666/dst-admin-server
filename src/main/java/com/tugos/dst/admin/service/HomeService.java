@@ -238,7 +238,6 @@ public class HomeService {
         shellService.delCavesRecord(roomId);
         shellService.delMasterRecord(roomId);
 
-        playerLogService.delRoomPlayerLog(roomId);
     }
 
     /**
@@ -249,8 +248,6 @@ public class HomeService {
         //删除房间的文件夹
         backupService.delRoomDir(roomId);
 
-        //删除房间用户日志
-        playerLogService.delRoomPlayerLog(roomId);
     }
 
 
