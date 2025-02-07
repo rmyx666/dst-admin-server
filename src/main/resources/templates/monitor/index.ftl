@@ -132,7 +132,8 @@
                 const timePeriods = this.trendData.map(item => item.timePeriod);
                 const counts = this.trendData.map(item => ({
                     count: item.count,
-                    playerLogs: item.playerLogs // 玩家在线趋势数据
+                    playerLogs: item.playerLogs, // 玩家在线趋势数据
+                    timePeriod: item.timePeriod // 时间段
                 }));
 
                 // 合并房间操作趋势数据
@@ -177,6 +178,7 @@
                             const roomTrendInfo = roomCounts[params[1].dataIndex];
 
                             let playerContent = '<div style="padding: 10px; max-width: 280px; word-wrap: break-word;">';
+                            playerContent += '时间: ' + playerTrendInfo.timePeriod + '<br/>';
                             playerContent += '<strong>玩家在线数据</strong><br/>';
                             playerContent += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:<br/>';
                             if (Array.isArray(playerTrendInfo.playerLogs)) {
