@@ -152,54 +152,34 @@
                     },
                     tooltip: {
                         trigger: 'axis',
-                        position: function (point, params, dom, rect, size) {
-                            // 获取tooltip的宽度和高度
-                            const tooltipWidth = 300; // 假定tooltip宽度为300px
-                            const tooltipHeight = 200; // 假定tooltip高度为200px
-
-                            // 获取当前鼠标位置
-                            let tooltipX = point[0];
-                            let tooltipY = point[1];
-
-                            // 确保tooltip不会超出页面右侧边界
-                            if (tooltipX + tooltipWidth > size.viewSize[0]) {
-                                tooltipX = size.viewSize[0] - tooltipWidth;
-                            }
-
-                            // 确保tooltip不会超出页面底部边界
-                            if (tooltipY + tooltipHeight > size.viewSize[1]) {
-                                tooltipY = size.viewSize[1] - tooltipHeight;
-                            }
-
-                            return [tooltipX, tooltipY];
-                        },
                         formatter: (params) => {
                             const playerTrendInfo = counts[params[0].dataIndex];
                             const roomTrendInfo = roomCounts[params[1].dataIndex];
 
-                            let playerContent = '<div style="padding: 10px; max-width: 280px; word-wrap: break-word;">';
-                            playerContent += '时间: ' + playerTrendInfo.timePeriod + '<br/>';
-                            playerContent += '<strong>玩家在线数据</strong><br/>';
-                            playerContent += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:<br/>';
+                            let content = '';
+
+                            // 玩家在线数据
+                            content += '时间: ' + playerTrendInfo.timePeriod + '<br/>';
+                            content += '<strong>玩家在线数据</strong><br/>';
+                            content += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:<br/>';
                             if (Array.isArray(playerTrendInfo.playerLogs)) {
                                 playerTrendInfo.playerLogs.forEach(log => {
-                                    playerContent += '用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage + '<br/>';
+                                    content += '用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage + '<br/>';
                                 });
                             } else {
-                                playerContent += '没有玩家详情';
+                                content += '没有玩家详情';
                             }
-                            playerContent += '</div>';
 
-                            let roomContent = '<div style="padding: 10px; max-width: 280px; word-wrap: break-word;">';
-                            roomContent += '<strong>房间操作数据</strong><br/>';
-                            roomContent += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
-                            roomContent += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
-                            roomContent += '生存天数: ' + roomTrendInfo.playDay + '<br/>';
-                            roomContent += '</div>';
+                            content += '<strong>房间操作数据</strong><br/>';
+                            content += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
+                            content += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
+                            content += '生存天数: ' + roomTrendInfo.playDay + '<br/>';
 
-                            return playerContent + roomContent;
+                            return content;
                         }
+
                     },
+
 
                     xAxis: {
                         type: 'category',
