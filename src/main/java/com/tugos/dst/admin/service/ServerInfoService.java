@@ -3,6 +3,7 @@ package com.tugos.dst.admin.service;
 import com.tugos.dst.admin.common.ResultVO;
 import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
 import com.tugos.dst.admin.entity.ServerInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,8 @@ public class ServerInfoService {
         dstServerInfoData.setIp(serverInfo.getIp());
         dstServerInfoData.setName(serverInfo.getName());
         dstServerInfoData.setUsername(serverInfo.getUsername());
-        dstServerInfoData.setPassword(serverInfo.getPassword());
+        if (StringUtils.isNotBlank(serverInfo.getPassword()) && serverInfo.getPassword() != "***")
+            dstServerInfoData.setPassword(serverInfo.getPassword());
         dstServerInfoDataMapper.updateById(dstServerInfoData);
         return ResultVO.success();
     }
