@@ -54,39 +54,45 @@ public class RoomService {
         }
 
 
-        //配置每天6点更新游戏
-        roomInfo.scheduleUpdateMap = new TreeMap<>();
-        roomInfo.scheduleUpdateMap.put("01:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("02:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("03:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("04:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("05:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("06:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("07:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("08:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("09:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("10:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("11:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("12:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("13:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("14:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("15:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("16:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("17:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("18:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("19:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("20:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("21:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("22:00:00", 0);
-        roomInfo.scheduleUpdateMap.put("23:00:00", 0);
+        //一小时更新一次mod
+        roomInfo.scheduleUpdateModMap = new TreeMap<>();
+        roomInfo.scheduleUpdateModMap.put("01:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("02:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("03:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("04:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("05:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("06:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("07:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("08:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("09:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("10:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("11:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("12:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("13:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("14:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("15:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("16:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("17:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("18:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("19:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("20:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("21:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("22:00:00", 0);
+        roomInfo.scheduleUpdateModMap.put("23:00:00", 0);
         //每天6点，18点备份
         roomInfo.scheduleBackupMap = new TreeMap<>();
         roomInfo.scheduleBackupMap.put("06:00:00", 0);
         roomInfo.scheduleBackupMap.put("18:00:00", 0);
+        //六点更新服务器
+        roomInfo.scheduleUpdateServerMap.put("06:00:00", 0);
 
         roomInfo.setAutoStartMaster(true);
         roomInfo.setAutoStartCaves(true);
         roomInfo.setAutoRegenerate(false);
+
+        //默认自动更新开启
+        roomInfo.setSmartUpdateMod(true);
+        roomInfo.setSmartUpdateServer(true);
 
         roomInfoMapper.insert(roomInfo);
         //创建新房间的文件夹

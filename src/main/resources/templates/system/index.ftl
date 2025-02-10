@@ -45,46 +45,52 @@
 
             <el-card class="card">
                 <div slot="header" class="clearfix">
-                    <span><@spring.message code="setting.system.time.task.update.game"/></span>
-<#--                    <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.time.task.update.game.not.start"/>：</span>-->
-<#--                        <el-checkbox v-model="notStartMaster"><@spring.message code="setting.system.ground"/></el-checkbox>-->
-<#--                        <el-checkbox v-model="notStartCaves"><@spring.message code="setting.system.cave"/></el-checkbox>-->
-
+                    <span>定时更新游戏服务器</span>
                     <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.smart.update"/>：</span>
-                    <el-switch v-model="smartUpdate" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
+                    <el-switch v-model="smartUpdateServer" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
+                    <span>（定时时间到时关闭所有房间，更新服务器版本，更新成功后开启所有房间）</span>
                 </div>
-                    <div v-for="item in scheduleVO.updateTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
+                <div v-for="item in scheduleVO.updateServerTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
+                    <strong style="color: green" v-if="item.count > 0">
+                        <@spring.message code="setting.system.task.execution.status.done"/></strong><strong style="color: orange" v-if="item.count === 0">
+                        <@spring.message code="setting.system.task.execution.status.not.performed"/></strong>
+                </div>
+                <el-row style="margin: 5px">
+                    <el-col :span="5">
+                        <el-button :size="size" type="primary" @click="addUpdateServerTime()"><@spring.message code="setting.player.admin.add"/> <@spring.message code="setting.system.task.execution.time"/></el-button>
+                    </el-col>
+                </el-row>
+
+                <tempate v-for="(item,key) in updateServerTimeList">
+                    <div style="margin: 5px">
+                        <el-time-picker :size="size" style="width:120px" placeholder="<@spring.message code="home.pane1.card1.dst.please.choose"/> <@spring.message code="setting.system.task.execution.time"/>" v-model="item.time" clearable></el-time-picker>
+                        <el-button :size="size" type="warning" style="margin-left: 5px" @click="delUpdateServerTime(key)"><@spring.message code="setting.player.admin.delete"/></el-button>
+                    </div>
+                </tempate>
+            </el-card>
+
+            <el-card class="card">
+                <div slot="header" class="clearfix">
+                    <span>定时更新游戏mod</span>
+                    <span style="color: red;margin-left: 40px"><@spring.message code="setting.system.smart.update"/>：</span>
+                    <el-switch v-model="smartUpdateMod" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
+                    <span>（定时时间到时如果房间无人，重启房间以更新mod）</span>
+                </div>
+                    <div v-for="item in scheduleVO.updateModTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
                         <strong style="color: green" v-if="item.count > 0">
                             <@spring.message code="setting.system.task.execution.status.done"/></strong><strong style="color: orange" v-if="item.count === 0">
                             <@spring.message code="setting.system.task.execution.status.not.performed"/></strong>
                     </div>
                 <el-row style="margin: 5px">
                     <el-col :span="5">
-                        <el-button :size="size" type="primary" @click="addUpdateTime()"><@spring.message code="setting.player.admin.add"/> <@spring.message code="setting.system.task.execution.time"/></el-button>
+                        <el-button :size="size" type="primary" @click="addUpdateModTime()"><@spring.message code="setting.player.admin.add"/> <@spring.message code="setting.system.task.execution.time"/></el-button>
                     </el-col>
-                    <!-- 新增按钮代码 START -->
-                    <el-col :span="5" style="margin-left: 10px;">
-                        <el-button :size="size" type="primary" @click="setIntervalTimes(1)">
-                            间隔一小时执行
-                        </el-button>
-                    </el-col>
-                    <el-col :span="5" style="margin-left: 10px;">
-                        <el-button :size="size" type="primary" @click="setIntervalTimes(2)">
-                            间隔两小时执行
-                        </el-button>
-                    </el-col>
-                    <el-col :span="5" style="margin-left: 10px;">
-                        <el-button :size="size" type="primary" @click="setIntervalTimes(3)">
-                            间隔三小时执行
-                        </el-button>
-                    </el-col>
-                    <!-- 新增按钮代码 END -->
                 </el-row>
 
-                <tempate v-for="(item,key) in updateTimeList">
+                <tempate v-for="(item,key) in updateModTimeList">
                     <div style="margin: 5px">
                         <el-time-picker :size="size" style="width:120px" placeholder="<@spring.message code="home.pane1.card1.dst.please.choose"/> <@spring.message code="setting.system.task.execution.time"/>" v-model="item.time" clearable></el-time-picker>
-                        <el-button :size="size" type="warning" style="margin-left: 5px" @click="delUpdateTime(key)"><@spring.message code="setting.player.admin.delete"/></el-button>
+                        <el-button :size="size" type="warning" style="margin-left: 5px" @click="delUpdateModTime(key)"><@spring.message code="setting.player.admin.delete"/></el-button>
                     </div>
                 </tempate>
             </el-card>
@@ -248,13 +254,16 @@
             cavesLog: [],
             chatLog: [],
             scheduleVO: undefined,
-            updateTimeList: [],
+            updateModTimeList: [],
+            updateServerTimeList: [],
             backupTimeList: [],
-            smartUpdate:false,
+            smartUpdateMod:false,
+            smartUpdateServer:false,
             versionMap: {},
             model: {
                 backupTimeList: [],
-                updateTimeList: [],
+                updateModTimeList: [],
+                updateServerTimeList: [],
             },
             labelPosition:'left',
             size:'medium',
@@ -274,21 +283,6 @@
             }
           },
         methods: {
-            // 新增方法用来新增更新间隔时间 START
-            setIntervalTimes(intervalHours) {
-                // 清空当前的 updateTimeList
-                this.updateTimeList = [];
-
-                // 创建新的时间点，间隔 intervalHours 小时
-                for (let i = 0; i < 24; i += intervalHours) {
-
-                    let timeStr = '2020-10-23 ' + i.toString().padStart(2, '0')+':00:00';
-                    console.log(timeStr);
-                    this.updateTimeList.push({ count: 0, time: timeStr });
-
-                }
-            },
-            // 新增方法 END
             getLabelPosition(){
                 let windowWidth = window.innerWidth
                     console.log('getLabelPosition',windowWidth)
@@ -306,14 +300,23 @@
                 get("/system/getScheduleList?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
                     this.scheduleVO = data;
                     //初始化
-                    this.updateTimeList = [];
+                    this.updateModTimeList = [];
+                    this.updateServerTimeList = [];
                     this.backupTimeList = [];
-                    if (this.scheduleVO.updateTimeList) {
-                        this.scheduleVO.updateTimeList.forEach(e => {
+                    if (this.scheduleVO.updateModTimeList) {
+                        this.scheduleVO.updateModTimeList.forEach(e => {
                             let obj = {};
                             obj.time = "2020-10-23 " + e.time;
                             obj.count = e.count;
-                            this.updateTimeList.push(obj);
+                            this.updateModTimeList.push(obj);
+                        })
+                    }
+                    if (this.scheduleVO.updateServerTimeList) {
+                        this.scheduleVO.updateServerTimeList.forEach(e => {
+                            let obj = {};
+                            obj.time = "2020-10-23 " + e.time;
+                            obj.count = e.count;
+                            this.updateServerTimeList.push(obj);
                         })
                     }
                     if (this.scheduleVO.backupTimeList) {
@@ -327,7 +330,8 @@
                     this.autoStartMaster = data.autoStartMaster ? data.autoStartMaster : false;
                     this.autoStartCaves = data.autoStartCaves ? data.autoStartCaves : false;
                     this.autoRegenerate = data.autoRegenerate ? data.autoRegenerate : false;
-                    this.smartUpdate = data.smartUpdate ? data.smartUpdate : false;
+                    this.smartUpdateMod = data.smartUpdateMod ? data.smartUpdateMod : false;
+                    this.smartUpdateServer = data.smartUpdateServer ? data.smartUpdateServer : false;
                 })
             },
             getVersion(){
@@ -335,11 +339,17 @@
                     this.versionMap = data;
                 });
             },
-            addUpdateTime() {
-                this.updateTimeList.push({count: 0, time: '2020-10-23 06:00:00'});
+            addUpdateModTime() {
+                this.updateModTimeList.push({count: 0, time: '2020-10-23 06:00:00'});
             },
-            delUpdateTime(key) {
-                this.updateTimeList.splice(key, 1);
+            delUpdateModTime(key) {
+                this.updateModTimeList.splice(key, 1);
+            },
+            addUpdateServerTime() {
+                this.updateServerTimeList.push({count: 0, time: '2020-10-23 06:00:00'});
+            },
+            delUpdateServerTime(key) {
+                this.updateServerTimeList.splice(key, 1);
             },
             addBackupTime() {
                 this.backupTimeList.push({count: 0, time: '2020-10-23 06:00:00'});
@@ -374,7 +384,8 @@
             saveSchedule() {
                 let params = {};
                 params.backupTimeList = [];
-                params.updateTimeList = [];
+                params.updateModTimeList = [];
+                params.updateServerTimeList = [];
                 if (this.backupTimeList.length > 0) {
                     this.backupTimeList.forEach(e => {
                         let formatTime = this.formatTime(e.time, "yyyy-MM-dd hh:mm:ss");
@@ -382,17 +393,25 @@
                         params.backupTimeList.push(obj);
                     })
                 }
-                if (this.updateTimeList.length > 0) {
-                    this.updateTimeList.forEach(e => {
+                if (this.updateModTimeList.length > 0) {
+                    this.updateModTimeList.forEach(e => {
                         let formatTime = this.formatTime(e.time, "yyyy-MM-dd hh:mm:ss");
                         let obj = {time: formatTime, count: e.count};
-                        params.updateTimeList.push(obj);
+                        params.updateModTimeList.push(obj);
+                    })
+                }
+                if (this.updateServerTimeList.length > 0) {
+                    this.updateServerTimeList.forEach(e => {
+                        let formatTime = this.formatTime(e.time, "yyyy-MM-dd hh:mm:ss");
+                        let obj = {time: formatTime, count: e.count};
+                        params.updateServerTimeList.push(obj);
                     })
                 }
                 params.autoStartMaster = this.autoStartMaster
                 params.autoStartCaves = this.autoStartCaves
                 params.autoRegenerate = this.autoRegenerate
-                params.smartUpdate = this.smartUpdate;
+                params.smartUpdateMod = this.smartUpdateMod;
+                params.smartUpdateServer = this.smartUpdateServer;
                 post("/system/saveSchedule?roomId=" + this.roomId+"&serverId="+this.serverId, params).then((data) => {
                     if (data) {
                         this.$message({message: data.message, type: 'warning'});

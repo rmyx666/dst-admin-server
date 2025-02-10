@@ -15,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.*;
@@ -31,6 +32,7 @@ public class SystemService {
     DataService dataService;
     @Autowired
     RoomInfoMapper roomInfoMapper;
+
     /**
      * 拉取dst游戏日志
      *
@@ -69,17 +71,19 @@ public class SystemService {
     public ScheduleVO getScheduleList(String roomId) {
         RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         ScheduleVO data = new ScheduleVO();
-        Set<String> updateSet = roomInfo.scheduleUpdateMap.keySet();
-        if (CollectionUtils.isNotEmpty(updateSet)) {
-            List<ScheduleVO.InnerData> updateTimeList = new ArrayList<>();
-            updateSet.forEach(e -> {
+
+        Set<String> updateModSet = roomInfo.scheduleUpdateModMap.keySet();
+        if (CollectionUtils.isNotEmpty(updateModSet)) {
+            List<ScheduleVO.InnerData> updateModTimeList = new ArrayList<>();
+            updateModSet.forEach(e -> {
                 ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
                 innerData.setTime(e);
-                innerData.setCount(roomInfo.scheduleUpdateMap.get(e));
-                updateTimeList.add(innerData);
+                innerData.setCount(roomInfo.scheduleUpdateModMap.get(e));
+                updateModTimeList.add(innerData);
             });
-            data.setUpdateTimeList(updateTimeList);
+            data.setUpdateModTimeList(updateModTimeList);
         }
+
         Set<String> backupSet = roomInfo.scheduleBackupMap.keySet();
         if (CollectionUtils.isNotEmpty(backupSet)) {
             List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
@@ -91,10 +95,27 @@ public class SystemService {
             });
             data.setBackupTimeList(backupTimeList);
         }
+
+        Set<String> updateServerSet = roomInfo.scheduleUpdateServerMap.keySet();
+        if (CollectionUtils.isNotEmpty(updateServerSet)) {
+            List<ScheduleVO.InnerData> updateServerTimeList = new ArrayList<>();
+            updateServerSet.forEach(e -> {
+                ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
+                innerData.setTime(e);
+                innerData.setCount(roomInfo.scheduleUpdateServerMap.get(e));
+                updateServerTimeList.add(innerData);
+            });
+            data.setUpdateServerTimeList(updateServerTimeList);
+        }
+
         data.setAutoStartMaster(roomInfo.getAutoStartMaster());
         data.setAutoStartCaves(roomInfo.getAutoStartCaves());
         data.setAutoRegenerate(roomInfo.getAutoRegenerate());
-        data.setSmartUpdate(dataService.getSmartUpdate());
+
+        data.setSmartUpdateMod(roomInfo.getSmartUpdateMod());
+        data.setSmartUpdateServer(roomInfo.getSmartUpdateServer());
+
+
         return data;
     }
 
@@ -103,13 +124,14 @@ public class SystemService {
      *
      * @param vo 提交的数据
      */
+    @Transactional
     public void saveSchedule(ScheduleVO vo, String roomId) {
         RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
 
         roomInfo.clearAllData();
 
         if (CollectionUtils.isNotEmpty(vo.getBackupTimeList())) {
-            //写入缓存
+
             List<ScheduleVO.InnerData> backupTimeList = vo.getBackupTimeList();
             for (ScheduleVO.InnerData e : backupTimeList) {
                 if (StringUtils.isNotBlank(e.getTime())) {
@@ -118,22 +140,20 @@ public class SystemService {
                     roomInfo.scheduleBackupMap.put(format, e.getCount());
                 }
             }
-
-
         }
-        if (CollectionUtils.isNotEmpty(vo.getUpdateTimeList())) {
-            //写入缓存
-            List<ScheduleVO.InnerData> updateTimeList = vo.getUpdateTimeList();
+        if (CollectionUtils.isNotEmpty(vo.getUpdateModTimeList())) {
+
+            List<ScheduleVO.InnerData> updateTimeList = vo.getUpdateModTimeList();
             for (ScheduleVO.InnerData e : updateTimeList) {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
-                    roomInfo.scheduleUpdateMap.put(format, e.getCount());
+                    roomInfo.scheduleUpdateModMap.put(format, e.getCount());
                 }
-
             }
-
         }
+
+
         if (vo.getAutoStartMaster() != null) {
             roomInfo.autoStartMaster = vo.getAutoStartMaster();
         }
@@ -143,12 +163,33 @@ public class SystemService {
         if (vo.getAutoRegenerate() != null) {
             roomInfo.autoRegenerate = vo.getAutoRegenerate();
         }
-//        if (vo.getSmartUpdate() != null) {
-//            roomInfo.smartUpdate = vo.getSmartUpdate();
-//        } else {
-//            roomInfo.smartUpdate = false;
-//        }
-     roomInfoMapper.updateById(roomInfo);
+
+        if (vo.getSmartUpdateMod() != null) {
+            roomInfo.setSmartUpdateMod(vo.getSmartUpdateMod());
+        }
+
+
+        roomInfoMapper.updateById(roomInfo);
+
+        //更新所有房间的更新服务器时间
+        List<RoomInfo> roomInfos = roomInfoMapper.selectList(null);
+        for (RoomInfo info : roomInfos) {
+            if (CollectionUtils.isNotEmpty(vo.getUpdateServerTimeList())) {
+
+                List<ScheduleVO.InnerData> updateServerTimeList = vo.getUpdateServerTimeList();
+                for (ScheduleVO.InnerData e : updateServerTimeList) {
+                    if (StringUtils.isNotBlank(e.getTime())) {
+                        DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
+                        String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
+                        info.scheduleUpdateServerMap.put(format, e.getCount());
+                    }
+                }
+            }
+            if (vo.getSmartUpdateServer() != null) {
+                info.setSmartUpdateServer(vo.getSmartUpdateServer());
+            }
+            roomInfoMapper.updateById(info);
+        }
     }
 
     /**

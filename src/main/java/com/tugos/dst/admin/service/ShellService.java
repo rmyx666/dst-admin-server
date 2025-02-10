@@ -207,6 +207,21 @@ public class ShellService {
         return ShellUtil.runShell(DstConstant.CP_FILE);
     }
 
+
+    /**
+     * @Title updateServer
+     * @Description 更新游戏服务器版本
+     * @author wgr
+     * @return java.util.List<java.lang.String>
+     * @date 2025/2/7 17:21
+     */
+    public List<String> updateServer() {
+        //复制文件解决mod不能正确下载的问题
+        ShellUtil.runShell(DstConstant.CP_FILE);
+        ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
+        return ShellUtil.runShell(DstConstant.CP_FILE);
+    }
+
     /**
      * 睡眠
      *

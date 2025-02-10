@@ -6,23 +6,26 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.tugos.dst.admin.vo.ScheduleVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
- * @author qinming
- * @date 2020-10-25 23:13:42
- * <p> 本地数据库 </p>
+
+ * @Description 房间信息
+ * @author wgr
+
+ * @date 2025/2/7 18:00
  */
 
 @Data
-@TableName(value = "room_info",autoResultMap = true)
+@TableName(value = "room_info", autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,10 +37,26 @@ public class RoomInfo implements Serializable {
     //@ApiModelProperty(value = "房间名称", required = true, hidden = false)
     public String roomName;
 
-    @TableField(typeHandler = JacksonTypeHandler.class)  // 指定使用 JSON 序列化
-    //@ApiModelProperty(value = "定时更新游戏任务", required = false, hidden = true)
-    public TreeMap<String, Integer> scheduleUpdateMap;
+    /**
+     * 智能更新mod标志
+     */
+    private Boolean smartUpdateMod;
 
+    @TableField(typeHandler = JacksonTypeHandler.class)  // 指定使用 JSON 序列化
+    //@ApiModelProperty(value = "定时更新Mod任务", required = false, hidden = true)
+    public TreeMap<String, Integer> scheduleUpdateModMap;
+
+
+    /**
+     * 智能更新服务器标志
+     */
+    private Boolean smartUpdateServer;
+    /**
+     * 更新游戏服务器时间列表
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)  // 指定使用 JSON 序列化
+    //@ApiModelProperty(value = "定时更新Mod任务", required = false, hidden = true)
+    public TreeMap<String, Integer> scheduleUpdateServerMap;
 
 
     @TableField(typeHandler = JacksonTypeHandler.class)
@@ -67,8 +86,9 @@ public class RoomInfo implements Serializable {
      * 清理所有数据
      */
     public void clearAllData() {
-        scheduleUpdateMap.clear();
+        scheduleUpdateModMap.clear();
         scheduleBackupMap.clear();
+        scheduleUpdateServerMap.clear();
     }
 
 }

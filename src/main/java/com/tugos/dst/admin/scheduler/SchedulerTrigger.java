@@ -25,8 +25,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.tugos.dst.admin.init.InitUtil.CPU_NUM;
-
 /**
  * @author wgr
  * @Title 定时任务启动器
@@ -125,9 +123,9 @@ public class SchedulerTrigger {
             for (String key : backupKeySet) {
                 roomInfo.scheduleBackupMap.put(key, 0);
             }
-            Set<String> updateKeySet = roomInfo.scheduleUpdateMap.keySet();
+            Set<String> updateKeySet = roomInfo.scheduleUpdateModMap.keySet();
             for (String key : updateKeySet) {
-                roomInfo.scheduleUpdateMap.put(key, 0);
+                roomInfo.scheduleUpdateModMap.put(key, 0);
             }
             roomInfoMapper.updateById(roomInfo);
         }
@@ -148,25 +146,23 @@ public class SchedulerTrigger {
      */
     @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
     public void smartUpdateGame() {
-        Boolean smartUpdate = dataService.getSmartUpdate();
-        if (smartUpdate != null && smartUpdate) {
-            String steamVersion = DstVersionUtils.getSteamVersionV3();
-            String localVersion = DstVersionUtils.getLocalVersion();
-            if (StringUtils.isNoneBlank(steamVersion, localVersion)) {
-                long sv = Long.parseLong(steamVersion);
-                long lv = Long.parseLong(localVersion);
-                if (sv > lv) {
-                    log.info("智能更新进行...");
-                    List<RoomInfo> roomData = roomInfoMapper.selectList(null);
-                    for (RoomInfo roomInfo : roomData) {
-                        onlyUpdateGame(roomInfo);
-                    }
 
-                }
-            } else {
-                log.info("拿不到最新的版本号：steamVersion={},localVersion={}", steamVersion, localVersion);
+        String steamVersion = DstVersionUtils.getSteamVersionV3();
+        String localVersion = DstVersionUtils.getLocalVersion();
+        if (StringUtils.isNoneBlank(steamVersion, localVersion)) {
+            long sv = Long.parseLong(steamVersion);
+            long lv = Long.parseLong(localVersion);
+            if (sv > lv) {
+                LoggerUtil.systemLog("智能更新进行...");
+
+                updateServerAndRestartRoom();
+
             }
+        } else {
+            LoggerUtil.systemLog("拿不到最新的版本号：steamVersion={" + steamVersion + "},localVersion={" + localVersion + "}");
+
         }
+
     }
 
     /**
@@ -174,24 +170,24 @@ public class SchedulerTrigger {
      */
     @Scheduled(fixedDelay = 60 * 1000, initialDelay = 10 * 1000)
     public void scheduleExe() {
-        this.backupGame();
-        this.updateGame();
-
+        backupGame();
+        updateMod();
+        updateServer();
     }
 
 
     /**
-     * 更新游戏任务
+     * 更新游戏mod
      */
-    public void updateGame() {
+    public void updateMod() {
         Date currentDate = new Date();
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
         List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
-            Set<String> updateListTime = roomInfo.scheduleUpdateMap.keySet();
+            Set<String> updateListTime = roomInfo.scheduleUpdateModMap.keySet();
             if (CollectionUtils.isNotEmpty(updateListTime)) {
                 updateListTime.forEach(time -> {
-                    Integer count = roomInfo.scheduleUpdateMap.get(time);
+                    Integer count = roomInfo.scheduleUpdateModMap.get(time);
                     if (count < 1) {
                         DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
                         long execTime = parse.getTime();
@@ -204,9 +200,9 @@ public class SchedulerTrigger {
                             try {
                                 playerList = shellService.getPlayerList(roomInfo.getRoomId());
                                 if (CollectionUtils.isEmpty(playerList)) {
-                                    this.onlyUpdateGame(roomInfo);
+                                    updateMod(roomInfo);
                                     //记录执行次数
-                                    roomInfo.scheduleUpdateMap.put(time, 1);
+                                    roomInfo.scheduleUpdateModMap.put(time, 1);
                                 } else {
                                     log.info("当前时间：" + new Date().toString() + "房间ID：" + roomInfo.getRoomId() + "房间内存在玩家正在游玩，暂不更新");
                                 }
@@ -225,7 +221,16 @@ public class SchedulerTrigger {
 
     }
 
-    private void onlyUpdateGame(RoomInfo roomInfo) {
+
+    /**
+     * @param roomInfo
+     * @return void
+     * @Title UpdateMod
+     * @Description 重启指定的房间更新mod
+     * @author wgr
+     * @date 2025/2/7 17:31
+     */
+    private void updateMod(RoomInfo roomInfo) {
         shellService.sendBroadcast("服务器将马上进行更新，你将与服务器断开连接(The server will be updated immediately)", roomInfo.roomId);
         shellService.sendBroadcast("请稍后再进入房间(Please enter the room later)", roomInfo.roomId);
         try {
@@ -233,14 +238,40 @@ public class SchedulerTrigger {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        homeService.updateGame(roomInfo.roomId);
+        homeService.restart(roomInfo);
+    }
 
+    /**
+     * @return void
+     * @Title updateServerAndRestartRoom
+     * @Description 关闭所有服务器 更新游戏服务器版本 再重新启动所有服务器
+     * @author wgr
+     * @date 2025/2/7 17:20
+     */
+    private void updateServerAndRestartRoom() {
         List<RoomInfo> roomData = roomInfoMapper.selectList(null);
+
+        for (RoomInfo roomDatum : roomData) {
+            shellService.sendBroadcast("服务器将马上进行更新，你将与服务器断开连接(The server will be updated immediately)", roomDatum.roomId);
+            shellService.sendBroadcast("请稍后再进入房间(Please enter the room later)", roomDatum.roomId);
+        }
+
+        try {
+            TimeUnit.SECONDS.sleep(20);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (RoomInfo roomDatum : roomData) {
+            homeService.stop(roomDatum);
+        }
+
+        shellService.updateServer();
+
+
         for (RoomInfo roomDatum : roomData) {
             homeService.start(roomDatum);
         }
-
-
     }
 
 
@@ -272,10 +303,49 @@ public class SchedulerTrigger {
             }
             roomInfoMapper.updateById(roomInfo);
         }
-
-
     }
 
+    /**
+     * @return void
+     * @Title updateServer
+     * @Description 更新游戏服务器版本
+     * @author wgr
+     * @date 2025/2/7 17:44
+     */
+    public void updateServer() {
+        Date currentDate = new Date();
+        String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
+        List<RoomInfo> roomData = roomInfoMapper.selectList(null);
+        if (CollectionUtils.isNotEmpty(roomData)) {
+            RoomInfo roomInfo = roomData.get(0);
+            if (roomInfo.getSmartUpdateServer()) {
+                Set<String> updateServerListTime = roomInfo.scheduleUpdateServerMap.keySet();
+                //执行备份任务
+                if (CollectionUtils.isNotEmpty(updateServerListTime)) {
+                    updateServerListTime.forEach(time -> {
+                        Integer count = roomInfo.scheduleUpdateServerMap.get(time);
+                        if (count < 1) {
+                            DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
+                            long execTime = parse.getTime();
+                            long currentDateTime = currentDate.getTime();
+                            long subTime = currentDateTime - execTime;
+                            if (Range.open(0, upper).contains((int) subTime)) {
+                                LoggerUtil.systemLog("更新游戏服务器");
+                                updateServerAndRestartRoom();
+
+                                //更新所有room的状态
+                                for (RoomInfo roomDatum : roomData) {
+                                    roomDatum.scheduleUpdateServerMap.put(time, 1);
+                                    roomInfoMapper.updateById(roomDatum);
+                                }
+
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    }
 
     /**
      * @return void

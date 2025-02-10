@@ -114,6 +114,21 @@ public class HomeService {
         return ResultVO.success();
     }
 
+
+    /**
+     * @param roomInfo
+     * @return com.tugos.dst.admin.common.ResultVO<java.lang.String>
+     * @Title restart
+     * @Description 重启房间
+     * @author wgr
+     * @date 2025/2/7 17:35
+     */
+    public ResultVO<String> restart(RoomInfo roomInfo) {
+        stop(roomInfo);
+        start(roomInfo);
+        return ResultVO.success();
+    }
+
     /**
      * @param roomInfo
      * @return com.tugos.dst.admin.common.ResultVO<java.lang.String>

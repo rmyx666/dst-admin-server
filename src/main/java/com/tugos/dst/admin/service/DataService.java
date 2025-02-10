@@ -43,13 +43,7 @@ public class DataService {
 
     }
 
-    /**
-     * 智能更新标志
-     */
 
-    public Boolean getSmartUpdate() {
-        return true;
-    }
 
 
 }
