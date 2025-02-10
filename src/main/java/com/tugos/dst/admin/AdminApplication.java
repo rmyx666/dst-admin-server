@@ -8,6 +8,10 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 /**
  * @author qinming
  * @date 2020-05-17
@@ -21,6 +25,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class AdminApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
+        // 检查并创建目录
+        if (!Files.exists(Paths.get("data"))) {
+            try {
+                Files.createDirectories(Paths.get("data"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         SpringApplication.run(AdminApplication.class, args);
     }
 

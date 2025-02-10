@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS player_log (
 CREATE TABLE IF NOT EXISTS room_info (
     room_id VARCHAR(255) PRIMARY KEY,
     room_name VARCHAR(255),
+    smart_update_mod BOOLEAN,
     schedule_update_mod_map TEXT,  -- JSON 存储
+    smart_update_server BOOLEAN,
     schedule_update_server_map TEXT,  -- JSON 存储
     schedule_backup_map TEXT,  -- JSON 存储
     auto_start_master BOOLEAN, -- 修改字段名
@@ -19,8 +21,6 @@ CREATE TABLE IF NOT EXISTS room_info (
     ground_port VARCHAR(10),
     caves_port VARCHAR(10),
     auto_regenerate BOOLEAN    -- 新增字段
-    smart_update_mod BOOLEAN
-    smart_update_server BOOLEAN
 );
 CREATE TABLE IF NOT EXISTS server_info (
     id INTEGER PRIMARY KEY,                 -- 主键，自增ID
