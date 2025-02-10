@@ -184,38 +184,40 @@ public class SchedulerTrigger {
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
         List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
-            Set<String> updateListTime = roomInfo.scheduleUpdateModMap.keySet();
-            if (CollectionUtils.isNotEmpty(updateListTime)) {
-                updateListTime.forEach(time -> {
-                    Integer count = roomInfo.scheduleUpdateModMap.get(time);
-                    if (count < 1) {
-                        DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
-                        long execTime = parse.getTime();
-                        long currentDateTime = currentDate.getTime();
-                        long subTime = currentDateTime - execTime;
-                        if (Range.open(0, upper).contains((int) subTime)) {
-                            log.info("定时更新并重启游戏");
+            if (roomInfo.getSmartUpdateMod()){
+                Set<String> updateListTime = roomInfo.scheduleUpdateModMap.keySet();
+                if (CollectionUtils.isNotEmpty(updateListTime)) {
+                    updateListTime.forEach(time -> {
+                        Integer count = roomInfo.scheduleUpdateModMap.get(time);
+                        if (count < 1) {
+                            DateTime parse = DateUtil.parse(currentDateStr + " " + time, DatePattern.NORM_DATETIME_PATTERN);
+                            long execTime = parse.getTime();
+                            long currentDateTime = currentDate.getTime();
+                            long subTime = currentDateTime - execTime;
+                            if (Range.open(0, upper).contains((int) subTime)) {
+                                log.info("定时更新并重启游戏");
 
-                            List<String> playerList = null;
-                            try {
-                                playerList = shellService.getPlayerList(roomInfo.getRoomId());
-                                if (CollectionUtils.isEmpty(playerList)) {
-                                    updateMod(roomInfo);
-                                    //记录执行次数
-                                    roomInfo.scheduleUpdateModMap.put(time, 1);
-                                } else {
-                                    log.info("当前时间：" + new Date().toString() + "房间ID：" + roomInfo.getRoomId() + "房间内存在玩家正在游玩，暂不更新");
+                                List<String> playerList = null;
+                                try {
+                                    playerList = shellService.getPlayerList(roomInfo.getRoomId());
+                                    if (CollectionUtils.isEmpty(playerList)) {
+                                        updateMod(roomInfo);
+                                        //记录执行次数
+                                        roomInfo.scheduleUpdateModMap.put(time, 1);
+                                    } else {
+                                        log.info("当前时间：" + new Date().toString() + "房间ID：" + roomInfo.getRoomId() + "房间内存在玩家正在游玩，暂不更新");
+                                    }
+                                } catch (Exception e) {
+                                    log.error("更新时获取玩家列表失败或者其他原因导致失败");
                                 }
-                            } catch (Exception e) {
-                                log.error("更新时获取玩家列表失败或者其他原因导致失败");
+
+
                             }
-
-
                         }
-                    }
-                });
+                    });
+                }
+                roomInfoMapper.updateById(roomInfo);
             }
-            roomInfoMapper.updateById(roomInfo);
         }
 
 
