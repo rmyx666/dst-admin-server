@@ -183,8 +183,8 @@
         if (!Number.isInteger(value)) {
             callback(new Error('请输入数字'))
         }
-        if (value < 1 || value > 100) {
-            callback(new Error('id只能在1-100之间'))
+        if (value < 1 || value > 9) {
+            callback(new Error('id只能在1-9之间'))
         }
         callback()
     }
