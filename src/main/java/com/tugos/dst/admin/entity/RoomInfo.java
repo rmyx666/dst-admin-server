@@ -86,9 +86,12 @@ public class RoomInfo implements Serializable {
      * 清理所有数据
      */
     public void clearAllData() {
-        scheduleUpdateModMap.clear();
-        scheduleBackupMap.clear();
-        scheduleUpdateServerMap.clear();
+        if (scheduleUpdateModMap != null)
+            scheduleUpdateModMap.clear();
+        if (scheduleBackupMap != null)
+            scheduleBackupMap.clear();
+        if (scheduleUpdateServerMap != null)
+            scheduleUpdateServerMap.clear();
     }
 
 }

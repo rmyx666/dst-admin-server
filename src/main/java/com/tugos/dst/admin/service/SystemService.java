@@ -72,41 +72,48 @@ public class SystemService {
         RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
         ScheduleVO data = new ScheduleVO();
 
-        Set<String> updateModSet = roomInfo.scheduleUpdateModMap.keySet();
-        if (CollectionUtils.isNotEmpty(updateModSet)) {
-            List<ScheduleVO.InnerData> updateModTimeList = new ArrayList<>();
-            updateModSet.forEach(e -> {
-                ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
-                innerData.setTime(e);
-                innerData.setCount(roomInfo.scheduleUpdateModMap.get(e));
-                updateModTimeList.add(innerData);
-            });
-            data.setUpdateModTimeList(updateModTimeList);
+        if (roomInfo.scheduleUpdateModMap!=null) {
+            Set<String> updateModSet = roomInfo.scheduleUpdateModMap.keySet();
+            if (CollectionUtils.isNotEmpty(updateModSet)) {
+                List<ScheduleVO.InnerData> updateModTimeList = new ArrayList<>();
+                updateModSet.forEach(e -> {
+                    ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
+                    innerData.setTime(e);
+                    innerData.setCount(roomInfo.scheduleUpdateModMap.get(e));
+                    updateModTimeList.add(innerData);
+                });
+                data.setUpdateModTimeList(updateModTimeList);
+            }
         }
 
-        Set<String> backupSet = roomInfo.scheduleBackupMap.keySet();
-        if (CollectionUtils.isNotEmpty(backupSet)) {
-            List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
-            backupSet.forEach(e -> {
-                ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
-                innerData.setTime(e);
-                innerData.setCount(roomInfo.scheduleBackupMap.get(e));
-                backupTimeList.add(innerData);
-            });
-            data.setBackupTimeList(backupTimeList);
+        if (roomInfo.scheduleBackupMap!=null) {
+            Set<String> backupSet = roomInfo.scheduleBackupMap.keySet();
+            if (CollectionUtils.isNotEmpty(backupSet)) {
+                List<ScheduleVO.InnerData> backupTimeList = new ArrayList<>();
+                backupSet.forEach(e -> {
+                    ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
+                    innerData.setTime(e);
+                    innerData.setCount(roomInfo.scheduleBackupMap.get(e));
+                    backupTimeList.add(innerData);
+                });
+                data.setBackupTimeList(backupTimeList);
+            }
         }
 
-        Set<String> updateServerSet = roomInfo.scheduleUpdateServerMap.keySet();
-        if (CollectionUtils.isNotEmpty(updateServerSet)) {
-            List<ScheduleVO.InnerData> updateServerTimeList = new ArrayList<>();
-            updateServerSet.forEach(e -> {
-                ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
-                innerData.setTime(e);
-                innerData.setCount(roomInfo.scheduleUpdateServerMap.get(e));
-                updateServerTimeList.add(innerData);
-            });
-            data.setUpdateServerTimeList(updateServerTimeList);
+        if (roomInfo.scheduleUpdateServerMap!=null) {
+            Set<String> updateServerSet = roomInfo.scheduleUpdateServerMap.keySet();
+            if (CollectionUtils.isNotEmpty(updateServerSet)) {
+                List<ScheduleVO.InnerData> updateServerTimeList = new ArrayList<>();
+                updateServerSet.forEach(e -> {
+                    ScheduleVO.InnerData innerData = new ScheduleVO.InnerData();
+                    innerData.setTime(e);
+                    innerData.setCount(roomInfo.scheduleUpdateServerMap.get(e));
+                    updateServerTimeList.add(innerData);
+                });
+                data.setUpdateServerTimeList(updateServerTimeList);
+            }
         }
+
 
         data.setAutoStartMaster(roomInfo.getAutoStartMaster());
         data.setAutoStartCaves(roomInfo.getAutoStartCaves());
@@ -137,6 +144,7 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
+                    if (roomInfo.scheduleBackupMap==null)roomInfo.setScheduleBackupMap(new TreeMap<>());
                     roomInfo.scheduleBackupMap.put(format, e.getCount());
                 }
             }
@@ -148,6 +156,7 @@ public class SystemService {
                 if (StringUtils.isNotBlank(e.getTime())) {
                     DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                     String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
+                    if (roomInfo.scheduleUpdateModMap==null)roomInfo.setScheduleUpdateModMap(new TreeMap<>());
                     roomInfo.scheduleUpdateModMap.put(format, e.getCount());
                 }
             }
@@ -181,6 +190,7 @@ public class SystemService {
                     if (StringUtils.isNotBlank(e.getTime())) {
                         DateTime parse = DateUtil.parse(e.getTime(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);
                         String format = DateUtil.format(parse, DatePattern.NORM_TIME_PATTERN);
+                        if (info.scheduleUpdateServerMap==null)info.setScheduleUpdateServerMap(new TreeMap<>());
                         info.scheduleUpdateServerMap.put(format, e.getCount());
                     }
                 }
