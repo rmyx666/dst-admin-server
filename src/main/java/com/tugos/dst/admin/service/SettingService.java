@@ -90,7 +90,7 @@ public class SettingService {
         if (SettingTypeEnum.SAVE_RESTART.type.equals(vo.getType())) {
 
             RoomInfo roomInfo = roomInfoMapper.selectById(roomId);
-            homeService.start(roomInfo);
+            homeService.restart(roomInfo);
         }
         return ResultVO.success();
     }
