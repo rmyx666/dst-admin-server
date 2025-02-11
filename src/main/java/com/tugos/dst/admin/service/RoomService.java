@@ -84,7 +84,7 @@ public class RoomService {
         roomInfo.scheduleBackupMap.put("06:00:00", 0);
         roomInfo.scheduleBackupMap.put("18:00:00", 0);
         //六点更新服务器
-        roomInfo.scheduleBackupMap = new TreeMap<>();
+        roomInfo.scheduleUpdateServerMap = new TreeMap<>();
         roomInfo.scheduleUpdateServerMap.put("06:00:00", 0);
 
         roomInfo.setAutoStartMaster(true);
