@@ -10,8 +10,11 @@ import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.ShellUtil;
 import com.tugos.dst.admin.vo.RoomInfoVO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
@@ -28,17 +31,20 @@ import static com.tugos.dst.admin.utils.TransCoderUtil.convertMapToObject;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
+
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
-import java.net.URI;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+
+import org.springframework.core.io.Resource;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class UpdateProgramService {
@@ -51,6 +57,7 @@ public class UpdateProgramService {
 
     @Value("${app.version}")
     private String oldVersion;
+
 
     public void autoUpdateProgram() throws Exception {
         SystemSetting systemSetting = systemSettingMapper.selectById(1);
@@ -65,39 +72,18 @@ public class UpdateProgramService {
                 int oldVersionNum = Integer.parseInt(oldVersion);
 
                 if (newVersionNum > oldVersionNum) {
-                    LoggerUtil.systemLog("开始更新Java程序 旧版本号："+oldVersionNum+"新版本号："+newVersionNum+"主机ip："+masterProgramIp);
+                    LoggerUtil.systemLog("开始更新Java程序 旧版本号：" + oldVersionNum + "新版本号：" + newVersionNum + "主机ip：" + masterProgramIp);
                     // 目标接口 URL
-                    String url = ip+"/update/download";  // 替换成实际的接口地址
+                    String url = ip + "/update/download";  // 替换成实际的接口地址
 
-                    // 创建 RestTemplate
-                    RestTemplate restTemplate = new RestTemplate();
 
-                    // 发起 GET 请求下载文件
-                    ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, null, byte[].class);
+                    ShellUtil.runShell("cd ~ ; rm -f ~/log/fileDownload.log");
+                    ShellUtil.runShell("cd ~ ; wget " + url + " -O dst-admin-update.jar 2>&1 | tee -a ~/log/fileDownload.log");
 
-                    // 获取文件内容
-                    byte[] fileContent = response.getBody();
+                    LoggerUtil.systemLog("下载完毕准备重启 旧版本号：" + oldVersionNum + "新版本号：" + newVersionNum + "主机ip：" + masterProgramIp);
+                    ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
 
-                    // 将文件保存到根目录
-                    if (fileContent != null) {
-                        try {
-                            Path path = Paths.get(System.getProperty("user.dir"), "dst-admin-update.jar");
 
-                            // 保存文件到根目录
-                            Files.write(path, fileContent);
-                            System.out.println("文件已保存到根目录：" + path.toString());
-
-                            LoggerUtil.systemLog("下载完毕准备重启 旧版本号："+oldVersionNum+"新版本号："+newVersionNum+"主机ip："+masterProgramIp);
-                            Thread.sleep(10000);
-
-                            ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            System.err.println("文件保存失败！");
-                        }
-                    } else {
-                        System.err.println("文件内容为空！");
-                    }
                 }
             }
         }
