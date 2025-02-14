@@ -1,5 +1,6 @@
 package com.tugos.dst.admin;
 
+import com.tugos.dst.admin.logger.LoggerUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -40,5 +41,6 @@ public class AdminApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("dst-admin-饥荒管理平台-启动成功(Successfully started)......");
+        LoggerUtil.systemLog("dst-admin-饥荒管理平台-启动成功(Successfully started)......");
     }
 }

@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import com.tugos.dst.admin.dao.SystemSettingMapper;
 import com.tugos.dst.admin.entity.ServerInfo;
 import com.tugos.dst.admin.entity.SystemSetting;
+import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.ShellUtil;
 import com.tugos.dst.admin.vo.RoomInfoVO;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,6 +65,7 @@ public class UpdateProgramService {
                 int oldVersionNum = Integer.parseInt(oldVersion);
 
                 if (newVersionNum > oldVersionNum) {
+                    LoggerUtil.systemLog("开始更新Java程序 旧版本号："+oldVersionNum+"新版本号："+newVersionNum+"主机ip："+masterProgramIp);
                     // 目标接口 URL
                     String url = ip+"/update/download";  // 替换成实际的接口地址
 
@@ -84,6 +87,7 @@ public class UpdateProgramService {
                             Files.write(path, fileContent);
                             System.out.println("文件已保存到根目录：" + path.toString());
 
+                            LoggerUtil.systemLog("下载完毕准备重启 旧版本号："+oldVersionNum+"新版本号："+newVersionNum+"主机ip："+masterProgramIp);
                             Thread.sleep(10000);
 
                             ShellUtil.runShell(DstConstant.UPDATE_JAVAPROGRAM);
@@ -101,10 +105,9 @@ public class UpdateProgramService {
 
     public void sendMasterProgramIp() throws Exception {
 
-        // 获取本机的 InetAddress
-        InetAddress localHost = InetAddress.getLocalHost();
-        // 获取本机的 IP 地址
-        String masterIp = localHost.getHostAddress();
+        URL url = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+        String masterIp = in.readLine(); // 读取返回的 IP 地址
 
 
         List<ServerInfo> serverInfoList = serverInfoService.getServerInfoList();

@@ -206,6 +206,8 @@ public class BackupService {
      * @return 结果
      */
     public ResultVO<String> backup(String name, String roomId) {
+        LoggerUtil.systemLog("开始自动备份存档 房间id：" + roomId );
+
         if (!this.checkGameFileIsExists(roomId)) {
             //未安装dst
             return ResultVO.fail(I18nResourcesConfig.getMessage("tip.home.backup.error"));

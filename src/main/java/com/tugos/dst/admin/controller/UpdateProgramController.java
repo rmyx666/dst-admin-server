@@ -27,7 +27,8 @@ import java.nio.file.Paths;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
-
+import java.io.*;
+import java.net.*;
 /**
  * @author wgr
  * @Description 用来上传和下载更新jar包的
@@ -46,7 +47,7 @@ public class UpdateProgramController {
 
     @GetMapping("/version")
     @ResponseBody
-    public String getVersion() {
+    public String getVersion() throws IOException {
         return version;
     }
 
@@ -79,15 +80,5 @@ public class UpdateProgramController {
         return ResultVO.success();
     }
 
-    public static void main(String[] args) {
-        try {
-            // 获取本机的 InetAddress
-            InetAddress localHost = InetAddress.getLocalHost();
-            // 获取本机的 IP 地址
-            String ip = localHost.getHostAddress();
-            System.out.println("本机 IP 地址: " + ip);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
+
 }

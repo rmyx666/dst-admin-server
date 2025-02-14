@@ -54,30 +54,13 @@ public class RoomService {
         }
 
 
-        //一小时更新一次mod
+        //更新一次mod
         roomInfo.scheduleUpdateModMap = new TreeMap<>();
         roomInfo.scheduleUpdateModMap.put("01:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("02:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("03:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("04:00:00", 0);
         roomInfo.scheduleUpdateModMap.put("05:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("06:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("07:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("08:00:00", 0);
         roomInfo.scheduleUpdateModMap.put("09:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("10:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("11:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("12:00:00", 0);
         roomInfo.scheduleUpdateModMap.put("13:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("14:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("15:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("16:00:00", 0);
         roomInfo.scheduleUpdateModMap.put("17:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("18:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("19:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("20:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("21:00:00", 0);
-        roomInfo.scheduleUpdateModMap.put("22:00:00", 0);
         roomInfo.scheduleUpdateModMap.put("23:00:00", 0);
         //每天6点，18点备份
         roomInfo.scheduleBackupMap = new TreeMap<>();
@@ -313,7 +296,7 @@ public class RoomService {
                     break;
                 default:
             }
-        }else {
+        } else {
             StopTypeEnum typeEnum = StopTypeEnum.get(type);
             Objects.requireNonNull(typeEnum);
             switch (typeEnum) {
