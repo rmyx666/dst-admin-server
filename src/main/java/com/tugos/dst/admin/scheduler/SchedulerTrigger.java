@@ -152,14 +152,14 @@ public class SchedulerTrigger {
 //    }
 
     /**
-     * 智能更新，每30分钟向子服务器发送ip地址
+     * 智能更新，每30分钟向子服务器发送ip地址 延迟5分钟
      */
-    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
+    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 5)
     public void autosendMasterProgramIp() throws Exception {
         updateProgramService.sendMasterProgramIp();
     }
     /**
-     * 智能更新，每30分钟丛主服务器获取最近的jar包
+     * 智能更新，每30分钟丛主服务器获取最近的jar包 延迟三十分钟
      */
     @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
     public void autoUpdateProgram() throws Exception {
