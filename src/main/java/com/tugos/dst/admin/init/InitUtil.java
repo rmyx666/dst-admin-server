@@ -2,7 +2,9 @@ package com.tugos.dst.admin.init;
 
 import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
+import com.tugos.dst.admin.dao.SystemSettingMapper;
 import com.tugos.dst.admin.dao.UserMapper;
+import com.tugos.dst.admin.entity.SystemSetting;
 import com.tugos.dst.admin.entity.User;
 import com.tugos.dst.admin.service.DataService;
 import com.tugos.dst.admin.systementity.Server;
@@ -39,6 +41,8 @@ public class InitUtil {
     DstServerInfoDataMapper dstServerInfoDataMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    SystemSettingMapper systemSettingMapper;
 
     @Value("${dst.username:admin}")
     private String dstUser;
@@ -82,10 +86,25 @@ public class InitUtil {
                     .build();
             userMapper.insert(user);
         }
-
-
     }
 
+    /**
+     * @Title initSystemSetting
+     * @Description 初始化系统设置
+     * @author wgr
+     * @return void
+     * @date 2025/2/14 11:40
+     */
+    @PostConstruct
+    public void initSystemSetting() throws Exception {
+        if (systemSettingMapper.selectById(1L) == null) {
+            SystemSetting systemSetting = SystemSetting.builder()
+                    .id(1L)
+                    .autoSendqq(true)
+                    .build();
+            systemSettingMapper.insert(systemSetting);
+        }
+    }
 /**
  * @Title initCpuNum
  * @Description 获取当前cpu核数 目前不需要

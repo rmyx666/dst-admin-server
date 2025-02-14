@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Range;
 import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
+import com.tugos.dst.admin.dao.SystemSettingMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.entity.RoomInfo;
+import com.tugos.dst.admin.entity.SystemSetting;
 import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.service.*;
 import com.tugos.dst.admin.utils.*;
@@ -53,6 +55,18 @@ public class SchedulerTrigger {
     RoomInfoMapper roomInfoMapper;
     @Autowired
     RoomOperationLogService roomOperationLogService;
+    @Autowired
+    UpdateProgramService updateProgramService;
+    /**
+     * 最大阈值 3分钟
+     * 任务时间在当前时间的0到3分钟之间执行
+     */
+    public int upper = 3 * 60 * 1000;
+
+    @Autowired
+    PlayerLogMapper playerLogMapper;
+    @Autowired
+    SystemSettingMapper systemSettingMapper;
 
     /**
      * @return void
@@ -85,16 +99,7 @@ public class SchedulerTrigger {
     }
 
 
-    /**
-     * 最大阈值 3分钟
-     * 任务时间在当前时间的0到3分钟之间执行
-     */
-    public int upper = 3 * 60 * 1000;
 
-    @Autowired
-    DataService dataService;
-    @Autowired
-    PlayerLogMapper playerLogMapper;
 
     /**
      * 每十分钟发送一个公告广播
@@ -102,12 +107,17 @@ public class SchedulerTrigger {
     @Scheduled(fixedRate = 600000)
     public void sendMsg() throws InterruptedException {
 
-        List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
-        String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
-        for (String roomId : collect) {
-            shellService.sendBroadcast(message, roomId);
-            Thread.sleep(1000);
+        SystemSetting systemSetting = systemSettingMapper.selectById(1);
+        if (systemSetting.getAutoSendqq()){
+            List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
+            String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
+            for (String roomId : collect) {
+                shellService.sendBroadcast(message, roomId);
+                Thread.sleep(1000);
+            }
         }
+
+
 
     }
 
@@ -140,6 +150,21 @@ public class SchedulerTrigger {
 //    public void updateJavaProgram() {
 //        javaProgramUpdateUtil.updateJavaProgram();
 //    }
+
+    /**
+     * 智能更新，每30分钟向子服务器发送ip地址
+     */
+    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
+    public void autosendMasterProgramIp() throws Exception {
+        updateProgramService.sendMasterProgramIp();
+    }
+    /**
+     * 智能更新，每30分钟丛主服务器获取最近的jar包
+     */
+    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
+    public void autoUpdateProgram() throws Exception {
+        updateProgramService.autoUpdateProgram();
+    }
 
     /**
      * 智能更新，每30分钟检查一下最新版本
@@ -184,7 +209,7 @@ public class SchedulerTrigger {
         String currentDateStr = DateUtil.format(currentDate, DatePattern.NORM_DATE_PATTERN);
         List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
-            if (roomInfo.getSmartUpdateMod()){
+            if (roomInfo.getSmartUpdateMod()) {
                 Set<String> updateListTime = roomInfo.scheduleUpdateModMap.keySet();
                 if (CollectionUtils.isNotEmpty(updateListTime)) {
                     updateListTime.forEach(time -> {

@@ -49,7 +49,9 @@ public class ShiroConfig {
         filterMap.put("/webjars/**", "anon");
         filterMap.put("/swagger-resources/**", "anon");
         filterMap.put("/v2/api-docs", "anon");
-        //忽略测试用的接口
+        //忽略下载接口
+        filterMap.put("/update/download", "anon");
+        filterMap.put("/update/version", "anon");
 
         // 通过配置文件方式配置的[anon]忽略规则
         String[] excludes = properties.getExcludes().split(",");
