@@ -13,7 +13,7 @@ status() {
 start() {
   if [[ -z $(ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}') ]]; then
     #    停止了
-    nohup java -jar -Xms100m -Xmx100m ${server_name}'.jar' --server.port=8080  >/dev/null 2>&1 &
+    nohup java -jar -Xms200m -Xmx200m ${server_name}'.jar' --server.port=8080  >/dev/null 2>&1 &
     sleep 2
     if [[ -n $(ps -ef | grep -v grep | grep ${server_name} | sed -n '1P' | awk '{print $2}') ]]; then
       echo -e "\033[36m ##: 启动成功(Start successfully) ~ \033[0m"
