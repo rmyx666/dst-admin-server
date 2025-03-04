@@ -8,10 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Range;
 import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.dao.PlayerLogMapper;
-import com.tugos.dst.admin.dao.SystemSettingMapper;
 import com.tugos.dst.admin.entity.PlayerLog;
 import com.tugos.dst.admin.entity.RoomInfo;
-import com.tugos.dst.admin.entity.SystemSetting;
 import com.tugos.dst.admin.logger.LoggerUtil;
 import com.tugos.dst.admin.service.*;
 import com.tugos.dst.admin.utils.*;
@@ -55,8 +53,7 @@ public class SchedulerTrigger {
     RoomInfoMapper roomInfoMapper;
     @Autowired
     RoomOperationLogService roomOperationLogService;
-    @Autowired
-    UpdateProgramService updateProgramService;
+
     /**
      * 最大阈值 3分钟
      * 任务时间在当前时间的0到3分钟之间执行
@@ -65,8 +62,7 @@ public class SchedulerTrigger {
 
     @Autowired
     PlayerLogMapper playerLogMapper;
-    @Autowired
-    SystemSettingMapper systemSettingMapper;
+
 
     /**
      * @return void
@@ -85,8 +81,6 @@ public class SchedulerTrigger {
         //每分钟保存所有房间的房间运行日志
         roomOperationLogService.saveRoomOperationLog();
 
-//        autoStartOrStopGame(allPlayerLog);
-
     }
 
     /**
@@ -99,24 +93,19 @@ public class SchedulerTrigger {
     }
 
 
-
-
     /**
      * 每十分钟发送一个公告广播
      */
     @Scheduled(fixedRate = 600000)
     public void sendMsg() throws InterruptedException {
 
-        SystemSetting systemSetting = systemSettingMapper.selectById(1);
-        if (systemSetting.getAutoSendqq()){
-            List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
-            String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
-            for (String roomId : collect) {
-                shellService.sendBroadcast(message, roomId);
-                Thread.sleep(1000);
-            }
-        }
 
+        List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
+        String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
+        for (String roomId : collect) {
+            shellService.sendBroadcast(message, roomId);
+            Thread.sleep(1000);
+        }
 
 
     }
@@ -151,20 +140,6 @@ public class SchedulerTrigger {
 //        javaProgramUpdateUtil.updateJavaProgram();
 //    }
 
-    /**
-     * 智能更新，每3小时向子服务器发送ip地址 启动后延迟5分钟
-     */
-    @Scheduled(fixedDelay = 1000 * 60 * 160, initialDelay = 1000 * 60 * 5)
-    public void autosendMasterProgramIp() throws Exception {
-        updateProgramService.sendMasterProgramIp();
-    }
-    /**
-     * 智能更新，每30分钟丛主服务器获取最近的jar包 启动后延迟三十分钟
-     */
-    @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
-    public void autoUpdateProgram() throws Exception {
-        updateProgramService.autoUpdateProgram();
-    }
 
     /**
      * 智能更新，每30分钟检查一下最新版本
@@ -185,9 +160,7 @@ public class SchedulerTrigger {
             }
         } else {
             LoggerUtil.systemLog("拿不到最新的版本号：steamVersion={" + steamVersion + "},localVersion={" + localVersion + "}");
-
         }
-
     }
 
     /**
@@ -234,7 +207,7 @@ public class SchedulerTrigger {
                                         LoggerUtil.systemLog("房间ID：" + roomInfo.getRoomId() + "房间内存在玩家正在游玩，暂不更新");
                                     }
                                 } catch (Exception e) {
-                                    log.error("更新时获取玩家列表失败或者其他原因导致失败",e);
+                                    log.error("更新时获取玩家列表失败或者其他原因导致失败", e);
                                     LoggerUtil.systemLog("更新时获取玩家列表失败或者其他原因导致失败");
                                 }
 
@@ -378,7 +351,7 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title autoRegenerateEveryday
-     * @Description 如果游戏时长大于0小于40天，且三天内用户在线时长少于60分钟，重置该世界，每天晚上六点判定一次
+     * @Description 如果游戏时长大于0小于40天，且12小时内用户在线时长少于60分钟，重置该世界，每天晚上五点判定一次
      * @author wgr
      * @date 2024/10/23 10:55
      */
@@ -388,10 +361,9 @@ public class SchedulerTrigger {
         for (RoomInfo roomInfo : roomData) {
             if (roomInfo.autoRegenerate) {
 
-
                 // 获取当前时间和一个月前的时间
                 Date now = new Date();
-                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(3L * 24 * 60 * 60)); // 3天前
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(  12 * 60 * 60)); // 12小时前
 
                 // 构建查询条件
                 QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
@@ -432,9 +404,9 @@ public class SchedulerTrigger {
             if (roomInfo.autoRegenerate) {
 
 
-                // 获取当前时间和一个月前的时间
+                // 获取当前时间和七天前的时间
                 Date now = new Date();
-                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(7L * 24 * 60 * 60)); // 30天前
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(7L * 24 * 60 * 60)); // 7天前
 
                 // 构建查询条件
                 QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
@@ -460,65 +432,4 @@ public class SchedulerTrigger {
             }
         }
     }
-
-    /**
-     * @param allPlayerLog
-     * @return void
-     * @Title autoStartOrStopGame
-     * @Description 一个服务器同时启动多个房间时，根据核心数的情况启动和关闭房间
-     * @author wgr
-     * @date 2024/10/28 14:17
-     */
-//    private void autoStartOrStopGame(Map<RoomInfo, List<PlayerLog>> allPlayerLog) {
-//
-//        int usedCpuNum = 0;
-//        List<RoomInfo> freeUseTwoCpuRoomList = new ArrayList<>();
-//        List<RoomInfo> freeUseOneCpuRoomList = new ArrayList<>();
-//        for (Map.Entry<RoomInfo, List<PlayerLog>> roomInfoListEntry : allPlayerLog.entrySet()) {
-//            if (CollectionUtils.isNotEmpty(roomInfoListEntry.getValue())) {
-//
-//                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) usedCpuNum++;
-//                if (roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) usedCpuNum++;
-//            } else {
-//                if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true) && roomInfoListEntry.getKey().getAutoStartCaves().equals(true)) {
-//                    freeUseTwoCpuRoomList.add(roomInfoListEntry.getKey());
-//                } else if (roomInfoListEntry.getKey().getAutoStartMaster().equals(true)) {
-//                    freeUseOneCpuRoomList.add(roomInfoListEntry.getKey());
-//                }
-//            }
-//        }
-//
-//        int freeCpuNum = CPU_NUM - usedCpuNum;
-//        if (freeCpuNum >= 2) {
-//            start(freeUseTwoCpuRoomList);
-//            start(freeUseOneCpuRoomList);
-//        } else if (freeCpuNum == 1) {
-//            stop(freeUseTwoCpuRoomList);
-//            start(freeUseOneCpuRoomList);
-//        } else {
-//            stop(freeUseTwoCpuRoomList);
-//            stop(freeUseOneCpuRoomList);
-//        }
-//
-//    }
-//
-//    void stop(List<RoomInfo> roomInfos) {
-//        for (RoomInfo roomInfo : roomInfos) {
-//            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
-//            if (masterStatus) {
-//                homeService.stop(roomInfo);
-//                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 因为核心数不够关闭房间");
-//            }
-//        }
-//    }
-//
-//    void start(List<RoomInfo> roomInfos) {
-//        for (RoomInfo roomInfo : roomInfos) {
-//            boolean masterStatus = shellService.getMasterStatus(roomInfo.roomId);
-//            if (!masterStatus) {
-//                homeService.start(roomInfo);
-//                LoggerUtil.systemLog("自动启停房间 房间id:" + roomInfo.roomId + " 核心数充足启动房间");
-//            }
-//        }
-//    }
 }

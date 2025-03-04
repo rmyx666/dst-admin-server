@@ -43,8 +43,3 @@ CREATE TABLE IF NOT EXISTS room_operation_log (
     caves_status BOOLEAN,                 -- 洞穴状态 true 启动
     play_day TEXT                         -- 存档内游戏天数
 );
-CREATE TABLE IF NOT EXISTS system_setting (
-    id INTEGER PRIMARY KEY,              -- 主键ID
-    master_program_ip TEXT,                -- 房间ID
-    auto_sendqq BOOLEAN -- 修改字段名
-);

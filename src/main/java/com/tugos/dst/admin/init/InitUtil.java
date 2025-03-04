@@ -1,14 +1,10 @@
 package com.tugos.dst.admin.init;
 
-import com.tugos.dst.admin.dao.RoomInfoMapper;
-import com.tugos.dst.admin.dao.DstServerInfoDataMapper;
-import com.tugos.dst.admin.dao.SystemSettingMapper;
+
 import com.tugos.dst.admin.dao.UserMapper;
-import com.tugos.dst.admin.entity.SystemSetting;
+
 import com.tugos.dst.admin.entity.User;
-import com.tugos.dst.admin.service.DataService;
-import com.tugos.dst.admin.systementity.Server;
-import com.tugos.dst.admin.systementity.serverInfo.Cpu;
+
 import com.tugos.dst.admin.utils.DstConstant;
 import com.tugos.dst.admin.utils.FileUtils;
 import com.tugos.dst.admin.utils.ShellUtil;
@@ -18,9 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 
 
 /**
@@ -34,15 +28,8 @@ import java.nio.file.Paths;
 public class InitUtil {
 
     @Autowired
-    DataService dataService;
-    @Autowired
-    RoomInfoMapper roomInfoMapper;
-    @Autowired
-    DstServerInfoDataMapper dstServerInfoDataMapper;
-    @Autowired
     UserMapper userMapper;
-    @Autowired
-    SystemSettingMapper systemSettingMapper;
+
 
     @Value("${dst.username:admin}")
     private String dstUser;
@@ -53,7 +40,6 @@ public class InitUtil {
     @Value("${dst.nickname:管理员}")
     private String nickname;
 
-    public static Integer CPU_NUM = 0;
 
 
     /**
@@ -66,11 +52,11 @@ public class InitUtil {
         //释放脚本并授权
         copyAndChmod(DstConstant.INSTALL_DST);
         copyAndChmod(DstConstant.DST_START);
-        copyAndChmod(DstConstant.UPDATE);
+//        copyAndChmod(DstConstant.UPDATE);
         copyAndChmod(DstConstant.RESTART);
         ShellUtil.runShell("sed -i 's/\\r//' ~/dstStart.sh");
         ShellUtil.runShell("sed -i 's/\\r//' ~/install.sh");
-        ShellUtil.runShell("sed -i 's/\\r//' ~/update.sh");
+//        ShellUtil.runShell("sed -i 's/\\r//' ~/update.sh");
         ShellUtil.runShell("sed -i 's/\\r//' ~/restart.sh");
 
 
@@ -88,38 +74,6 @@ public class InitUtil {
         }
     }
 
-    /**
-     * @Title initSystemSetting
-     * @Description 初始化系统设置
-     * @author wgr
-     * @return void
-     * @date 2025/2/14 11:40
-     */
-    @PostConstruct
-    public void initSystemSetting() throws Exception {
-        if (systemSettingMapper.selectById(1L) == null) {
-            SystemSetting systemSetting = SystemSetting.builder()
-                    .id(1L)
-                    .autoSendqq(true)
-                    .build();
-            systemSettingMapper.insert(systemSetting);
-        }
-    }
-/**
- * @Title initCpuNum
- * @Description 获取当前cpu核数 目前不需要
- * @author wgr
- * @return void
- * @date 2025/2/6 14:39
- */
-//    @PostConstruct
-//    public void initCpuNum() throws Exception {
-//        //获取硬件信息
-//        Server server = new Server();
-//        server.copyTo();
-//        Cpu cpu = server.getCpu();
-//        CPU_NUM = cpu.getCpuNum();
-//    }
 
     /**
      * 释放脚本并授权
