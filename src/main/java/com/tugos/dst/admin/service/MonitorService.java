@@ -129,9 +129,23 @@ public class MonitorService {
 
         String roomId = param.getRoomId();
 
+        // 查询数据库获取玩家日志
+        QueryWrapper<RoomOperationLog> getTime = new QueryWrapper<>();
+        getTime.eq("room_id", roomId)
+                .eq("play_day", "unknown_days")
+                .orderByDesc("create_time")  // 按时间降序排序
+                .last("limit 1");
+
+        RoomOperationLog latestLog = roomOperationLogMapper.selectOne(getTime);
+
         // 获取当前时间和一个月前的时间
         Date now = new Date();
         Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(30L * 24 * 60 * 60)); // 30天前
+
+        if (latestLog != null) {
+            oneMonthAgo = latestLog.getCreateTime();
+        }
+
 
         // 构建查询条件
         QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
@@ -240,7 +254,6 @@ public class MonitorService {
             if (log.getCavesStatus()) {
                 trend.setCavesStatus(true); // 如果有 cavesStatus 为 true，设置为 true
             }
-
 
 
             // 处理 playDay，保留同一时间段内 createTime 最晚的记录

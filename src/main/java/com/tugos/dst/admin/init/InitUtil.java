@@ -59,8 +59,7 @@ public class InitUtil {
 //        ShellUtil.runShell("sed -i 's/\\r//' ~/update.sh");
         ShellUtil.runShell("sed -i 's/\\r//' ~/restart.sh");
 
-        //初始化时解决服务器不能正常下载mod的问题
-        ShellUtil.runShell(DstConstant.CP_FILE);
+
     }
 
     @PostConstruct
