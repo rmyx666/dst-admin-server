@@ -115,7 +115,7 @@
                 <el-row style="margin: 5px">
                     <el-col :span="8">
                         <el-switch v-model="autoRegenerate" active-text="自动重置世界" inactive-text="关闭自动重置"></el-switch>
-                        <span>（如果游戏时长大于0小于40天，且12小时内用户在线时长少于60分钟，重置该世界，每天晚上五点判定一次 如果游戏7天内游玩时间少于60分钟，重置该世界，每周五晚上六点判定一次）</span>
+                        <span>（如果游戏时长大于0小于40天，且12小时内用户在线时长少于60分钟，重置该世界，每天晚上五点判定一次 如果游戏2天内游玩时间少于60分钟，重置该世界，每周五晚八点 周六日上午十点判定）</span>
                     </el-col>
                 </el-row>
             </el-card>

@@ -363,7 +363,7 @@ public class SchedulerTrigger {
 
                 // 获取当前时间和一个月前的时间
                 Date now = new Date();
-                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(  12 * 60 * 60)); // 12小时前
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(12 * 60 * 60)); // 12小时前
 
                 // 构建查询条件
                 QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
@@ -393,11 +393,25 @@ public class SchedulerTrigger {
     /**
      * @return void
      * @Title autoRegenerateFriday
-     * @Description 如果游戏7天内游玩时间少于60分钟，重置该世界，每周五晚上六点判定一次
+     * @Description 如果游戏2天内游玩时间少于60分钟，重置该世界，每周五六日晚上六点判定一次
      * @author wgr
      * @date 2024/10/23 10:56
      */
-    @Scheduled(cron = "0 0 18 ? * FRI")
+
+    // 每周五晚 8 点执行任务
+    @Scheduled(cron = "0 0 20 ? * FRI")
+    public void performFridayEveningTask() {
+        autoRegenerateFriday();
+    }
+
+    // 每周六和周日早上 10 点执行任务
+    @Scheduled(cron = "0 0 10 ? * SAT,SUN")
+    public void performWeekendMorningTask() {
+        autoRegenerateFriday();
+    }
+
+    // 每周五、六、日的 18:00 执行任务
+//    @Scheduled(cron = "0 0 18 ? * FRI,SAT,SUN")
     public void autoRegenerateFriday() {
         List<RoomInfo> roomData = roomInfoMapper.selectList(null);
         for (RoomInfo roomInfo : roomData) {
@@ -406,7 +420,7 @@ public class SchedulerTrigger {
 
                 // 获取当前时间和七天前的时间
                 Date now = new Date();
-                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(7L * 24 * 60 * 60)); // 7天前
+                Date oneMonthAgo = Date.from(now.toInstant().minusSeconds(2L * 24 * 60 * 60)); // 2天前
 
                 // 构建查询条件
                 QueryWrapper<PlayerLog> queryWrapper = new QueryWrapper<>();
