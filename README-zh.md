@@ -39,7 +39,8 @@ java -version
 ###  下载最新版dst-admin安装包
 
 ```bash
-wget http://156.236.75.110:9000/download/dst-admin-1.5.0.jar -O dst-admin.jar
+#wget http://156.236.75.110:9000/download/dst-admin-1.5.0.jar -O dst-admin.jar
+下载git根目录下的jar包放到服务器根目录下
 ```
 
 
@@ -60,16 +61,5 @@ java -jar dst-admin.jar
 ./dstStart.sh
 ```
 
-### 一键式部署
-```
-wget http://clouddn.tugos.cn/startDst.sh
-chmod +x ./startDst.sh
-./startDst.sh
-     
-```
-初代内存占用
-ubuntu   15200  4.0  1.6 3623152 258848 pts/6  Sl   11:03   0:29 java -jar -Xms100m -Xmx100m dst-admin.jar --server.port=8080
-
-添加sqlite之后的内存占用
-ubuntu   23457  1.0  1.8 3627476 286636 pts/6  Sl   09:22   0:57 java -jar -Xms100m -Xmx100m dst-admin.jar --server.port=8080
+启动后手动点一下更新按钮，否则可能下载不下来mod
 
