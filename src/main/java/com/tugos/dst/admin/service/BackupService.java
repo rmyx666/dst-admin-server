@@ -274,6 +274,8 @@ public class BackupService {
                 }
             } else {
                 LoggerUtil.systemLog("自动备份存档 房间id：" + roomId + " 存档天数解析异常");
+                // 天数解析异常也 备份
+                createBackup(fileName, roomId);
             }
 
         } else {
