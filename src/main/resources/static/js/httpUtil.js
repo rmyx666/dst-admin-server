@@ -61,35 +61,6 @@ function post(url, params,msg) {
     )
 }
 
-//异步请求 PUT
-function put(url, params,msg) {
-    return new Promise(((resolve, reject) => {
-            http.put(url, params).then(response => {
-                resolve(response.data)
-            }).catch(err => {
-                if (msg){
-                    msg();
-                }
-                reject(err)
-            })
-        })
-    )
-}
-
-//异步请求 DELETE
-function deleteRequest(url, params,msg) {
-    return new Promise(((resolve, reject) => {
-            http.delete(url, {params: params}).then(response => {
-                resolve(response.data)
-            }).catch(err => {
-                if (msg){
-                    msg();
-                }
-                reject(err)
-            })
-        })
-    )
-}
 
 // ========== 公告专用请求函数 - 返回完整响应对象 {code, data, message} ==========
 
@@ -107,26 +78,6 @@ function announcementGet(url, params, msg) {
 function announcementPost(url, params, msg) {
     return new Promise(((resolve, reject) => {
         http.post(url, params).then(response => {
-            resolve(response)
-        }).catch(err => {
-            reject(err)
-        })
-    }))
-}
-//更新公告
-function announcementPut(url, params, msg) {
-    return new Promise(((resolve, reject) => {
-        http.put(url, params).then(response => {
-            resolve(response)
-        }).catch(err => {
-            reject(err)
-        })
-    }))
-}
-//删除公告
-function announcementDelete(url, params, msg) {
-    return new Promise(((resolve, reject) => {
-        http.delete(url, {params: params}).then(response => {
             resolve(response)
         }).catch(err => {
             reject(err)

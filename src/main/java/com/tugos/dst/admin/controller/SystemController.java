@@ -149,7 +149,7 @@ public class SystemController {
     /**
      * 更新定时公告
      */
-    @PutMapping("/announcement/update/{id}")
+    @PostMapping("/announcement/update/{id}")
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> updateAnnouncement(@PathVariable Long id, @RequestBody ScheduledAnnouncement announcement) {
@@ -167,7 +167,7 @@ public class SystemController {
     /**
      * 删除定时公告
      */
-    @DeleteMapping("/announcement/delete/{id}")
+    @PostMapping("/announcement/delete/{id}")
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> deleteAnnouncement(@PathVariable Long id) {
@@ -181,7 +181,7 @@ public class SystemController {
     /**
      * 启用定时公告
      */
-    @PutMapping("/announcement/enable/{id}")
+    @PostMapping("/announcement/enable/{id}")
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> enableAnnouncement(@PathVariable Long id) {
@@ -196,7 +196,7 @@ public class SystemController {
     /**
      * 禁用定时公告
      */
-    @PutMapping("/announcement/disable/{id}")
+    @PostMapping("/announcement/disable/{id}")
     @ResponseBody
     @RequiresAuthentication
     public ResultVO<String> disableAnnouncement(@PathVariable Long id) {

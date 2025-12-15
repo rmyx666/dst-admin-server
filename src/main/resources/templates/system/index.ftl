@@ -540,7 +540,7 @@
                 this.currentAnnouncement.intervalMs = this.currentAnnouncement.intervalMinutes * 1000 * 60;
 
                 if (this.currentAnnouncement.id) {
-                    announcementPut("/system/announcement/update/" + this.currentAnnouncement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, this.currentAnnouncement).then((res) => {
+                    announcementPost("/system/announcement/update/" + this.currentAnnouncement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, this.currentAnnouncement).then((res) => {
                         this.$message({message: res.message, type: 'success'});
                         this.announcementDialogVisible = false;
                         this.getAnnouncementList();
@@ -563,7 +563,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    announcementDelete("/system/announcement/delete/" + id + "?roomId=" + this.roomId+"&serverId="+this.serverId).then((res) => {
+                    announcementPost("/system/announcement/delete/" + id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((res) => {
                         this.$message({message: res.message, type: 'success'});
                         this.getAnnouncementList();
                     }).catch((err) => {
@@ -574,7 +574,7 @@
             },
             toggleAnnouncement(announcement) {
                 if (announcement.isEnabled) {
-                    announcementPut("/system/announcement/enable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((res) => {
+                    announcementPost("/system/announcement/enable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((res) => {
                         this.$message({message: res.message, type: 'success'});
                         this.getAnnouncementList();
                     }).catch((err) => {
@@ -582,7 +582,7 @@
                         this.getAnnouncementList();
                     });
                 } else {
-                    announcementPut("/system/announcement/disable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((res) => {
+                    announcementPost("/system/announcement/disable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((res) => {
                         this.$message({message: res.message, type: 'success'});
                         this.getAnnouncementList();
                     }).catch((err) => {

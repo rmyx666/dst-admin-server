@@ -35,7 +35,6 @@ public class ShiroConfig {
 //        filterMap.put("/server/**", "anon");
 //        filterMap.put("/serverinfo/**", "anon");
         filterMap.put("/logout", "anon");
-        filterMap.put("/system/**", "anon");
         //忽略websocket
         filterMap.put("/websocket", "anon");
         filterMap.put("/captcha", "anon");
