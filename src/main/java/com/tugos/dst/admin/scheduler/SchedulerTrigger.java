@@ -96,19 +96,19 @@ public class SchedulerTrigger {
     /**
      * 每十分钟发送一个公告广播
      */
-    @Scheduled(fixedRate = 600000)
-    public void sendMsg() throws InterruptedException {
-
-
-        List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
-        String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
-        for (String roomId : collect) {
-            shellService.sendBroadcast(message, roomId);
-            Thread.sleep(1000);
-        }
-
-
-    }
+//    @Scheduled(fixedRate = 600000)
+//    public void sendMsg() throws InterruptedException {
+//
+//
+//        List<String> collect = roomInfoMapper.selectList(null).stream().map(x -> x.getRoomId()).collect(Collectors.toList());
+//        String message = "\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D";
+//        for (String roomId : collect) {
+//            shellService.sendBroadcast(message, roomId);
+//            Thread.sleep(1000);
+//        }
+//
+//
+//    }
 
     /**
      * 每天更新清理一下定时任务的执行次数

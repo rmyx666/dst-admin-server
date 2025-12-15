@@ -1,6 +1,9 @@
 package com.tugos.dst.admin.controller;
 
 import com.tugos.dst.admin.common.ResultVO;
+import com.tugos.dst.admin.entity.ScheduledAnnouncement;
+import com.tugos.dst.admin.scheduler.DynamicSchedulerManager;
+import com.tugos.dst.admin.service.ScheduledAnnouncementService;
 import com.tugos.dst.admin.service.SystemService;
 import com.tugos.dst.admin.vo.GamePortVO;
 import com.tugos.dst.admin.vo.ScheduleVO;
@@ -26,6 +29,12 @@ import java.util.Map;
 public class SystemController {
 
     private SystemService systemService;
+
+    @Autowired
+    private ScheduledAnnouncementService scheduledAnnouncementService;
+
+    @Autowired
+    private DynamicSchedulerManager dynamicSchedulerManager;
 
     /**
      * 系统设置页
@@ -112,6 +121,89 @@ public class SystemController {
         return ResultVO.success();
     }
 
+    /**
+     * 获取定时公告列表（按房间ID过滤）
+     */
+    @GetMapping("/announcement/list")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<List<ScheduledAnnouncement>> getAnnouncementList(@RequestParam(required = true) String roomId) {
+        return ResultVO.data(scheduledAnnouncementService.getAnnouncementsByRoomId(roomId));
+    }
+
+    /**
+     * 新增定时公告
+     */
+    @PostMapping("/announcement/add")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> addAnnouncement(@RequestBody ScheduledAnnouncement announcement) {
+        scheduledAnnouncementService.addAnnouncement(announcement);
+        // 如果启用，立即启动该公告的定时任务
+        if (announcement.getIsEnabled()) {
+            dynamicSchedulerManager.scheduleAnnouncement(announcement);
+        }
+        return ResultVO.success("公告添加成功");
+    }
+
+    /**
+     * 更新定时公告
+     */
+    @PutMapping("/announcement/update/{id}")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> updateAnnouncement(@PathVariable Long id, @RequestBody ScheduledAnnouncement announcement) {
+        announcement.setId(id);
+        scheduledAnnouncementService.updateAnnouncement(announcement);
+        // 重新安排定时任务
+        if (announcement.getIsEnabled()) {
+            dynamicSchedulerManager.rescheduleAnnouncement(announcement);
+        } else {
+            dynamicSchedulerManager.cancelAnnouncement(id);
+        }
+        return ResultVO.success("公告更新成功");
+    }
+
+    /**
+     * 删除定时公告
+     */
+    @DeleteMapping("/announcement/delete/{id}")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> deleteAnnouncement(@PathVariable Long id) {
+        // 先取消定时任务
+        dynamicSchedulerManager.cancelAnnouncement(id);
+        // 再删除数据库记录
+        scheduledAnnouncementService.deleteAnnouncement(id);
+        return ResultVO.success("公告删除成功");
+    }
+
+    /**
+     * 启用定时公告
+     */
+    @PutMapping("/announcement/enable/{id}")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> enableAnnouncement(@PathVariable Long id) {
+        scheduledAnnouncementService.enableAnnouncement(id);
+        ScheduledAnnouncement announcement = scheduledAnnouncementService.getAnnouncementById(id);
+        if (announcement != null) {
+            dynamicSchedulerManager.scheduleAnnouncement(announcement);
+        }
+        return ResultVO.success("公告已启用");
+    }
+
+    /**
+     * 禁用定时公告
+     */
+    @PutMapping("/announcement/disable/{id}")
+    @ResponseBody
+    @RequiresAuthentication
+    public ResultVO<String> disableAnnouncement(@PathVariable Long id) {
+        scheduledAnnouncementService.disableAnnouncement(id);
+        dynamicSchedulerManager.cancelAnnouncement(id);
+        return ResultVO.success("公告已禁用");
+    }
 
     @Autowired
     public void setSystemService(SystemService systemService) {

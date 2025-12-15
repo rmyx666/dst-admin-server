@@ -60,3 +60,33 @@ function post(url, params,msg) {
         })
     )
 }
+
+//异步请求 PUT
+function put(url, params,msg) {
+    return new Promise(((resolve, reject) => {
+            http.put(url, params).then(response => {
+                resolve(response.data)
+            }).catch(err => {
+                if (msg){
+                    msg();
+                }
+                reject(err)
+            })
+        })
+    )
+}
+
+//异步请求 DELETE
+function deleteRequest(url, params,msg) {
+    return new Promise(((resolve, reject) => {
+            http.delete(url, {params: params}).then(response => {
+                resolve(response.data)
+            }).catch(err => {
+                if (msg){
+                    msg();
+                }
+                reject(err)
+            })
+        })
+    )
+}

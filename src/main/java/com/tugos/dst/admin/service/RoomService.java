@@ -4,6 +4,7 @@ import com.tugos.dst.admin.common.ResultVO;
 
 import com.tugos.dst.admin.dao.RoomInfoMapper;
 import com.tugos.dst.admin.entity.RoomInfo;
+import com.tugos.dst.admin.entity.ScheduledAnnouncement;
 import com.tugos.dst.admin.enums.StartTypeEnum;
 import com.tugos.dst.admin.enums.StopTypeEnum;
 import com.tugos.dst.admin.utils.DstConstant;
@@ -44,6 +45,10 @@ public class RoomService {
     ServerService serverService;
     @Autowired
     RoomInfoMapper roomInfoMapper;
+    @Autowired
+    ScheduledAnnouncementService scheduledAnnouncementService;
+
+
 
     public ResultVO<String> saveRoomInfos(RoomInfo roomInfo) {
         roomInfo.setRoomId("SERVER_" + roomInfo.getRoomId());
@@ -79,6 +84,17 @@ public class RoomService {
         roomInfo.setSmartUpdateServer(true);
 
         roomInfoMapper.insert(roomInfo);
+
+        ScheduledAnnouncement announcement = ScheduledAnnouncement.builder()
+                .roomId(roomInfo.getRoomId())
+                .announcementName("落霞加群公告")
+                .intervalMs(600000L)
+                .announcementText("\uDB80\uDC0D 玩得开心可以加QQ群一起玩呀 683251529 \uDB80\uDC0D")
+                .remarks("落霞加群公告")
+                .build();
+        scheduledAnnouncementService.addAnnouncement(announcement);
+
+
         //创建新房间的文件夹
         String basePath = DstConstant.ROOT_PATH + DstConstant.SINGLE_SLASH + DstConstant.DST_DOC_PATH + DstConstant.SINGLE_SLASH + roomInfo.getRoomId();
         FileUtils.mkdirs(basePath);
@@ -252,6 +268,8 @@ public class RoomService {
     public ResultVO<String> delRoomInfos(String roomId) {
         //删除房间信息
         roomInfoMapper.deleteById(roomId);
+
+        scheduledAnnouncementService.deleteAnnouncementsByRoomId(roomId);
 
         //停止房间 删除房间文件夹 删除玩家日志
         homeService.delRoomPath(roomId);

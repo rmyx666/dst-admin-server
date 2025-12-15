@@ -43,3 +43,14 @@ CREATE TABLE IF NOT EXISTS room_operation_log (
     caves_status BOOLEAN,                 -- 洞穴状态 true 启动
     play_day TEXT                         -- 存档内游戏天数
 );
+CREATE TABLE IF NOT EXISTS scheduled_announcement (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,              -- 主键ID
+    room_id VARCHAR(255) NOT NULL,                    -- 房间ID
+    announcement_name VARCHAR(100) NOT NULL,          -- 公告名称
+    interval_ms BIGINT NOT NULL,                      -- 发送间隔（毫秒）
+    announcement_text TEXT NOT NULL,                  -- 公告文字内容
+    is_enabled BOOLEAN DEFAULT 1,                     -- 是否启用
+    created_time DATETIME DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
+    updated_time DATETIME DEFAULT CURRENT_TIMESTAMP,  -- 更新时间
+    remarks VARCHAR(255)                              -- 备注
+);

@@ -232,6 +232,54 @@
                 <el-button :size="size" type="primary" @click="saveGamePort()"><@spring.message code="home.pane1.card1.dst.active.save"/></el-button>
             </el-card>
         </el-tab-pane>
+        <el-tab-pane label="定时公告" name="sixth">
+            <el-card class="card">
+                <div slot="header" class="clearfix">
+                    <span>定时公告管理</span>
+                    <el-button style="float: right;" type="primary" :size="size" @click="showAddAnnouncementDialog()">新增公告</el-button>
+                </div>
+                <el-table :data="announcementList" style="width: 100%">
+                    <el-table-column prop="announcementName" label="公告名称" width="180"></el-table-column>
+                    <el-table-column prop="intervalMs" label="发送间隔(分钟)" width="150">
+                        <template slot-scope="scope">
+                            {{ Math.round(scope.row.intervalMs / 1000 / 60) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="announcementText" label="公告内容" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="isEnabled" label="状态" width="100">
+                        <template slot-scope="scope">
+                            <el-switch v-model="scope.row.isEnabled" active-color="#13ce66" inactive-color="#ff4949" @change="toggleAnnouncement(scope.row)"></el-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="200">
+                        <template slot-scope="scope">
+                            <el-button type="primary" :size="size" @click="editAnnouncement(scope.row)">编辑</el-button>
+                            <el-button type="danger" :size="size" @click="deleteAnnouncement(scope.row.id)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-card>
+            <el-dialog title="定时公告编辑" :visible.sync="announcementDialogVisible">
+                <el-form :model="currentAnnouncement" label-width="100px">
+                    <el-form-item label="公告名称">
+                        <el-input v-model="currentAnnouncement.announcementName" placeholder="请输入公告名称"></el-input>
+                    </el-form-item>
+                    <el-form-item label="发送间隔(分钟)">
+                        <el-input-number v-model="currentAnnouncement.intervalMinutes" :min="1" :step="1"></el-input-number>
+                    </el-form-item>
+                    <el-form-item label="公告内容">
+                        <el-input type="textarea" v-model="currentAnnouncement.announcementText" placeholder="请输入公告内容" rows="4"></el-input>
+                    </el-form-item>
+                    <el-form-item label="备注">
+                        <el-input v-model="currentAnnouncement.remarks" placeholder="请输入备注"></el-input>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="announcementDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="saveAnnouncement()">确定</el-button>
+                </span>
+            </el-dialog>
+        </el-tab-pane>
     </el-tabs>
 </div>
 
@@ -269,6 +317,9 @@
             labelPosition:'left',
             size:'medium',
             gamePort:{},
+            announcementList: [],
+            announcementDialogVisible: false,
+            currentAnnouncement: {},
         },
         created() {
             this.roomId = RoomUtil.getRoomId()
@@ -277,6 +328,7 @@
             this.getVersion();
             this.getLabelPosition();
             this.getGamePort();
+            this.getAnnouncementList();
         },
         mounted(){
          window.onresize = () => {
@@ -452,6 +504,80 @@
                         this.getGamePort()
                     }
                 })
+            },
+            getAnnouncementList() {
+                get("/system/announcement/list?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
+                    this.announcementList = data;
+                });
+            },
+            showAddAnnouncementDialog() {
+                this.currentAnnouncement = {
+                    announcementName: '',
+                    intervalMinutes: 10,
+                    intervalMs: 600000,
+                    announcementText: '',
+                    isEnabled: true,
+                    remarks: '',
+                    roomId: this.roomId
+                };
+                this.announcementDialogVisible = true;
+            },
+            editAnnouncement(announcement) {
+                this.currentAnnouncement = Object.assign({}, announcement);
+                this.currentAnnouncement.intervalMinutes = Math.round(this.currentAnnouncement.intervalMs / 1000 / 60);
+                this.announcementDialogVisible = true;
+            },
+            saveAnnouncement() {
+                if (!this.currentAnnouncement.announcementName) {
+                    this.$message({message: '请输入公告名称', type: 'warning'});
+                    return;
+                }
+                if (!this.currentAnnouncement.announcementText) {
+                    this.$message({message: '请输入公告内容', type: 'warning'});
+                    return;
+                }
+                // 保存前将分钟转换回毫秒
+                this.currentAnnouncement.intervalMs = this.currentAnnouncement.intervalMinutes * 1000 * 60;
+
+                if (this.currentAnnouncement.id) {
+                    put("/system/announcement/update/" + this.currentAnnouncement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, this.currentAnnouncement).then((data) => {
+                        this.$message({message: data.message, type: 'success'});
+                        this.announcementDialogVisible = false;
+                        this.getAnnouncementList();
+                    });
+                } else {
+                    post("/system/announcement/add?roomId=" + this.roomId+"&serverId="+this.serverId, this.currentAnnouncement).then((data) => {
+                        this.$message({message: data.message, type: 'success'});
+                        this.announcementDialogVisible = false;
+                        this.getAnnouncementList();
+                    });
+                }
+            },
+            deleteAnnouncement(id) {
+                this.$confirm('确定删除此公告吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    deleteRequest("/system/announcement/delete/" + id + "?roomId=" + this.roomId+"&serverId="+this.serverId).then((data) => {
+                        this.$message({message: data.message, type: 'success'});
+                        this.getAnnouncementList();
+                    });
+                }).catch(() => {
+                });
+            },
+            toggleAnnouncement(announcement) {
+                if (announcement.isEnabled) {
+                    put("/system/announcement/enable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((data) => {
+                        this.$message({message: data.message, type: 'success'});
+                        this.getAnnouncementList();
+                    });
+                } else {
+                    put("/system/announcement/disable/" + announcement.id + "?roomId=" + this.roomId+"&serverId="+this.serverId, {}).then((data) => {
+                        this.$message({message: data.message, type: 'success'});
+                        this.getAnnouncementList();
+                    });
+                }
             }
 
         }
