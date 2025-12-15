@@ -35,7 +35,7 @@ http.interceptors.response.use(
 function get(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.get(url, {params: params}).then(response => {
-                resolve(response)
+                resolve(response.data)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -50,7 +50,7 @@ function get(url, params,msg) {
 function post(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.post(url, params).then(response => {
-                resolve(response)
+                resolve(response.data)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -65,7 +65,7 @@ function post(url, params,msg) {
 function put(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.put(url, params).then(response => {
-                resolve(response)
+                resolve(response.data)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -80,7 +80,7 @@ function put(url, params,msg) {
 function deleteRequest(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.delete(url, {params: params}).then(response => {
-                resolve(response)
+                resolve(response.data)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -89,4 +89,47 @@ function deleteRequest(url, params,msg) {
             })
         })
     )
+}
+
+// ========== 公告专用请求函数 - 返回完整响应对象 {code, data, message} ==========
+
+//获取公告列表
+function announcementGet(url, params, msg) {
+    return new Promise(((resolve, reject) => {
+        http.get(url, {params: params}).then(response => {
+            resolve(response)
+        }).catch(err => {
+            reject(err)
+        })
+    }))
+}
+//新增公告
+function announcementPost(url, params, msg) {
+    return new Promise(((resolve, reject) => {
+        http.post(url, params).then(response => {
+            resolve(response)
+        }).catch(err => {
+            reject(err)
+        })
+    }))
+}
+//更新公告
+function announcementPut(url, params, msg) {
+    return new Promise(((resolve, reject) => {
+        http.put(url, params).then(response => {
+            resolve(response)
+        }).catch(err => {
+            reject(err)
+        })
+    }))
+}
+//删除公告
+function announcementDelete(url, params, msg) {
+    return new Promise(((resolve, reject) => {
+        http.delete(url, {params: params}).then(response => {
+            resolve(response)
+        }).catch(err => {
+            reject(err)
+        })
+    }))
 }
