@@ -5,7 +5,7 @@
     <#import "../system/user/spring.ftl" as spring>
     <title><@spring.message code="setting.player.title"/></title>
     <#include "../common/header.ftl"/>
-    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 
 <body>
@@ -40,10 +40,10 @@
     </el-table>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/element-ui/lib/index.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui/lib/theme-chalk/index.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/element-ui@2.15.13/lib/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.15.13/lib/theme-chalk/index.css">
 <script>
     new Vue({
         el: '#app',
@@ -152,28 +152,44 @@
                     },
                     tooltip: {
                         trigger: 'axis',
+                        confine: true,
+                        position: function(point, params, dom, rect, size) {
+                            let x = point[0];
+                            let y = point[1];
+
+                            if (x + size.contentSize[0] > window.innerWidth - 20) {
+                                x = point[0] - size.contentSize[0] - 20;
+                            }
+
+                            if (y + size.contentSize[1] > window.innerHeight - 20) {
+                                y = point[1] - size.contentSize[1] - 20;
+                            }
+
+                            return [x, y];
+                        },
                         formatter: (params) => {
                             const playerTrendInfo = counts[params[0].dataIndex];
                             const roomTrendInfo = roomCounts[params[1].dataIndex];
 
-                            let content = '';
+                            let content = '<div style="font-size: 12px; line-height: 1.6;">';
+                            content += '<strong>时间:</strong> ' + playerTrendInfo.timePeriod + '<br/>';
 
-                            // 玩家在线数据
-                            content += '时间: ' + playerTrendInfo.timePeriod + '<br/>';
-                            content += '<strong>玩家在线数据</strong><br/>';
-                            content += '玩家数量: ' + playerTrendInfo.count + '<br/>玩家详情:<br/>';
-                            if (Array.isArray(playerTrendInfo.playerLogs)) {
+                            content += '<strong>玩家数据:</strong><br/>';
+                            content += '└ 数量: ' + playerTrendInfo.count + '<br/>';
+
+                            if (Array.isArray(playerTrendInfo.playerLogs) && playerTrendInfo.playerLogs.length > 0) {
                                 playerTrendInfo.playerLogs.forEach(log => {
-                                    content += '用户ID: ' + log.userId + ', 昵称: ' + log.name + ', 角色: ' + log.prefab + ', 生存天数: ' + log.playerage + '<br/>';
+                                    content += '└ ' + log.name + '(ID:' + log.userId + ') ' + log.prefab + ' ' + log.playerage + '天<br/>';
                                 });
                             } else {
-                                content += '没有玩家详情';
+                                content += '└ 暂无玩家<br/>';
                             }
 
-                            content += '<strong>房间操作数据</strong><br/>';
-                            content += '地面状态: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
-                            content += '洞穴状态: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
-                            content += '生存天数: ' + roomTrendInfo.playDay + '<br/>';
+                            content += '<strong>房间数据:</strong><br/>';
+                            content += '└ 地面: ' + (roomTrendInfo.masterStatus ? '启动' : '停止') + '<br/>';
+                            content += '└ 洞穴: ' + (roomTrendInfo.cavesStatus ? '启动' : '停止') + '<br/>';
+                            content += '└ 天数: ' + roomTrendInfo.playDay + '<br/>';
+                            content += '</div>';
 
                             return content;
                         }
