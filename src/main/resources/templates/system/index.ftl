@@ -20,7 +20,7 @@
                 <div slot="header" class="clearfix">
                     <span><@spring.message code="setting.system.time.task.desc"/></span>
                 </div>
-                <div style="margin: 5px" v-for="item in scheduleVO.backupTimeList">
+                <div style="margin: 5px" v-if="scheduleVO && scheduleVO.backupTimeList" v-for="item in scheduleVO.backupTimeList">
                         <@spring.message code="setting.system.task.execution.time"/>：{{item.time}},
 
                         <@spring.message code="setting.system.task.execution.status"/>：
@@ -50,7 +50,7 @@
                     <el-switch v-model="smartUpdateServer" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
                     <span>（定时时间到时关闭所有房间，更新服务器版本，更新成功后开启所有房间）</span>
                 </div>
-                <div v-for="item in scheduleVO.updateServerTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
+                <div v-if="scheduleVO && scheduleVO.updateServerTimeList" v-for="item in scheduleVO.updateServerTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
                     <strong style="color: green" v-if="item.count > 0">
                         <@spring.message code="setting.system.task.execution.status.done"/></strong><strong style="color: orange" v-if="item.count === 0">
                         <@spring.message code="setting.system.task.execution.status.not.performed"/></strong>
@@ -76,7 +76,7 @@
                     <el-switch v-model="smartUpdateMod" active-text="<@spring.message code="setting.system.open"/>" inactive-text="<@spring.message code="setting.system.close"/>"></el-switch>
                     <span>（定时时间到时如果房间无人，重启房间以更新mod）</span>
                 </div>
-                    <div v-for="item in scheduleVO.updateModTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
+                    <div v-if="scheduleVO && scheduleVO.updateModTimeList" v-for="item in scheduleVO.updateModTimeList"><@spring.message code="setting.system.task.execution.time"/>：{{item.time}}, <@spring.message code="setting.system.task.execution.status"/>：
                         <strong style="color: green" v-if="item.count > 0">
                             <@spring.message code="setting.system.task.execution.status.done"/></strong><strong style="color: orange" v-if="item.count === 0">
                             <@spring.message code="setting.system.task.execution.status.not.performed"/></strong>
@@ -302,7 +302,16 @@
             masterLog: [],
             cavesLog: [],
             chatLog: [],
-            scheduleVO: undefined,
+            scheduleVO: {
+                backupTimeList: [],
+                updateServerTimeList: [],
+                updateModTimeList: [],
+                autoStartMaster: false,
+                autoStartCaves: false,
+                autoRegenerate: false,
+                smartUpdateMod: false,
+                smartUpdateServer: false
+            },
             updateModTimeList: [],
             updateServerTimeList: [],
             backupTimeList: [],
