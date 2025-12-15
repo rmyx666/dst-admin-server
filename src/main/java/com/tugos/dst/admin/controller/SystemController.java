@@ -126,7 +126,7 @@ public class SystemController {
      */
     @GetMapping("/announcement/list")
     @ResponseBody
-    @RequiresAuthentication
+//    @RequiresAuthentication
     public ResultVO<List<ScheduledAnnouncement>> getAnnouncementList(@RequestParam(required = true) String roomId) {
         return ResultVO.data(scheduledAnnouncementService.getAnnouncementsByRoomId(roomId));
     }

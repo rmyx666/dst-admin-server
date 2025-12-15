@@ -35,7 +35,7 @@ http.interceptors.response.use(
 function get(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.get(url, {params: params}).then(response => {
-                resolve(response.data)
+                resolve(response)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -50,7 +50,7 @@ function get(url, params,msg) {
 function post(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.post(url, params).then(response => {
-                resolve(response.data)
+                resolve(response)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -65,7 +65,7 @@ function post(url, params,msg) {
 function put(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.put(url, params).then(response => {
-                resolve(response.data)
+                resolve(response)
             }).catch(err => {
                 if (msg){
                     msg();
@@ -80,7 +80,7 @@ function put(url, params,msg) {
 function deleteRequest(url, params,msg) {
     return new Promise(((resolve, reject) => {
             http.delete(url, {params: params}).then(response => {
-                resolve(response.data)
+                resolve(response)
             }).catch(err => {
                 if (msg){
                     msg();
