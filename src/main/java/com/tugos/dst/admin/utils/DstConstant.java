@@ -85,10 +85,6 @@ public final class DstConstant {
      * 更新游戏目录
      */
     public static final String UPDATE_GAME_CMD = "cd ~/steamcmd ; ./steamcmd.sh +login anonymous +force_install_dir ~/dst +app_update 343050 validate +quit";
-    /**
-     * 复制文件解决mod不能正确下载的问题
-     */
-    public static final String CP_FILE = "cp ~/steamcmd/linux32/steamclient.so ~/dst/bin/lib32/";
 
     /**
      * 删除地面游戏记录

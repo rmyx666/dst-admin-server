@@ -201,10 +201,7 @@ public class ShellService {
         this.elegantShutdownMaster(roomId);
         this.elegantShutdownCaves(roomId);
 
-        //复制文件解决mod不能正确下载的问题
-        ShellUtil.runShell(DstConstant.CP_FILE);
-        ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
-        return ShellUtil.runShell(DstConstant.CP_FILE);
+        return ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
     }
 
 
@@ -216,10 +213,7 @@ public class ShellService {
      * @date 2025/2/7 17:21
      */
     public List<String> updateServer() {
-        //复制文件解决mod不能正确下载的问题
-        ShellUtil.runShell(DstConstant.CP_FILE);
-        ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
-        return ShellUtil.runShell(DstConstant.CP_FILE);
+        return ShellUtil.runShell(DstConstant.UPDATE_GAME_CMD);
     }
 
     /**
